@@ -1,0 +1,11 @@
+configobj
+loguru
+gspread
+python-telegram-bot
+pydantic
+pydantic_settings
+sqlalchemy
+aiosqlite
+alembic
+dependency-injector
+aiogram

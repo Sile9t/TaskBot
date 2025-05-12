@@ -1,0 +1,40 @@
+from loguru import logger
+from sqlalchemy.ext.asyncio import AsyncSession 
+from .base import BaseDAO
+from .models import User, Region, Role, TaskStatus, TaskPriority, Task
+
+class RegionDAO(BaseDAO[Region]):
+    model = Region
+
+class RoleDAO(BaseDAO[Role]):
+    model = Role
+
+    @classmethod
+    async def seed(cls, session: AsyncSession):
+        defaultRoles = [
+            Role(
+                name = 'Admin',
+                description = 'Administrator'
+            )
+        ]
+        
+        try:
+            for role in defaultRoles:
+                session.add(role)
+            await session.commit()
+        except Exception as e:
+            await session.rollback()
+            logger.error(f"Ошибка при seed: {e}")
+            raise e
+
+class UserDAO(BaseDAO[User]):
+    model = User
+
+class TaskPriorityDAO(BaseDAO[TaskStatus]):
+    model = TaskStatus
+
+class TaskPriorityDAO(BaseDAO[TaskPriority]):
+    model = TaskPriority
+
+class TaskDAO(BaseDAO[Task]):
+    model = Task
