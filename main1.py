@@ -4,7 +4,11 @@ from taskbot import create_app
 from telegram import Update
 from aiogram.types import BotCommand, BotCommandScopeDefault
 from config import bot, dp
+from taskbot.dao.database_middleware import DatabaseMiddlewareWithCommit, DatabaseMiddlewareWithoutCommit
 from taskbot.admin.admin import admin_router
+from taskbot.admin.role import role_router
+from taskbot.user.user import user_router
+from taskbot.dao.seed import seed
 
 """
 Точка входа в программу.
@@ -18,7 +22,8 @@ async def set_commands():
     commands = [
         BotCommand(command='help', description='Список команд'),
         BotCommand(command='start', description='Старт'),
-        BotCommand(command='admin', description='Меню администрирования'),
+        BotCommand(command='admin_panel', description='Меню администрирования'),
+        BotCommand(command='role_menu', description='Меню для должностей'),
         BotCommand(command='task_menu', description='Меню для задач'),
         BotCommand(command='task_list', description='Список задач'),
         BotCommand(command='task_add', description='Добавить задачу'),
@@ -44,8 +49,16 @@ async def stop_bot():
     await bot.session.close()
     logger.info("Бот остановлен!")
 
+
 async def main():
+    await seed()
+
+    dp.update.middleware.register(DatabaseMiddlewareWithCommit())
+    dp.update.middleware.register(DatabaseMiddlewareWithoutCommit())
+
     dp.include_router(admin_router)
+    dp.include_router(role_router)
+    dp.include_router(user_router)
 
     dp.startup.register(start_bot)
     dp.shutdown.register(stop_bot)

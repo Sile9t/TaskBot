@@ -1,20 +1,38 @@
 import asyncio
 from loguru import logger
 from aiogram import Router, F
-from aiogram.filters import CommandStart
+from aiogram.filters import CommandStart, Command
 from aiogram.fsm.context import FSMContext
 from aiogram.fsm.state import StatesGroup, State
 from aiogram.types import CallbackQuery, Message
 from config import settings, bot
 from taskbot.dao.dao import TaskDAO
 from taskbot.dao.schemas import TaskDto
-
+from taskbot.user.kbs import menu_kb, task_kb
 user_router = Router()
+
+@user_router.message(Command("help"))
+async def cmd_help(message: Message):
+    logger.info("Вызов команды user/help")
+    await message.answer(
+        f"Список комманд:",
+        reply_markup=None
+    )
+    
 
 @user_router.message(CommandStart())
 async def cmd_start(message: Message):
-    logger.info("Вызов команды /start")
+    logger.info("Вызов команды user/start")
     await message.answer(
         f"👋🏻 Привет, {message.from_user.full_name}!\nВыберите дальнейшие действия:",
-        reply_markup=None
+        reply_markup=menu_kb()
+    )
+
+
+@user_router.callback_query(F.data == "task_menu")
+async def task_menu(call: CallbackQuery):
+    logger.info("Вызов команды user/task_menu")
+    await call.message.edit_text(
+        text=f"Выберите действия с задачами:",
+        reply_markup=task_kb()
     )

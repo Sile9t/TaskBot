@@ -10,15 +10,22 @@ class RoleDAO(BaseDAO[Role]):
     model = Role
 
     @classmethod
-    async def seed(cls, session: AsyncSession):
+    async def seed(cls, self, session: AsyncSession):
         defaultRoles = [
             Role(
+                id = 1,
                 name = 'Admin',
                 description = 'Administrator'
+            ),
+            Role(
+                id = 2,
+                name = 'Worker',
+                description = 'Regular worker'
             )
         ]
         
         try:
+            self.upsert()
             for role in defaultRoles:
                 session.add(role)
             await session.commit()

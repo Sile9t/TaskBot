@@ -15,10 +15,10 @@ def menu_kb():
 def task_kb():
     kb = InlineKeyboardBuilder()
 
-    kb.button(text="✔ Закрыть задачу", callback_data="task_add")
-    # kb.button(text="➕ Добавить задачу", callback_data="task_add")
-    # kb.button(text="🖋 Редактировать задачу", callback_data="task_add")
-    # kb.button(text="➖ Удалить задачу", callback_data="task_add")
+    
+    kb.button(text="📋 Список задач", callback_data="task_list")
+    kb.button(text="✔ Закрыть задачу", callback_data="task_close")
+    kb.button(text="Назад", callback_data="admin_panel")
     kb.adjust(1)
     
     return kb.as_markup()
