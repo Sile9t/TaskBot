@@ -1,18 +1,23 @@
-import asyncio
 import locale
 from loguru import logger
-from taskbot import create_app
-from telegram import Update
+from aiogram import Bot, Dispatcher
+from aiogram.enums import ParseMode
+from aiogram.fsm.storage.memory import MemoryStorage
+from aiogram.fsm.storage.redis import RedisStorage
+from aiogram.client.default import DefaultBotProperties
 from aiogram.types import BotCommand, BotCommandScopeDefault
 from aiogram_dialog import setup_dialogs
-from config import bot, dp
+from config import settings
 from taskbot.dao.database_middleware import DatabaseMiddlewareWithCommit, DatabaseMiddlewareWithoutCommit
 from taskbot.admin.admin import admin_router
 from taskbot.admin.role import role_router
 from taskbot.admin.employee import employee_router
 from taskbot.user.user import user_router
-from taskbot.role.dialog import role_dialog
 from taskbot.dao.seed import seed
+
+bot = Bot(token=settings.BOT_TOKEN, default=DefaultBotProperties(parse_mode=ParseMode.HTML))
+storage = RedisStorage.from_url(settings.REDIS)
+dp = Dispatcher(storage=storage)
 
 async def set_commands():
     commands = [
@@ -50,35 +55,25 @@ def set_russian_locale():
             pass
 
 async def start_bot():
-    await set_commands()
-    logger.success("Бот успешно запущен.")
-
-async def stop_bot():
-    logger.error("Бот остановлен!")
-
-
-async def main():
     set_russian_locale()
     await seed()
 
     setup_dialogs(dp)
     dp.update.middleware.register(DatabaseMiddlewareWithCommit())
     dp.update.middleware.register(DatabaseMiddlewareWithoutCommit())
+    
+    await set_commands()
 
     dp.include_router(admin_router)
-    dp.include_router(role_dialog)
     dp.include_router(role_router)
     dp.include_router(employee_router)
     dp.include_router(user_router)
 
-    dp.startup.register(start_bot)
-    dp.shutdown.register(stop_bot)
-    
-    try:
-        await bot.delete_webhook(drop_pending_updates=True)
-        await dp.start_polling(bot, allowed_updates=dp.resolve_used_update_types())
-    finally:
-        await bot.session.close()
+    logger.success("Бот успешно запущен.")
 
-if __name__ == "__main__":
-    asyncio.run(main())
+async def stop_bot():
+    logger.error("Бот остановлен!")
+
+dp.startup.register(start_bot)
+dp.shutdown.register(stop_bot)
+    

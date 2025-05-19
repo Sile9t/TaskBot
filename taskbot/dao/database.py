@@ -1,6 +1,8 @@
+import uuid
 from datetime import datetime
 from typing import Annotated
-from sqlalchemy import TIMESTAMP, Integer, func
+from decimal import Decimal
+from sqlalchemy import TIMESTAMP, Integer, func, inspect
 from sqlalchemy.orm import declared_attr, DeclarativeBase, Mapped, mapped_column
 from sqlalchemy.ext.asyncio import AsyncAttrs, AsyncSession, async_sessionmaker, create_async_engine
 from config import settings
@@ -28,4 +30,32 @@ class Base(AsyncAttrs, DeclarativeBase):
     @declared_attr.directive
     def __tablename__(cls) -> str:
         return cls.__name__.lower() + 's'
+    
+    def to_dict(self, exclude_none: bool = False):
+        """
+        Преобразует объект модели в словарь.
+
+        Args:
+            exclude_none (bool): Исключать ли None значения из результата
+
+        Returns:
+            dict: Словарь с данными объекта
+        """
+        result = {}
+        for column in inspect(self.__class__).columns:
+            value = getattr(self, column.key)
+
+            # Преобразование специальных типов данных
+            if isinstance(value, datetime):
+                value = value.isoformat()
+            elif isinstance(value, Decimal):
+                value = float(value)
+            elif isinstance(value, uuid.UUID):
+                value = str(value)
+
+            # Добавляем значение в результат
+            if not exclude_none or value is not None:
+                result[column.key] = value
+
+        return result
             

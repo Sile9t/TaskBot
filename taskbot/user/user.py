@@ -29,6 +29,24 @@ async def cmd_start(message: Message):
     )
 
 
+@user_router.message(Command("cancel"))
+@user_router.message(F.text.casefold() == "cancel")
+async def cancel_handler(message: Message, state: FSMContext) -> None:
+    """
+    Allow user to cancel any action
+    """
+    current_state = await state.get_state()
+    if current_state is None:
+        return
+
+    logging.info("Cancelling state %r", current_state)
+    await state.clear()
+    await message.answer(
+        "Cancelled.",
+        reply_markup=ReplyKeyboardRemove(),
+    )
+
+
 @user_router.callback_query(F.data == "task_menu")
 async def task_menu(call: CallbackQuery):
     logger.info("Вызов команды user/task_menu")

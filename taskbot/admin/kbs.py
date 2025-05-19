@@ -1,9 +1,28 @@
 from typing import List
-from aiogram.types import InlineKeyboardMarkup, ReplyKeyboardMarkup
+from aiogram.types import InlineKeyboardMarkup, ReplyKeyboardMarkup, KeyboardButton
 from aiogram.utils.keyboard import InlineKeyboardBuilder, ReplyKeyboardBuilder
-# from taskbot.admin.utils import Pagination
 
-def admin_kb():
+def yes_no_kb():
+    kb = InlineKeyboardBuilder()
+
+    kb.button(text="Нет", callback_data='no')
+    kb.button(text="Да", callback_data='yes')
+    kb.adjust(2)
+
+    return kb.as_markup()
+
+def pass_kb():
+    kb_list = [
+        [KeyboardButton(text='Пропустить')]
+    ]
+    
+    return ReplyKeyboardMarkup(
+        keyboard=kb_list,
+        resize_keyboard=True,
+        one_time_keyboard=True
+    )
+
+def main_admin_kb(user_id: int = -1):
     kb = InlineKeyboardBuilder()
     
     kb.button(text="👩🏻‍💼👨🏻‍💼 Сотрудники", callback_data="employee_menu")
@@ -14,21 +33,7 @@ def admin_kb():
     return kb.as_markup()
 
 
-def task_kb():
-    kb = InlineKeyboardBuilder()
-
-    kb.button(text="📋 Список задач", callback_data="task_list")
-    kb.button(text="➕ Добавить задачу", callback_data="task_add")
-    kb.button(text="🖋 Редактировать задачу", callback_data="task_edit")
-    kb.button(text="➖ Удалить задачу", callback_data="task_delete")
-    kb.button(text="✔ Закрыть задачу", callback_data="task_close")
-    kb.button(text="Назад", callback_data="admin_panel")
-    kb.adjust(1, 2, 2, 1)
-
-    return kb.as_markup()
-
-
-def role_kb():
+def role_menu_kb():
     kb = InlineKeyboardBuilder()
     
     kb.button(text="📋 Список должностей", callback_data="role_list")
@@ -45,9 +50,9 @@ def role_list_kb(page: int = 1, pageCount: int = 1):
     kb = InlineKeyboardBuilder()
     
     if (page > 1):
-        kb.button(text="Предыдущие", callback_data=f"role_list_{page+1}")
+        kb.button(text="Предыдущие", callback_data=f"role_list_{page-1}")
     if (page < pageCount):
-        kb.button(text="Следующие", callback_data=f"role_list_{page-1}")
+        kb.button(text="Следующие", callback_data=f"role_list_{page+1}")
     kb.button(text="Назад", callback_data="role_menu")
     kb.adjust(2, 1)
 
@@ -63,6 +68,20 @@ def role_add_kb():
         one_time_keyboard=True,
         input_field_placeholder=f"title: Название,\ndescription: Описание"
     )
+
+
+def task_kb():
+    kb = InlineKeyboardBuilder()
+
+    kb.button(text="📋 Список задач", callback_data="task_list")
+    kb.button(text="➕ Добавить задачу", callback_data="task_add")
+    kb.button(text="🖋 Редактировать задачу", callback_data="task_edit")
+    kb.button(text="➖ Удалить задачу", callback_data="task_delete")
+    kb.button(text="✔ Закрыть задачу", callback_data="task_close")
+    kb.button(text="Назад", callback_data="admin_panel")
+    kb.adjust(1, 2, 2, 1)
+
+    return kb.as_markup()
 
 
 def task_add_kb():
@@ -84,5 +103,17 @@ def employee_kb():
     kb.button(text="✔ Изменить роль сотрудника ", callback_data="employee_change_role")
     kb.button(text="Назад", callback_data="admin_panel")
     kb.adjust(1, 2, 2, 1)
+
+    return kb.as_markup()
+
+def employee_list_kb(page: int = 1, pageCount: int = 1):
+    kb = InlineKeyboardBuilder()
+    
+    if (page > 1):
+        kb.button(text="Предыдущие", callback_data=f"role_list_{page+1}")
+    if (page < pageCount):
+        kb.button(text="Следующие", callback_data=f"role_list_{page-1}")
+    kb.button(text="Назад", callback_data="role_menu")
+    kb.adjust(2, 1)
 
     return kb.as_markup()

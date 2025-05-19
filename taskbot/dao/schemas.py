@@ -12,13 +12,15 @@ class RegionDtoBase(BaseModel):
 class RegionDto(RegionDtoBase):
     id: int = Field(frozen = True)
 
-class RoleDto(BaseModel):
-    id: int = Field(frozen = True)
+class RoleDtoBase(BaseModel):
     name: str
     description: Optional[str]
 
     model_config = ConfigDict(from_attributes=True)
 
+class RoleDto(RoleDtoBase):
+    id: int = Field(frozen = True)
+    
 
 class UserDto(BaseModel):
     id: int = Field(frozen = True)

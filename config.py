@@ -4,6 +4,7 @@ from loguru import logger
 from aiogram import Bot, Dispatcher
 from aiogram.enums import ParseMode
 from aiogram.fsm.storage.memory import MemoryStorage
+from aiogram.fsm.storage.redis import RedisStorage
 from aiogram.client.default import DefaultBotProperties
 from configobj import ConfigObj
 from pydantic_settings import BaseSettings, SettingsConfigDict
@@ -15,6 +16,8 @@ class Settings(BaseSettings):
 
     BOT_TOKEN: str
     ADMIN_IDS: List[int]
+
+    REDIS: str
 
     DB_USER: str = config['database']['user']
     DB_PASSWORD: str = config['database']['password']
@@ -35,7 +38,9 @@ class Settings(BaseSettings):
 settings = Settings()
 
 bot = Bot(token=settings.BOT_TOKEN, default=DefaultBotProperties(parse_mode=ParseMode.HTML))
-dp = Dispatcher(storage=MemoryStorage())
+# storage = RedisStorage.from_url(settings.REDIS)
+storage = MemoryStorage()
+dp = Dispatcher(storage=storage)
 admins = settings.ADMIN_IDS
 
 log_file_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "log.txt")

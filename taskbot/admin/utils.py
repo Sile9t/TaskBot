@@ -1,12 +1,16 @@
-from aiogram.filters import callback_data
+import re
 from aiogram.fsm.context import FSMContext
-from aiogram.types import Message, CallbackQuery
+from aiogram.types import Message
 from loguru import logger
 from config import bot
 
-# class Pagination(CallbackQuery, prefix="page"):
-#     page: int
-
+def extract_number(text):
+    match = re.search(r'\b(\d+)\b', text)
+    if match:
+        return int(match.group(1))
+    else:
+        return None
+    
 async def process_dell_text_msg(message: Message, state: FSMContext):
     data = await state.get_data()
     last_msg_id = data.get('last_msg_id')

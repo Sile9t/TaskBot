@@ -1,5 +1,6 @@
 configobj
 loguru
+redis
 gspread
 python-telegram-bot
 pydantic
@@ -9,3 +10,4 @@ aiosqlite
 alembic
 dependency-injector
 aiogram
+aiogram_dialog

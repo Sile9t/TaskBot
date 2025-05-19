@@ -1,5 +1,4 @@
 import asyncio
-import re
 from loguru import logger
 from typing import List
 from aiogram import Router, F
@@ -7,13 +6,9 @@ from aiogram.filters import CommandStart, Command
 from aiogram.fsm.context import FSMContext
 from aiogram.fsm.state import StatesGroup, State
 from aiogram.types import CallbackQuery, Message
-from aiogram.utils.chat_action import ChatActionSender
-from config import bot
 from pydantic import BaseModel
 from sqlalchemy.ext.asyncio import AsyncSession
-from pydantic import create_model
-from taskbot.admin.kbs import admin_kb, task_kb, role_kb, role_list_kb, employee_kb
-from taskbot.dao.session_maker import connection
+from taskbot.admin.kbs import main_admin_kb, task_kb, employee_kb
 from taskbot.dao.dao import UserDAO, RoleDAO
 from taskbot.dao.schemas import UserDto, RoleDto
 from taskbot.admin.schemas import UserTelegramId, UserRoleId
@@ -109,7 +104,7 @@ async def admin_panel(message: Message, session_without_commit: AsyncSession):
     if (user):
         return await message.answer(
             text=f"Выберите необходимое действие:",
-            reply_markup=admin_kb()
+            reply_markup=main_admin_kb()
         )
     
     await message.answer(
@@ -129,91 +124,11 @@ async def admin_panel(call: CallbackQuery, session_without_commit: AsyncSession)
         await call.answer("Доступ в админ-панель разрешен!")
         return await call.message.edit_text(
             text=f"Выберите необходимое действие:",
-            reply_markup=admin_kb()
+            reply_markup=main_admin_kb()
         )
 
     await call.message.edit_text(
         text=f"У вас нет доступа к админ-панели!",
-        reply_markup=None
-    )
-
-# #
-# Employee routes
-# #
-@admin_router.message(Command("employee_menu"))
-async def employee_menu(message: Message):
-    logger.info("Вызов кнопки admin/employee_menu")
-    await message.answer(
-        text=f"Меню для сотрудников:",
-        reply_markup=employee_kb()
-    )
-
-
-@admin_router.callback_query(F.data == "employee_menu")
-async def employee_menu(call: CallbackQuery):
-    logger.info("Вызов кнопки admin/employee_menu")
-    await call.message.edit_text(
-        text=f"Выберите действия с сотрудниками:",
-        reply_markup=employee_kb()
-    )
-
-
-@admin_router.callback_query(F.data == "employee_list")
-async def employee_list(call: CallbackQuery, session_without_commit: AsyncSession):
-    logger.info("Вызов кнопки admin/employee_list")
-    
-    employees = await UserDAO.find_all(session_without_commit, UserRoleId(role_id=3))
-
-    data = (
-        f"Список сотрудников:\n"
-    )
-
-    for employee in employees:
-        data += (
-            f"{employee}\n"
-        )
-        
-    await call.message.edit_text(
-        text=f"Список сотрудников:",
-        reply_markup=None
-    )
-
-
-@admin_router.callback_query(F.data == "employee_add")
-async def employee_add():
-    logger.info("Вызов кнопки admin/employee_add")
-    await bot.send_message(
-        chat_id="", 
-        text="Вас добавили как сотрудника"
-    )
-    
-
-# #
-# Task routes
-# #
-@admin_router.message(Command("task_menu"))
-async def task_menu(message: Message):
-    logger.info("Вызов кнопки admin/task_menu")
-    await message.answer(
-        text=f"Меню для задач:",
-        reply_markup=task_kb()
-    )
-
-
-@admin_router.callback_query(F.data == "task_menu")
-async def task_menu(call: CallbackQuery):
-    logger.info("Вызов кнопки admin/task_menu")
-    await call.message.edit_text(
-        text=f"Выберите действия с задачами:",
-        reply_markup=task_kb()
-    )
-
-
-@admin_router.callback_query(F.data == "task_list")
-async def task_list(call: CallbackQuery):
-    logger.info("Вызов кнопки admin/task_list")
-    await call.message.edit_text(
-        text=f"Список задач:",
         reply_markup=None
     )
 
