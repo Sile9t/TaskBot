@@ -88,12 +88,6 @@ async def cmd_start(message: Message, session_without_commit: AsyncSession):
     # )
 
 
-# @admin_router.message(Command("bot_stop"))
-# async def cmd_stop(call: CallbackQuery):
-#     logger.info("Вызов команды /stop")
-#     await bot.close()
-
-
 @admin_router.message(Command('admin_panel'))
 async def admin_panel(message: Message, session_without_commit: AsyncSession):
     logger.info("Вызов команды admin/admin_panel")

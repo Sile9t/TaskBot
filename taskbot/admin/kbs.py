@@ -38,7 +38,7 @@ def role_menu_kb():
     
     kb.button(text="📋 Список должностей", callback_data="role_list")
     kb.button(text="➕ Добавить должность", callback_data="role_add")
-    kb.button(text="🖋 Редактировать должность", callback_data="role_edit")
+    kb.button(text="🖋 Редактировать должность", callback_data="role_update")
     kb.button(text="➖ Удалить должность", callback_data="role_delete")
     kb.button(text="Назад", callback_data="admin_panel")
     kb.adjust(2, 2, 1)
@@ -57,17 +57,6 @@ def role_list_kb(page: int = 1, pageCount: int = 1):
     kb.adjust(2, 1)
 
     return kb.as_markup()
-
-
-def role_add_kb():
-    kb_list = [[]]
-    
-    return ReplyKeyboardMarkup(
-        keyboard=None,
-        resize_keyboard=True,
-        one_time_keyboard=True,
-        input_field_placeholder=f"title: Название,\ndescription: Описание"
-    )
 
 
 def task_kb():
