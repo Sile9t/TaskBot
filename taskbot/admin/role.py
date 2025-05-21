@@ -32,6 +32,7 @@ async def cancel_handler(message: Message, state: FSMContext) -> None:
         reply_markup=ReplyKeyboardRemove(),
     )
 
+
 @role_router.message(Command('role_menu'))
 async def role_menu(message: Message):
     logger.info("Вызов кнопки admin/role_menu")
@@ -94,36 +95,3 @@ async def role_delete(call: CallbackQuery, state: FSMContext, session_with_commi
         state=FormRemove.id,
         mode=StartMode.RESET_STACK
     )
-
-
-# @role_router.message(FormRemove.id)
-# async def role_delete(message: Message, state: FSMContext, session_with_commit: AsyncSession):
-#     logger.info("Вызов кнопки admin/role_delete")
-#     text = message.text
-
-#     id = extract_number(text)
-    
-#     if (id is not None):
-#         role = await RoleDAO.find_one_or_none_by_id(session_with_commit, id)
-
-#         if role:
-#             count = await RoleDAO.delete(
-#                 session_with_commit,
-#                 RoleDto(
-#                     id=role.id,
-#                     name=role.name,
-#                     description=role.description
-#                 )
-#             )
-            
-#             text = f"Удалено {count} записей"
-#             await state.clear()
-#             return await message.answer(
-#                 text=text,
-#                 reply_markup=None
-#             )
-    
-#     await message.answer(
-#         text="Должности с таким ID не существует. Введите ID заново.",
-#         reply_markup=None
-#     )

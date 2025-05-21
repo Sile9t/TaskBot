@@ -1,14 +1,13 @@
 from aiogram.fsm.state import StatesGroup, State
 from aiogram.types import ContentType
 from aiogram_dialog import Window
-from aiogram_dialog.widgets.kbd import Button, Group, ScrollingGroup, Select, Calendar, CalendarConfig, Back, Cancel, NumberedPager, Row
+from aiogram_dialog.widgets.kbd import Button, Group, ScrollingGroup, Select, Calendar, CalendarConfig, Back, Cancel, NumberedPager, Row, Next, SwitchTo
 from aiogram_dialog.widgets.input import MessageInput, TextInput
 from aiogram_dialog.widgets.text import Const, Format, List
-from aiogram_dialog.widgets.kbd import Next
 from aiogram_dialog.widgets.utils import WidgetSrc
 from taskbot.role.getters import get_all_roles, get_confirmed_data
 from taskbot.role.handlers import (
-    cancel_logic, on_role_selected, on_create_confirmation, on_update_confirmation, process_delete_role
+    cancel_logic, on_role_selected, on_create_confirmation, on_update_confirmation, process_delete_role, on_role_id_input_error
 )
 from taskbot.role.state import FormCreate, FormRead, FormUpdate, FormRemove
 
@@ -68,6 +67,8 @@ def get_role_id_window(stateGroup: StatesGroup = FormUpdate, ):
         
         TextInput(
             id="id",
+            type_factory=int,
+            on_error=on_role_id_input_error,
             on_success=Next()
         ),
 
@@ -154,13 +155,11 @@ def get_delete_window():
             id='roles_list',
             page_size=10
         ),
-
         NumberedPager(
             scroll='roles_list'
         ),
         
         Const("Введите номер должности."),
-        
         TextInput(
             id="id",
             type_factory=int,

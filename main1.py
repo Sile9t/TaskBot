@@ -58,7 +58,7 @@ async def start_bot():
 async def stop_bot():
     logger.error("Бот остановлен!")
 
-
+#TODO: fix tasks cancellation on bot stoping
 async def main():
     set_russian_locale()
     await seed()
@@ -84,6 +84,8 @@ async def main():
     try:
         await bot.delete_webhook(drop_pending_updates=True)
         await dp.start_polling(bot, allowed_updates=dp.resolve_used_update_types())
+    except asyncio.exceptions.CancelledError:
+        pass
     finally:
         await bot.session.close()
 

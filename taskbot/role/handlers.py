@@ -1,10 +1,11 @@
-from aiogram.types import CallbackQuery
+from typing import Any
+from aiogram.types import CallbackQuery, Message
 from aiogram_dialog import DialogManager
 from aiogram_dialog.widgets.kbd import Button
 from taskbot.dao.dao import RoleDAO
 from taskbot.dao.schemas import RoleDto, RoleDtoBase
 from taskbot.admin.kbs import main_admin_kb
-
+from taskbot.role.state import FormUpdate
 
 async def cancel_logic(callback: CallbackQuery, button: Button, dialog_manager: DialogManager):
     await callback.answer("Сценарий отменен!")
@@ -14,14 +15,31 @@ async def cancel_logic(callback: CallbackQuery, button: Button, dialog_manager: 
     )
 
 
-async def on_role_selected(callback: CallbackQuery, widget, dialog_manager: DialogManager, item_id: str):
+async def on_role_selected(call: CallbackQuery, widget, dialog_manager: DialogManager, item_id: str):
     session = dialog_manager.middleware_data.get("session_without_commit")
     role_id = int(item_id)
     selected_role = await RoleDAO(session).find_one_or_none_by_id(role_id)
 
     dialog_manager.dialog_data["selected_role"] = selected_role
-    await callback.answer(f"Выбрана должность №{role_id}")
+    await call.answer(f"Выбрана должность №{role_id}")
     await dialog_manager.next()
+
+
+async def on_role_id_input_error(message: Message, dialog_: Any, dialog_manager: DialogManager, error_: ValueError):
+    await message.answer("Номер должен быть числом!")
+
+
+# async def on_role_id_input(message: Message, dialog_: Any, dialog_manager: DialogManager):
+#     session = dialog_manager.middleware_data.get("session_without_commit")
+
+#     id = dialog_manager.find('id').get_value()
+#     role = await RoleDAO.find_one_or_none_by_id(session, id)
+
+#     if role is None:
+#         await message.answer(f"Должности с таким номером не существует!\nВведите его еще раз.")
+#         return
+    
+#     await dialog_manager.next()
 
 
 async def on_create_confirmation(callback: CallbackQuery, widget, dialog_manager: DialogManager, **kwargs):
@@ -73,7 +91,7 @@ async def on_update_confirmation(callback: CallbackQuery, widget, dialog_manager
         await dialog_manager.done()
     else:
         await callback.message.answer("Такая должность не существует!")
-        await dialog_manager.back()
+        await dialog_manager.switch_to(FormUpdate.id)
 
 
 async def process_delete_role(call: CallbackQuery, widget, dialog_manager: DialogManager, **kwargs):
@@ -96,5 +114,4 @@ async def process_delete_role(call: CallbackQuery, widget, dialog_manager: Dialo
         
         await dialog_manager.done()
     else:
-        await call.message.answer("Такая должность не существует!")
-        await dialog_manager.back()
+        await call.answer("Такая должность не существует!\nВведите другой номер.")
