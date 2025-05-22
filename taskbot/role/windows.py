@@ -16,7 +16,7 @@ MAIN_BTNS = Row(
             Cancel(Const("Отмена"), on_click=cancel_logic),
         )
 
-def get_roles_window(state: State = RoleRead.id, *widgets: WidgetSrc):
+def get_roles_window(*widgets: WidgetSrc, state: State = RoleRead.id):
     return Window(
         Format("{text_table}"),
         
@@ -45,6 +45,17 @@ def get_roles_window(state: State = RoleRead.id, *widgets: WidgetSrc):
 
 
 def get_role_id_window(stateGroup: StatesGroup = RoleUpdate, ):
+    return get_all_roles(
+        Const("Введите номер должности для изменения."),
+        
+        TextInput(
+            id="id",
+            type_factory=int,
+            on_error=on_role_id_input_error,
+            on_success=Next()
+        ),
+        state=stateGroup.id
+    )
     return Window(
         Format("{text_table}"),
         
