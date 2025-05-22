@@ -2,10 +2,18 @@ from typing import Any
 from aiogram.types import CallbackQuery, Message
 from aiogram_dialog import DialogManager
 from aiogram_dialog.widgets.kbd import Button
-from taskbot.dao.dao import RoleDAO
-from taskbot.dao.schemas import RoleDto, RoleDtoBase
+from taskbot.dao.dao import RegionDAO
+from taskbot.dao.schemas import RegionDto, RegionDtoBase
 from taskbot.admin.kbs import main_admin_kb
-from taskbot.role.state import RoleUpdate
+from taskbot.region.kbs import region_menu_kb
+from taskbot.region.state import RegionUpdate
+
+async def go_menu(call: CallbackQuery, button: Button, dialog_manager: DialogManager):
+    await call.answer("Сценарий отменен!")
+    await call.message.answer(
+        "Вы отменили сценарий. Выход в меню",
+        reply_markup=region_menu_kb()
+    )
 
 async def cancel_logic(callback: CallbackQuery, button: Button, dialog_manager: DialogManager):
     await callback.answer("Сценарий отменен!")
@@ -15,31 +23,18 @@ async def cancel_logic(callback: CallbackQuery, button: Button, dialog_manager: 
     )
 
 
-async def on_role_selected(call: CallbackQuery, widget, dialog_manager: DialogManager, item_id: str):
+async def on_region_selected(call: CallbackQuery, widget, dialog_manager: DialogManager, item_id: str):
     session = dialog_manager.middleware_data.get("session_without_commit")
-    role_id = int(item_id)
-    selected_role = await RoleDAO(session).find_one_or_none_by_id(role_id)
+    region_id = int(item_id)
+    selected_region = await RegionDAO(session).find_one_or_none_by_id(region_id)
 
-    dialog_manager.dialog_data["selected_role"] = selected_role
-    await call.answer(f"Выбрана должность №{role_id}")
+    dialog_manager.dialog_data["selected_region"] = selected_region
+    await call.answer(f"Выбрана запись №{region_id}")
     await dialog_manager.next()
 
 
-async def on_role_id_input_error(message: Message, dialog_: Any, dialog_manager: DialogManager, error_: ValueError):
+async def on_region_id_input_error(message: Message, dialog_: Any, dialog_manager: DialogManager, error_: ValueError):
     await message.answer("Номер должен быть числом!")
-
-
-# async def on_role_id_input(message: Message, dialog_: Any, dialog_manager: DialogManager):
-#     session = dialog_manager.middleware_data.get("session_without_commit")
-
-#     id = dialog_manager.find('id').get_value()
-#     role = await RoleDAO.find_one_or_none_by_id(session, id)
-
-#     if role is None:
-#         await message.answer(f"Должности с таким номером не существует!\nВведите его еще раз.")
-#         return
-    
-#     await dialog_manager.next()
 
 
 async def on_create_confirmation(callback: CallbackQuery, widget, dialog_manager: DialogManager, **kwargs):
@@ -48,22 +43,22 @@ async def on_create_confirmation(callback: CallbackQuery, widget, dialog_manager
     user_id = callback.from_user.id
     name = dialog_manager.find("name").get_value()
     description = dialog_manager.find("description").get_value()
-    newRole = RoleDtoBase(
+    newregion = RegionDtoBase(
         name=name,
         description=description
     )
 
-    check = await RoleDAO.find_one_or_none(session, newRole)
+    check = await RegionDAO.find_one_or_none(session, newregion)
     if not check:
         await callback.answer("Приступаю к сохранению")
-        await RoleDAO.add(session, newRole)
-        await callback.answer(f"Должность успешно создано!")
-        text = "Должность успешно сохранена"
+        await RegionDAO.add(session, newregion)
+        await callback.answer(f"Запись успешно создана!")
+        text = "Запись успешно сохранена"
         await callback.message.answer(text, reply_markup=main_admin_kb())
 
         await dialog_manager.done()
     else:
-        await callback.message.answer("Такая должность уже существует!")
+        await callback.message.answer("Такая запись уже существует!")
         await dialog_manager.back()
 
     
@@ -75,7 +70,7 @@ async def on_update_confirmation(callback: CallbackQuery, widget, dialog_manager
     name = dialog_manager.find('name').get_value()
     description = dialog_manager.find('description').get_value()
     
-    check = await RoleDAO.find_one_or_none_by_id(session, id)
+    check = await RegionDAO.find_one_or_none_by_id(session, id)
     if check:
         await callback.answer("Приступаю к сохранению")
         
@@ -84,34 +79,34 @@ async def on_update_confirmation(callback: CallbackQuery, widget, dialog_manager
 
         await session.commit()
 
-        await callback.answer(f"Должность успешно обновлена!")
-        text = "Должность успешно сохранена"
+        await callback.answer(f"Запись успешно обновлена!")
+        text = "Запись успешно сохранена"
         await callback.message.answer(text, reply_markup=main_admin_kb())
 
         await dialog_manager.done()
     else:
-        await callback.message.answer("Такая должность не существует!")
-        await dialog_manager.switch_to(RoleUpdate.id)
+        await callback.message.answer("Такой записи не существует!")
+        await dialog_manager.switch_to(RegionUpdate.id)
 
 
-async def process_delete_role(call: CallbackQuery, widget, dialog_manager: DialogManager, **kwargs):
+async def process_delete_region(call: CallbackQuery, widget, dialog_manager: DialogManager, **kwargs):
     session = dialog_manager.middleware_data.get("session_with_commit")
 
     id = dialog_manager.find("id").get_value()
-    role = await RoleDAO.find_one_or_none_by_id(session, id)
+    region = await RegionDAO.find_one_or_none_by_id(session, id)
     
-    if role:
+    if region:
         await call.answer("Удаление записи")
-        roleDto = RoleDto(
-            id=role.id,
-            name=role.name,
-            description=role.description
+        record = RegionDto(
+            id=region.id,
+            name=region.name,
+            description=region.description
         )
-        count = await RoleDAO.delete(session, roleDto)
+        count = await RegionDAO.delete(session, record)
         text = f"Удалено {count} записей"
         await session.commit()
         await call.answer(text)
         
         await dialog_manager.done()
     else:
-        await call.answer("Такая должность не существует!\nВведите другой номер.")
+        await call.answer("Такая запись не существует!\nВведите другой номер.")

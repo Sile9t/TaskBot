@@ -1,10 +1,10 @@
 from aiogram_dialog import Dialog
-from taskbot.role.state import FormCreate, FormUpdate
+from taskbot.role.state import RoleCreate, RoleUpdate
 from taskbot.role.windows import get_roles_window, get_role_id_window, get_role_name_window, get_role_description_window, get_create_confirmation_window, get_update_confirmation_window, get_delete_window
 
 role_create_dialog = Dialog(
-    get_role_name_window(FormCreate),
-    get_role_description_window(FormCreate),
+    get_role_name_window(RoleCreate),
+    get_role_description_window(RoleCreate),
     get_create_confirmation_window()
 )
 
@@ -13,9 +13,9 @@ roles_read_dialog = Dialog(
 )
 
 role_update_dialog = Dialog(
-    get_role_id_window(FormUpdate),
-    get_role_name_window(FormUpdate),
-    get_role_description_window(FormUpdate),
+    get_role_id_window(RoleUpdate),
+    get_role_name_window(RoleUpdate),
+    get_role_description_window(RoleUpdate),
     get_update_confirmation_window()
 )
 

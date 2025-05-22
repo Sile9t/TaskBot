@@ -12,9 +12,9 @@ from pydantic import BaseModel
 from sqlalchemy.ext.asyncio import AsyncSession
 from taskbot.dao.dao import RoleDAO
 from taskbot.dao.schemas import RoleDtoBase, RoleDto
-from taskbot.admin.kbs import yes_no_kb, pass_kb, role_menu_kb, role_list_kb
+from taskbot.admin.kbs import yes_no_kb, pass_kb, role_menu_kb
 from taskbot.admin.utils import extract_number
-from taskbot.role.state import FormCreate, FormRead, FormUpdate, FormRemove
+from taskbot.role.state import RoleCreate, RoleRead, RoleUpdate, RoleRemove
 
 role_router = Router()
 
@@ -53,13 +53,12 @@ async def role_menu(call: CallbackQuery):
 
 @role_router.message(F.text.startswith("role_list"))
 @role_router.callback_query(F.data.startswith("role_list"))
-async def role_list(call: CallbackQuery, session_without_commit: AsyncSession, dialog_manager: DialogManager):
+async def role_list(call: CallbackQuery, dialog_manager: DialogManager):
     logger.info("Вызов кнопки admin/role_list")
 
     await call.answer()
-    
     await dialog_manager.start(
-        state=FormRead.id,
+        state=RoleRead.id,
         mode=StartMode.RESET_STACK
     )
 
@@ -70,28 +69,28 @@ async def role_add(call: CallbackQuery, dialog_manager: DialogManager):
 
     await call.answer("Добавление должности")
     await dialog_manager.start(
-        state=FormCreate.name,
+        state=RoleCreate.name,
         mode=StartMode.RESET_STACK
     )
 
 
 @role_router.callback_query(F.data == "role_update")
-async def role_update(call: CallbackQuery, state: FSMContext, session_with_commit: AsyncSession, dialog_manager: DialogManager):
+async def role_update(call: CallbackQuery, dialog_manager: DialogManager):
     logger.info("Вызов кнопки admin/role_update")
 
     await call.answer("Изменение должности")
     await dialog_manager.start(
-        state=FormUpdate.id,
+        state=RoleUpdate.id,
         mode=StartMode.RESET_STACK
     )
 
 
 @role_router.callback_query(F.data == "role_delete")
-async def role_delete(call: CallbackQuery, state: FSMContext, session_with_commit: AsyncSession, dialog_manager: DialogManager):
+async def role_delete(call: CallbackQuery, dialog_manager: DialogManager):
     logger.info("Вызов сценария удаления должности")
 
     await call.answer("Удаление должности")
     await dialog_manager.start(
-        state=FormRemove.id,
+        state=RoleRemove.id,
         mode=StartMode.RESET_STACK
     )

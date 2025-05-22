@@ -46,19 +46,6 @@ def role_menu_kb():
     return kb.as_markup()
 
 
-def role_list_kb(page: int = 1, pageCount: int = 1):
-    kb = InlineKeyboardBuilder()
-    
-    if (page > 1):
-        kb.button(text="Предыдущие", callback_data=f"role_list_{page-1}")
-    if (page < pageCount):
-        kb.button(text="Следующие", callback_data=f"role_list_{page+1}")
-    kb.button(text="Назад", callback_data="role_menu")
-    kb.adjust(2, 1)
-
-    return kb.as_markup()
-
-
 def task_kb():
     kb = InlineKeyboardBuilder()
 

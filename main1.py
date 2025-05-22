@@ -7,14 +7,22 @@ from aiogram.types import BotCommand, BotCommandScopeDefault
 from aiogram_dialog import setup_dialogs
 from config import bot, dp
 from taskbot.dao.database_middleware import DatabaseMiddlewareWithCommit, DatabaseMiddlewareWithoutCommit
+from taskbot.dao.seed import seed
+
 from taskbot.admin.admin import admin_router
-from taskbot.admin.role import role_router
 from taskbot.admin.task import task_router
 from taskbot.admin.employee import employee_router
+
+from taskbot.region.dialog import region_create_dialog, regions_read_dialog, region_update_dialog, region_delete_dialog
+from taskbot.region.router import region_router
+
 from taskbot.user.user import user_router
+
+from taskbot.role.router import role_router
 from taskbot.role.dialog import role_create_dialog, roles_read_dialog, role_update_dialog, role_delete_dialog
+
 from taskbot.task.dialog import task_dialog
-from taskbot.dao.seed import seed
+
 
 async def set_commands():
     commands = [
@@ -68,14 +76,16 @@ async def main():
     dp.update.middleware.register(DatabaseMiddlewareWithoutCommit())
 
     dp.include_router(admin_router)
-    dp.include_router(role_create_dialog)
-    dp.include_router(roles_read_dialog)
-    dp.include_router(role_update_dialog)
-    dp.include_router(role_delete_dialog)
-    dp.include_router(role_router)
+
+    dp.include_routers(region_create_dialog, regions_read_dialog, region_update_dialog, region_delete_dialog, region_router)
+
+    dp.include_routers(role_create_dialog, roles_read_dialog, role_update_dialog, role_delete_dialog, role_router)
+    
     dp.include_router(task_router)
     dp.include_router(task_dialog)
+    
     dp.include_router(employee_router)
+    
     dp.include_router(user_router)
 
     dp.startup.register(start_bot)

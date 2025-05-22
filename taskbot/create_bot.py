@@ -10,7 +10,7 @@ from aiogram_dialog import setup_dialogs
 from config import settings
 from taskbot.dao.database_middleware import DatabaseMiddlewareWithCommit, DatabaseMiddlewareWithoutCommit
 from taskbot.admin.admin import admin_router
-from taskbot.admin.role import role_router
+from taskbot.role.router import role_router
 from taskbot.admin.employee import employee_router
 from taskbot.user.user import user_router
 from taskbot.dao.seed import seed

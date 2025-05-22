@@ -1,18 +1,18 @@
 from aiogram.fsm.state import State, StatesGroup
 
-class RoleCreate(StatesGroup):
+class RegionCreate(StatesGroup):
     name = State()
     description = State()
     confirmation = State()
 
-class RoleRead(StatesGroup):
+class RegionRead(StatesGroup):
     id = State() 
 
-class RoleUpdate(StatesGroup):
+class RegionUpdate(StatesGroup):
     id = State()
     name = State()
     description = State()
     confirmation = State()
 
-class RoleRemove(StatesGroup):
+class RegionDelete(StatesGroup):
     id = State()

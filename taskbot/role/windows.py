@@ -9,14 +9,14 @@ from taskbot.role.getters import get_all_roles, get_confirmed_data
 from taskbot.role.handlers import (
     cancel_logic, on_role_selected, on_create_confirmation, on_update_confirmation, process_delete_role, on_role_id_input_error
 )
-from taskbot.role.state import FormCreate, FormRead, FormUpdate, FormRemove
+from taskbot.role.state import RoleCreate, RoleRead, RoleUpdate, RoleRemove
 
 MAIN_BTNS = Row(
             Back(Const("Назад")),
             Cancel(Const("Отмена"), on_click=cancel_logic),
         )
 
-def get_roles_window(state: State = FormRead.id, *widgets: WidgetSrc):
+def get_roles_window(state: State = RoleRead.id, *widgets: WidgetSrc):
     return Window(
         Format("{text_table}"),
         
@@ -44,7 +44,7 @@ def get_roles_window(state: State = FormRead.id, *widgets: WidgetSrc):
     )
 
 
-def get_role_id_window(stateGroup: StatesGroup = FormUpdate, ):
+def get_role_id_window(stateGroup: StatesGroup = RoleUpdate, ):
     return Window(
         Format("{text_table}"),
         
@@ -79,7 +79,7 @@ def get_role_id_window(stateGroup: StatesGroup = FormUpdate, ):
     )
 
 
-def get_role_name_window(stateGroup: StatesGroup = FormCreate):
+def get_role_name_window(stateGroup: StatesGroup = RoleCreate):
     return Window(
         Const("Введите название должности."),
         
@@ -94,7 +94,7 @@ def get_role_name_window(stateGroup: StatesGroup = FormCreate):
     )
 
 
-def get_role_description_window(stateGroup: StatesGroup = FormCreate):
+def get_role_description_window(stateGroup: StatesGroup = RoleCreate):
     return Window(
         Const("Введите название должности."),
         
@@ -122,7 +122,7 @@ def get_create_confirmation_window():
             Cancel(Const("Отмена"), on_click=cancel_logic),
         ),
 
-        state=FormCreate.confirmation,
+        state=RoleCreate.confirmation,
         getter=get_confirmed_data
     )
 
@@ -136,7 +136,7 @@ def get_update_confirmation_window():
             MAIN_BTNS,
         ),
 
-        state=FormUpdate.confirmation,
+        state=RoleUpdate.confirmation,
         getter=get_confirmed_data
     )
 
@@ -169,5 +169,5 @@ def get_delete_window():
         MAIN_BTNS,
 
         getter=get_all_roles,
-        state=FormRemove.id,
+        state=RoleRemove.id,
     )
