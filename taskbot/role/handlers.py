@@ -5,7 +5,15 @@ from aiogram_dialog.widgets.kbd import Button
 from taskbot.dao.dao import RoleDAO
 from taskbot.dao.schemas import RoleDto, RoleDtoBase
 from taskbot.admin.kbs import main_admin_kb
+from taskbot.role.kbs import role_menu_kb
 from taskbot.role.state import RoleUpdate
+
+async def go_menu(call: CallbackQuery, button: Button, dialog_manager: DialogManager):
+    await call.answer("Сценарий отменен!")
+    await call.message.answer(
+        "Вы отменили сценарий. Меню для должностей:",
+        reply_markup=role_menu_kb()
+    )
 
 async def cancel_logic(callback: CallbackQuery, button: Button, dialog_manager: DialogManager):
     await callback.answer("Сценарий отменен!")

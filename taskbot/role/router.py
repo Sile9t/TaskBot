@@ -12,10 +12,10 @@ from pydantic import BaseModel
 from sqlalchemy.ext.asyncio import AsyncSession
 from taskbot.dao.dao import RoleDAO
 from taskbot.dao.schemas import RoleDtoBase, RoleDto
-from taskbot.admin.kbs import yes_no_kb, pass_kb, role_menu_kb
+from taskbot.admin.kbs import yes_no_kb, pass_kb
 from taskbot.admin.utils import extract_number
-from taskbot.role.state import RoleCreate, RoleRead, RoleUpdate, RoleRemove
-
+from taskbot.role.state import RoleCreate, RoleRead, RoleUpdate, RoleDelete
+from taskbot.role.kbs import role_menu_kb
 role_router = Router()
 
 @role_router.message(Command("cancel"))
@@ -91,6 +91,6 @@ async def role_delete(call: CallbackQuery, dialog_manager: DialogManager):
 
     await call.answer("Удаление должности")
     await dialog_manager.start(
-        state=RoleRemove.id,
+        state=RoleDelete.id,
         mode=StartMode.RESET_STACK
     )

@@ -13,7 +13,7 @@ from taskbot.region.handlers import (
 from taskbot.region.state import RegionCreate, RegionRead, RegionUpdate, RegionDelete
 
 MAIN_BTNS = Row(
-            Back(Const("В меню"), on_click=go_menu),
+            Cancel(Const("В меню"), on_click=go_menu),
             Cancel(Const("Отмена"), on_click=cancel_logic),
         )
 

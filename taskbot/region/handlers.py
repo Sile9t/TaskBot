@@ -11,7 +11,7 @@ from taskbot.region.state import RegionUpdate
 async def go_menu(call: CallbackQuery, button: Button, dialog_manager: DialogManager):
     await call.answer("Сценарий отменен!")
     await call.message.answer(
-        "Вы отменили сценарий. Выход в меню",
+        "Вы отменили сценарий. Меню для регионов:",
         reply_markup=region_menu_kb()
     )
 

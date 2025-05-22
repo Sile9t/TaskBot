@@ -14,5 +14,5 @@ class RoleUpdate(StatesGroup):
     description = State()
     confirmation = State()
 
-class RoleRemove(StatesGroup):
+class RoleDelete(StatesGroup):
     id = State()
