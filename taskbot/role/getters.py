@@ -1,3 +1,4 @@
+from loguru import logger
 from aiogram_dialog import DialogManager
 from taskbot.dao.dao import RoleDAO
 

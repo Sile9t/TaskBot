@@ -8,7 +8,7 @@ from aiogram.types import CallbackQuery, Message
 from config import settings, bot
 from taskbot.dao.dao import TaskDAO
 from taskbot.dao.schemas import TaskDto
-from taskbot.user.kbs import menu_kb, task_kb
+from taskbot.user.kbs import user_menu_kb
 user_router = Router()
 
 @user_router.message(Command("help"))
@@ -25,7 +25,7 @@ async def cmd_start(message: Message):
     logger.info("Вызов команды user/start")
     await message.answer(
         f"👋🏻 Привет, {message.from_user.full_name}!\nВыберите дальнейшие действия:",
-        reply_markup=menu_kb()
+        reply_markup=user_menu_kb()
     )
 
 
@@ -39,18 +39,18 @@ async def cancel_handler(message: Message, state: FSMContext) -> None:
     if current_state is None:
         return
 
-    logging.info("Cancelling state %r", current_state)
+    logger.info("Cancelling state %r", current_state)
     await state.clear()
     await message.answer(
         "Cancelled.",
-        reply_markup=ReplyKeyboardRemove(),
+        reply_markup=None,
     )
 
 
-@user_router.callback_query(F.data == "task_menu")
-async def task_menu(call: CallbackQuery):
-    logger.info("Вызов команды user/task_menu")
-    await call.message.edit_text(
-        text=f"Выберите действия с задачами:",
-        reply_markup=task_kb()
-    )
+# @user_router.callback_query(F.data == "task_menu")
+# async def task_menu(call: CallbackQuery):
+#     logger.info("Вызов команды user/task_menu")
+#     await call.message.edit_text(
+#         text=f"Выберите действия с задачами:",
+#         reply_markup=task_kb()
+#     )

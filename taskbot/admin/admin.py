@@ -7,30 +7,32 @@ from aiogram.fsm.context import FSMContext
 from aiogram.fsm.state import StatesGroup, State
 from aiogram.types import CallbackQuery, Message
 from pydantic import BaseModel
+from sqlalchemy.orm import lazyload
 from sqlalchemy.ext.asyncio import AsyncSession
 from taskbot.admin.kbs import main_admin_kb, task_kb, employee_kb
+from taskbot.dao.models import User
 from taskbot.dao.dao import UserDAO, RoleDAO
-from taskbot.dao.schemas import UserDto, RoleDto
+from taskbot.dao.schemas import UserDtoBase, RoleDto
 from taskbot.admin.schemas import UserTelegramId, UserRoleId
 
-async def addAdmin(message: Message, session_without_commit: AsyncSession):
+async def getAdminFromMessage(message: Message, session_without_commit: AsyncSession):
     role = await RoleDAO.find_one_or_none_by_id(session_without_commit, 1)
-    return UserDto(
+    return UserDtoBase(
         first_name=message.from_user.first_name,
-        second_name=message.from_user.last_name,
+        last_name=message.from_user.last_name,
         telegram_id=message.from_user.id,
         role_id=1,
-        role=role
+        region_id=None
     )
 
-async def addEmployee(message: Message, session_without_commit: AsyncSession):
+async def getEmployeeFromMessage(message: Message, session_without_commit: AsyncSession):
     role = await RoleDAO.find_one_or_none_by_id(session_without_commit, 3)
-    return UserDto(
+    return UserDtoBase(
         first_name=message.from_user.first_name,
-        second_name=message.from_user.last_name,
+        last_name=message.from_user.last_name,
         telegram_id=message.from_user.id,
         role_id=3,
-        role=role
+        region_id=None
     )
 
 
@@ -47,45 +49,48 @@ async def cmd_help(message: Message):
 
 
 @admin_router.message(CommandStart())
-async def cmd_start(message: Message, session_without_commit: AsyncSession):
+async def cmd_start(message: Message, session_with_commit: AsyncSession):
     logger.info("Вызов команды admin/start")
     
-    filterModel = UserRoleId(role_id=1)
-    admins = await UserDAO.find_all(session_without_commit, filterModel)
-
-    # if (admins.count == 0):
-    #     role = await RoleDAO.find_one_or_none_by_id(session, 1)
-    #     newUser = UserDto(
-    #         first_name=message.from_user.first_name,
-    #         second_name=message.from_user.last_name,
-    #         telegram_id=message.from_user.id,
-    #         role_id=1,
-    #         role=role
-    #     )
-    # else:
-    #     role = await RoleDAO.find_one_or_none_by_id(session, 3)
-    #     newUser = UserDto(
-    #         first_name=message.from_user.first_name,
-    #         second_name=message.from_user.last_name,
-    #         telegram_id=message.from_user.id,
-    #         role_id=3,
-    #         role=role
-    #     )
-
-    # await UserDAO.add(session, newUser)
-    # session_without_commit.commit()
+    tgIdFilter = UserTelegramId(
+        telegram_id=message.from_user.id
+    )
+    check = await UserDAO.find_one_or_none(session_with_commit, tgIdFilter)
     
-    for admin in admins:
-        if (admin.telegram_id == message.from_user.id):
-            return await message.answer(
-                f"👋🏻 Привет, {message.from_user.full_name}!\nВы не зарегистрированы",
-                reply_markup=None
-            )
+    if check is None:
+        filterModel = UserRoleId(role_id=1)
+        admins = await UserDAO.find_all(session_with_commit, filterModel)
 
-    # await message.answer(
-    #     f"👋🏻 Привет, {message.from_user.full_name}!\nВы зарегистрированы как {role.name}",
-    #     reply_markup=admin_kb()
-    # )
+        logger.info(
+            f"\n\tUser:\n"
+            f"\t\t{message.from_user.first_name}\n"
+            f"\t\t{message.from_user.last_name}\n"
+            f"\t\t{message.from_user.id}\n"
+        )
+        
+        if (admins.count == 0):
+            newUser = await getAdminFromMessage(message, session_with_commit)
+        else:
+            newUser = await getEmployeeFromMessage(message, session_with_commit)
+
+        await UserDAO.add(session_with_commit, newUser)
+        
+        for admin in admins:
+            if (admin.telegram_id == message.from_user.id):
+                return await message.answer(
+                    f"Пользователь {message.from_user.full_name} зарегистрирован!",
+                    reply_markup=None
+                )
+        
+        return await message.answer(
+            f"👋🏻 Привет, {message.from_user.full_name}!\nВы не зарегистрированы",
+            reply_markup=None
+        )
+
+    await message.answer(
+        f"👋🏻 Привет, {message.from_user.full_name}!\nВы зарегистрированы как {check.role.name}",
+        reply_markup=main_admin_kb()
+    )
 
 
 @admin_router.message(Command('admin_panel'))
@@ -95,7 +100,7 @@ async def admin_panel(message: Message, session_without_commit: AsyncSession):
     user_id = message.from_user.id
     user = await UserDAO.find_one_or_none(session_without_commit, UserTelegramId(telegram_id=user_id))
     
-    if (user):
+    if (user.role_id == 1):
         return await message.answer(
             text=f"Выберите необходимое действие:",
             reply_markup=main_admin_kb()
@@ -114,7 +119,7 @@ async def admin_panel(call: CallbackQuery, session_without_commit: AsyncSession)
     user_id = call.from_user.id
     user = await UserDAO.find_one_or_none(session_without_commit, UserTelegramId(telegram_id=user_id))
 
-    if (user):
+    if (user.role_id == 1):
         await call.answer("Доступ в админ-панель разрешен!")
         return await call.message.edit_text(
             text=f"Выберите необходимое действие:",

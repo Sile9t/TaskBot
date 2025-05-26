@@ -1,15 +1,9 @@
 import asyncio
-from typing import Dict, Any
 from loguru import logger
 from aiogram import Router, F
-from aiogram.fsm.context import FSMContext
-from aiogram.fsm.state import State, StatesGroup
 from aiogram.types import Message, CallbackQuery, ReplyKeyboardRemove
 from aiogram.filters import Command
-from aiogram.utils.chat_action import ChatActionSender
 from aiogram_dialog import DialogManager, StartMode
-from pydantic import BaseModel
-from sqlalchemy.ext.asyncio import AsyncSession
 from taskbot.region.kbs import region_menu_kb
 from taskbot.region.state import RegionCreate, RegionRead, RegionUpdate, RegionDelete
 

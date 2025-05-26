@@ -13,7 +13,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from taskbot.admin.kbs import main_admin_kb, task_kb, employee_kb
 from taskbot.dao.dao import UserDAO, RoleDAO
-from taskbot.dao.schemas import UserDto, RoleDto
+from taskbot.dao.schemas import UserDtoBase, RoleDto
 from taskbot.admin.schemas import UserTelegramId, UserRoleId
 from taskbot.task.state import TaskForm
 

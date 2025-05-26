@@ -36,14 +36,14 @@ class Role(Base):
 # #
 class User(Base):
     first_name: Mapped[str]
-    second_name: Mapped[str]
-    telegram_id: Mapped[str] = mapped_column(unique=True)
+    last_name: Mapped[str]
+    telegram_id: Mapped[int] = mapped_column(unique=True)
     
     role_id: Mapped[int] = mapped_column(ForeignKey('roles.id'))
-    role: Mapped["Role"] = relationship("Role",back_populates="users", foreign_keys="[User.role_id]")
+    role: Mapped["Role"] = relationship("Role",back_populates="users", foreign_keys="[User.role_id]", lazy="joined")
     
     region_id: Mapped[Optional[int]] = mapped_column(ForeignKey("regions.id"))
-    region: Mapped[Optional["Region"]] = relationship("Region", back_populates="users", foreign_keys="[User.region_id]")
+    region: Mapped[Optional["Region"]] = relationship("Region", back_populates="users", foreign_keys="[User.region_id]", lazy="joined")
 
 # #
 # Task status class describes status of the task

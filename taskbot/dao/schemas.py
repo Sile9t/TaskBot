@@ -22,15 +22,15 @@ class RoleDto(RoleDtoBase):
     id: int = Field(frozen = True)
     
 
-class UserDto(BaseModel):
-    id: int = Field(frozen = True)
+class UserDtoBase(BaseModel):
     first_name: str
-    second_name: str
-    telegram_id: str
+    last_name: str
+    telegram_id: int
     role_id: int
-    role: RoleDto
     region_id: Optional[int]
-    region: Optional[RegionDto]
+
+class UserDto(UserDtoBase):
+    id: int = Field(frozen = True)
 
     model_config = ConfigDict(from_attributes=True)
 

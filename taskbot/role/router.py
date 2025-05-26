@@ -1,19 +1,10 @@
 import asyncio
-from typing import Dict, Any
 from loguru import logger
 from aiogram import Router, F
 from aiogram.fsm.context import FSMContext
-from aiogram.fsm.state import State, StatesGroup
 from aiogram.types import Message, CallbackQuery, ReplyKeyboardRemove
 from aiogram.filters import Command
-from aiogram.utils.chat_action import ChatActionSender
 from aiogram_dialog import DialogManager, StartMode
-from pydantic import BaseModel
-from sqlalchemy.ext.asyncio import AsyncSession
-from taskbot.dao.dao import RoleDAO
-from taskbot.dao.schemas import RoleDtoBase, RoleDto
-from taskbot.admin.kbs import yes_no_kb, pass_kb
-from taskbot.admin.utils import extract_number
 from taskbot.role.state import RoleCreate, RoleRead, RoleUpdate, RoleDelete
 from taskbot.role.kbs import role_menu_kb
 role_router = Router()

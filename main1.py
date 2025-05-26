@@ -16,7 +16,9 @@ from taskbot.admin.employee import employee_router
 from taskbot.region.dialog import region_create_dialog, regions_read_dialog, region_update_dialog, region_delete_dialog
 from taskbot.region.router import region_router
 
-from taskbot.user.user import user_router
+# from taskbot.user.user import user_router
+from taskbot.user.router import user_router
+from taskbot.user.dialog import user_create_dialog, users_read_dialog, user_update_dialog, user_delete_dialog 
 
 from taskbot.role.router import role_router
 from taskbot.role.dialog import role_create_dialog, roles_read_dialog, role_update_dialog, role_delete_dialog
@@ -81,12 +83,14 @@ async def main():
 
     dp.include_routers(role_create_dialog, roles_read_dialog, role_update_dialog, role_delete_dialog, role_router)
     
+    dp.include_routers(user_create_dialog, users_read_dialog, user_update_dialog, user_delete_dialog, user_router)
+
     dp.include_router(task_router)
     dp.include_router(task_dialog)
     
     dp.include_router(employee_router)
     
-    dp.include_router(user_router)
+    # dp.include_router(user_router)
 
     dp.startup.register(start_bot)
     dp.shutdown.register(stop_bot)
