@@ -26,6 +26,9 @@ from taskbot.role.dialog import role_create_dialog, roles_read_dialog, role_upda
 from taskbot.status.router import status_router
 from taskbot.status.dialog import status_create_dialog, statuses_read_dialog, status_update_dialog, status_delete_dialog
 
+from taskbot.priority.router import priority_router
+from taskbot.priority.dialog import priority_create_dialog, priorities_read_dialog, priority_update_dialog, priority_delete_dialog
+
 from taskbot.task.dialog import task_dialog
 
 
@@ -38,6 +41,7 @@ async def set_commands():
         BotCommand(command='task_menu', description='Меню для задач'),
         BotCommand(command='user_menu', description='Меню для пользователей'),
         # BotCommand(command='employee_menu', description='Меню для сотрудников'),
+        BotCommand(command='region_menu', description='Меню для регионов'),
         BotCommand(command='status_menu', description='Меню для статусов задач'),
         BotCommand(command='priority_menu', description='Меню для приоритетов задач'),
         BotCommand(command='priority_menu', description='Меню для приоритетов задач'),
@@ -83,6 +87,8 @@ async def main():
     dp.include_routers(user_create_dialog, users_read_dialog, user_update_dialog, user_delete_dialog, user_router)
 
     dp.include_routers(status_router, status_create_dialog, statuses_read_dialog, status_update_dialog, status_delete_dialog)
+
+    dp.include_routers(priority_router, priority_create_dialog, priorities_read_dialog, priority_update_dialog, priority_delete_dialog)
 
     dp.include_router(task_router)
     dp.include_router(task_dialog)
