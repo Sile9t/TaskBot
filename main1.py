@@ -23,6 +23,9 @@ from taskbot.user.dialog import user_create_dialog, users_read_dialog, user_upda
 from taskbot.role.router import role_router
 from taskbot.role.dialog import role_create_dialog, roles_read_dialog, role_update_dialog, role_delete_dialog
 
+from taskbot.status.router import status_router
+from taskbot.status.dialog import status_create_dialog, statuses_read_dialog, status_update_dialog, status_delete_dialog
+
 from taskbot.task.dialog import task_dialog
 
 
@@ -30,20 +33,14 @@ async def set_commands():
     commands = [
         BotCommand(command='help', description='Список команд'),
         BotCommand(command='start', description='Старт'),
-        BotCommand(command='admin_panel', description='Меню администрирования'),
+        BotCommand(command='admin_panel', description='Панель администрирования'),
         BotCommand(command='role_menu', description='Меню для должностей'),
         BotCommand(command='task_menu', description='Меню для задач'),
-        # BotCommand(command='task_list', description='Список задач'),
-        # BotCommand(command='task_add', description='Добавить задачу'),
-        # BotCommand(command='task_edit', description='Редактировать задачу'),
-        # BotCommand(command='task_close', description='Закрыть задачу'),
-        # BotCommand(command='task_delete', description='Удалить задачу'),
-        BotCommand(command='employee_menu', description='Меню для сотрудников'),
-        # BotCommand(command='employee_list', description='Список сотрудников'),
-        # BotCommand(command='employee_add', description='Добавить сотрудника'),
-        # BotCommand(command='employee_edit', description='Редактировать информацию о сотруднике'),
-        # BotCommand(command='employee_delete', description='Удалить информацию о сотруднике'),
-        # BotCommand(command='employee_change_role', description='Изменить роль сотрудника'),
+        BotCommand(command='user_menu', description='Меню для пользователей'),
+        # BotCommand(command='employee_menu', description='Меню для сотрудников'),
+        BotCommand(command='status_menu', description='Меню для статусов задач'),
+        BotCommand(command='priority_menu', description='Меню для приоритетов задач'),
+        BotCommand(command='priority_menu', description='Меню для приоритетов задач'),
         BotCommand(command='cancel', description='Отмена сценария'),
     ]
     
@@ -84,6 +81,8 @@ async def main():
     dp.include_routers(role_create_dialog, roles_read_dialog, role_update_dialog, role_delete_dialog, role_router)
     
     dp.include_routers(user_create_dialog, users_read_dialog, user_update_dialog, user_delete_dialog, user_router)
+
+    dp.include_routers(status_router, status_create_dialog, statuses_read_dialog, status_update_dialog, status_delete_dialog)
 
     dp.include_router(task_router)
     dp.include_router(task_dialog)

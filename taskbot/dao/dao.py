@@ -37,7 +37,7 @@ class RoleDAO(BaseDAO[Role]):
 class UserDAO(BaseDAO[User]):
     model = User
 
-class TaskPriorityDAO(BaseDAO[TaskStatus]):
+class TaskStatusDAO(BaseDAO[TaskStatus]):
     model = TaskStatus
 
 class TaskPriorityDAO(BaseDAO[TaskPriority]):

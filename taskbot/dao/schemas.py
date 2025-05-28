@@ -35,25 +35,28 @@ class UserDto(UserDtoBase):
     model_config = ConfigDict(from_attributes=True)
 
 
-class TaskStatusDto(BaseModel):
-    id: int = Field(frozen = True)
+class TaskStatusDtoBase(BaseModel):
     title: str
     description: Optional[str]
 
     model_config = ConfigDict(from_attributes=True)
 
-
-class TaskPriorityDto(BaseModel):
+class TaskStatusDto(TaskStatusDtoBase):
     id: int = Field(frozen = True)
+
+
+class TaskPriorityDtoBase(BaseModel):
     value: int
     title: str
     description: Optional[str]
 
     model_config = ConfigDict(from_attributes=True)
 
-
-class TaskDto(BaseModel):
+class TaskPriorityDto(TaskPriorityDtoBase):
     id: int = Field(frozen = True)
+
+
+class TaskDtoBase(BaseModel):
     title: str
     description: Optional[str]
     startline: datetime = datetime.now
@@ -69,3 +72,5 @@ class TaskDto(BaseModel):
 
     model_config = ConfigDict(from_attributes=True)
 
+class TaskDto(TaskDtoBase):
+    id: int = Field(frozen = True)

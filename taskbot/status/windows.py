@@ -1,0 +1,144 @@
+from aiogram.fsm.state import StatesGroup, State
+from aiogram.types import ContentType
+from aiogram_dialog import Window
+from aiogram_dialog.widgets.kbd import Button, Group, ScrollingGroup, Select, Calendar, CalendarConfig, Back, Cancel, NumberedPager, Row, Next, SwitchTo, CurrentPage, NextPage, PrevPage, FirstPage, LastPage
+from aiogram_dialog.widgets.input import MessageInput, TextInput
+from aiogram_dialog.widgets.text import Const, Format, List
+from aiogram_dialog.widgets.utils import WidgetSrc
+from taskbot.status.getters import get_all_statuses, get_confirmed_data
+from taskbot.status.handlers import (
+    go_menu, cancel_logic, on_status_selected, on_create_confirmation, on_update_confirmation, process_delete_status, on_status_id_input_error
+)
+from taskbot.status.state import StatusCreate, StatusRead, StatusUpdate, StatusDelete
+
+MAIN_BTNS = Row(
+            Cancel(Const("В меню"), on_click=go_menu),
+            Cancel(Const("Отмена"), on_click=cancel_logic),
+        )
+
+def get_statuses_window(*widgets: WidgetSrc, state: State = StatusRead.id):
+    return Window(
+        Format("{text_table}"),
+        
+        List(
+            Format(
+                "Статус №{item[id]}\n"
+                    "Название: {item[title]}\n"
+                    "Описание: {item[description]}\n"
+            ),
+            items="statuses",
+            id='statuses_list',
+            page_size=10
+        ),
+
+        Row(
+            FirstPage(
+                scroll="statuses_list", text=Format("⏮️ {target_page1}"),
+            ),
+            PrevPage(
+                scroll="statuses_list", text=Format("◀️"),
+            ),
+            CurrentPage(
+                scroll="statuses_list", text=Format("{current_page1}"),
+            ),
+            NextPage(
+                scroll="statuses_list", text=Format("▶️"),
+            ),
+            LastPage(
+                scroll="statuses_list", text=Format("{target_page1} ⏭️"),
+            ),
+        ),
+
+        *widgets,
+
+        MAIN_BTNS,
+        
+        getter=get_all_statuses,
+        state=state,
+    )
+
+
+def get_status_id_window(stateGroup: StatesGroup = StatusUpdate):
+    return get_statuses_window(
+        Const("Введите номер записи статуса для изменения."),
+        
+        TextInput(
+            id="id",
+            type_factory=int,
+            on_error=on_status_id_input_error,
+            on_success=Next()
+        ),
+        state=stateGroup.id
+    )
+
+
+def get_status_title_window(stateGroup: StatesGroup = StatusCreate):
+    return Window(
+        Const("Введите название статуса."),
+        
+        TextInput(
+            id="title",
+            on_success=Next()
+        ),
+
+        MAIN_BTNS,
+        
+        state=stateGroup.title,
+    )
+
+
+def get_status_description_window(stateGroup: StatesGroup = StatusCreate):
+    return Window(
+        Const("Введите описание статуса."),
+        
+        TextInput(
+            id="description",
+            on_success=Next()
+        ),
+
+        Group(
+            Next(Const("Пропустить")),         
+            MAIN_BTNS,
+        ),
+        state=stateGroup.description,
+    )
+
+
+def get_create_confirmation_window():
+    return Window(
+        Format("{confirmed_text}"),
+
+        Group(
+            Button(Const("Все верно"), id="confirm", on_click=on_create_confirmation),
+            MAIN_BTNS,
+        ),
+
+        state=StatusCreate.confirmation,
+        getter=get_confirmed_data
+    )
+
+
+def get_update_confirmation_window():
+    return Window(
+        Format("{confirmed_text}"),
+
+        Group(
+            Button(Const("Все верно"), id="confirm", on_click=on_update_confirmation),
+            MAIN_BTNS,
+        ),
+
+        state=StatusUpdate.confirmation,
+        getter=get_confirmed_data
+    )
+
+
+def get_delete_window():
+    return get_statuses_window(
+        Const("Введите номер записи статуса."),
+        TextInput(
+            id="id",
+            type_factory=int,
+            on_success=Next(on_click=process_delete_status)
+        ),
+        state=StatusDelete.id
+    )

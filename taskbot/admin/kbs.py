@@ -25,10 +25,13 @@ def pass_kb():
 def main_admin_kb(user_id: int = -1):
     kb = InlineKeyboardBuilder()
     
-    kb.button(text="👩🏻‍💼👨🏻‍💼 Сотрудники", callback_data="employee_menu")
+    kb.button(text="👩🏻‍💼👨🏻‍💼 Сотрудники", callback_data="user_menu")
     kb.button(text="📋 Задачи", callback_data="task_menu")
+    kb.button(text="🎭 Роли", callback_data="role_menu")
+    kb.button(text="✔ Статусы задач", callback_data="status_menu")
+    kb.button(text="🔥 Приоритеты задач", callback_data="priority_menu")
     kb.button(text="✉ Отправить рассылку", callback_data="send_messages")
-    kb.adjust(2, 1)
+    kb.adjust(2, 2, 2, 1)
 
     return kb.as_markup()
 
