@@ -10,7 +10,6 @@ from taskbot.dao.database_middleware import DatabaseMiddlewareWithCommit, Databa
 from taskbot.dao.seed import seed
 
 from taskbot.admin.admin import admin_router
-from taskbot.admin.task import task_router
 from taskbot.admin.employee import employee_router
 
 from taskbot.region.dialog import region_create_dialog, regions_read_dialog, region_update_dialog, region_delete_dialog
@@ -29,7 +28,8 @@ from taskbot.status.dialog import status_create_dialog, statuses_read_dialog, st
 from taskbot.priority.router import priority_router
 from taskbot.priority.dialog import priority_create_dialog, priorities_read_dialog, priority_update_dialog, priority_delete_dialog
 
-from taskbot.task.dialog import task_dialog
+from taskbot.task.router import task_router
+from taskbot.task.dialog import task_create_dialog, tasks_read_dialog, task_update_dialog, task_delete_dialog
 
 
 async def set_commands():
@@ -90,8 +90,7 @@ async def main():
 
     dp.include_routers(priority_router, priority_create_dialog, priorities_read_dialog, priority_update_dialog, priority_delete_dialog)
 
-    dp.include_router(task_router)
-    dp.include_router(task_dialog)
+    dp.include_routers(task_router, task_create_dialog, tasks_read_dialog, task_update_dialog, task_delete_dialog)
     
     dp.include_router(employee_router)
     

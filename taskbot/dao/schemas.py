@@ -60,15 +60,12 @@ class TaskDtoBase(BaseModel):
     title: str
     description: Optional[str]
     startline: datetime = datetime.now
-    deadlline:datetime = (datetime.now() + timedelta(hours=24))
+    deadline: datetime = datetime.now()
     is_active: bool = True
 
     status_id: int
-    status: Optional[TaskStatusDto]
     priority_id: int
-    priority: Optional[TaskPriorityDto]
     region_id: int
-    region: Optional[RegionDto]
 
     model_config = ConfigDict(from_attributes=True)
 

@@ -96,10 +96,10 @@ class Task(Base):
     is_active: Mapped[bool] = mapped_column(Boolean, default=True, server_default=text("'true'"))
     
     status_id: Mapped[int] = mapped_column(ForeignKey("task_statuses.id"))
-    status: Mapped["TaskStatus"] = relationship("TaskStatus", back_populates="tasks", foreign_keys="[Task.status_id]")
+    status: Mapped["TaskStatus"] = relationship("TaskStatus", back_populates="tasks", foreign_keys="[Task.status_id]", lazy="joined")
     
     priority_id: Mapped[int] = mapped_column(ForeignKey("task_priorities.id"))
-    priority: Mapped["TaskPriority"] = relationship("TaskPriority", back_populates="tasks", foreign_keys="[Task.priority_id]")
+    priority: Mapped["TaskPriority"] = relationship("TaskPriority", back_populates="tasks", foreign_keys="[Task.priority_id]", lazy="joined")
     
     region_id: Mapped[int] = mapped_column(ForeignKey("regions.id"))
-    region: Mapped["Region"] = relationship("Region", back_populates="tasks", foreign_keys="[Task.region_id]")
+    region: Mapped["Region"] = relationship("Region", back_populates="tasks", foreign_keys="[Task.region_id]", lazy="joined")
