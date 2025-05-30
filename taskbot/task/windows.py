@@ -8,9 +8,9 @@ from aiogram_dialog.widgets.utils import WidgetSrc
 from taskbot.task.getters import get_all_tasks, get_confirmed_data, get_is_active_variants
 from taskbot.status.windows import get_statuses_window 
 from taskbot.priority.windows import get_priorities_window 
-from taskbot.region.windows import get_regions_window
+from taskbot.region.windows import get_regions_window, get_region_selection_window
 from taskbot.task.handlers import (
-    go_menu, cancel_logic, on_task_selected, on_startline_selected, on_deadline_selected, on_is_active_selected, on_create_confirmation, on_update_confirmation, process_delete_task, on_task_id_input_error
+    go_menu, cancel_logic, on_task_selected, on_startline_selected, on_deadline_selected, on_is_active_selected, on_region_selected, on_create_confirmation, on_update_confirmation, process_delete_task, on_task_id_input_error
 )
 from taskbot.task.state import TaskCreate, TaskRead, TaskUpdate, TaskDelete
 
@@ -190,15 +190,11 @@ def get_task_priority_window(stateGroup: StatesGroup = TaskCreate):
 
 
 def get_task_region_window(stateGroup: StatesGroup = TaskCreate):
-    return get_regions_window(
-        Const("Введите номер региона."),
-        
-        TextInput(
-            id="region_id",
-            on_success=Next()
-        ),
-        
-        state=stateGroup.region
+    return get_region_selection_window(
+        Const("Выберите регион"),
+        state=stateGroup.region,
+        on_region_click=on_region_selected,
+        main_btns=MAIN_BTNS
     )
 
 

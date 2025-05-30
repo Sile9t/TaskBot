@@ -11,6 +11,19 @@ async def get_all_regions(dialog_manager: DialogManager, **kwargs):
     }
 
 
+async def get_region_id_tuples(dialog_manager: DialogManager, **kwargs):
+    session = dialog_manager.middleware_data.get("session_without_commit")
+    regions = await RegionDAO.find_all(session)
+    
+    caption = []
+    for region in regions:
+        caption.append((region.name, region.id))
+
+    return {
+        "region_id_tuples": caption, 
+        "text_table" : f"Всего найдено {len(regions)} должностей."
+    }
+
 async def get_confirmed_data(dialog_manager: DialogManager, **kwargs):
     name = dialog_manager.find("name").get_value()
     description = dialog_manager.find("description").get_value()

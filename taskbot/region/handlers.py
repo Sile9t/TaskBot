@@ -27,7 +27,10 @@ async def on_region_selected(call: CallbackQuery, widget, dialog_manager: Dialog
     session = dialog_manager.middleware_data.get("session_without_commit")
     region_id = int(item_id)
     selected_region = await RegionDAO(session).find_one_or_none_by_id(region_id)
+    if (selected_region is None):
+        return call.answer(f"Выбраная запись №{region_id} не существует. Выберите еще раз")
 
+    dialog_manager.dialog_data['region_id'] = region_id
     dialog_manager.dialog_data["selected_region"] = selected_region
     await call.answer(f"Выбрана запись №{region_id}")
     await dialog_manager.next()

@@ -53,7 +53,7 @@ async def get_confirmed_data(dialog_manager: DialogManager, **kwargs):
     status = await TaskStatusDAO.find_one_or_none_by_id(session, status_id)
     priority_id = dialog_manager.find('priority_id').get_value()
     priority = await TaskPriorityDAO.find_one_or_none_by_id(session, priority_id)
-    region_id = dialog_manager.find('region_id').get_value()
+    region_id = dialog_manager.dialog_data['region_id']
     region = await RegionDAO.find_one_or_none_by_id(session, region_id)
 
     confirmed_text = (

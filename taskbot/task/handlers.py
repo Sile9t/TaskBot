@@ -70,6 +70,19 @@ async def on_is_active_selected(call: CallbackQuery, widger, dialog_manager: Dia
     await dialog_manager.next()
 
 
+async def on_region_selected(call: CallbackQuery, widget, dialog_manager: DialogManager, item_id: str):
+    session = dialog_manager.middleware_data.get("session_without_commit")
+    region_id = int(item_id)
+    selected_region = await RegionDAO.find_one_or_none_by_id(session, region_id)
+    if (selected_region is None):
+        return call.answer(f"Выбраная запись №{region_id} не существует. Выберите еще раз")
+
+    dialog_manager.dialog_data['region_id'] = region_id
+    dialog_manager.dialog_data["selected_region"] = selected_region
+    await call.answer(f"Выбрана запись №{region_id}")
+    await dialog_manager.next()
+
+
 async def on_create_confirmation(callback: CallbackQuery, widget, dialog_manager: DialogManager, **kwargs):
     session = dialog_manager.middleware_data.get("session_with_commit")
 
@@ -92,7 +105,7 @@ async def on_create_confirmation(callback: CallbackQuery, widget, dialog_manager
         await callback.message.answer("Такого приоритета не существует!")
         return await dialog_manager.switch_to(TaskCreate.priority)
 
-    region_id = dialog_manager.find('region_id').get_value()
+    region_id = dialog_manager.dialog_data['region_id']
     region = await RegionDAO.find_one_or_none_by_id(session, region_id)
     if region is None:
         await callback.message.answer("Такого региона не существует!")
