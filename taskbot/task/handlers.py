@@ -70,6 +70,32 @@ async def on_is_active_selected(call: CallbackQuery, widger, dialog_manager: Dia
     await dialog_manager.next()
 
 
+async def on_status_selected(call: CallbackQuery, widget, dialog_manager: DialogManager, item_id: str):
+    session = dialog_manager.middleware_data.get("session_without_commit")
+    status_id = int(item_id)
+    selected_status = await TaskStatusDAO.find_one_or_none_by_id(session, status_id)
+    if (selected_status is None):
+        return call.answer(f"Выбраная запись №{status_id} не существует. Выберите еще раз")
+
+    dialog_manager.dialog_data['status_id'] = status_id
+    dialog_manager.dialog_data["selected_status"] = selected_status
+    await call.answer(f"Выбрана запись №{status_id}")
+    await dialog_manager.next()
+
+
+async def on_priority_selected(call: CallbackQuery, widget, dialog_manager: DialogManager, item_id: str):
+    session = dialog_manager.middleware_data.get("session_without_commit")
+    priority_id = int(item_id)
+    selected_priority = await TaskPriorityDAO.find_one_or_none_by_id(session, priority_id)
+    if (selected_priority is None):
+        return call.answer(f"Выбраная запись №{priority_id} не существует. Выберите еще раз")
+
+    dialog_manager.dialog_data['priority_id'] = priority_id
+    dialog_manager.dialog_data["selected_priority"] = selected_priority
+    await call.answer(f"Выбрана запись №{priority_id}")
+    await dialog_manager.next()
+
+
 async def on_region_selected(call: CallbackQuery, widget, dialog_manager: DialogManager, item_id: str):
     session = dialog_manager.middleware_data.get("session_without_commit")
     region_id = int(item_id)
@@ -93,13 +119,13 @@ async def on_create_confirmation(callback: CallbackQuery, widget, dialog_manager
     deadline = dialog_manager.dialog_data['deadline']
     is_active = dialog_manager.dialog_data['is_active']
 
-    status_id = dialog_manager.find('status_id').get_value()
+    status_id = dialog_manager.dialog_data['status_id']
     status = await TaskStatusDAO.find_one_or_none_by_id(session, status_id)
     if status is None:
         await callback.message.answer("Такого статуса не существует!")
         return await dialog_manager.switch_to(TaskCreate.status)
 
-    priority_id = dialog_manager.find('priority_id').get_value()
+    priority_id = dialog_manager.dialog_data['priority_id']
     priority = await TaskPriorityDAO.find_one_or_none_by_id(session, priority_id)
     if priority is None:
         await callback.message.answer("Такого приоритета не существует!")

@@ -21,7 +21,7 @@ async def get_region_id_tuples(dialog_manager: DialogManager, **kwargs):
 
     return {
         "region_id_tuples": caption, 
-        "text_table" : f"Всего найдено {len(regions)} должностей."
+        "text_table" : f"Всего найдено {len(regions)} регионов."
     }
 
 async def get_confirmed_data(dialog_manager: DialogManager, **kwargs):

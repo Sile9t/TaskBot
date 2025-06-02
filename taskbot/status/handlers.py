@@ -26,10 +26,13 @@ async def cancel_logic(callback: CallbackQuery, button: Button, dialog_manager: 
 async def on_status_selected(call: CallbackQuery, widget, dialog_manager: DialogManager, item_id: str):
     session = dialog_manager.middleware_data.get("session_without_commit")
     status_id = int(item_id)
-    selected_status = await TaskStatusDAO(session).find_one_or_none_by_id(status_id)
+    selected_status = await TaskStatusDAO.find_one_or_none_by_id(session, status_id)
+    if (selected_status is None):
+        return call.answer(f"Выбраная запись №{status_id} не существует. Выберите еще раз")
 
+    dialog_manager.dialog_data['status_id'] = status_id
     dialog_manager.dialog_data["selected_status"] = selected_status
-    await call.answer(f"Выбрана запись статуса №{status_id}")
+    await call.answer(f"Выбрана запись №{status_id}")
     await dialog_manager.next()
 
 

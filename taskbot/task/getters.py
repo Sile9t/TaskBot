@@ -49,9 +49,9 @@ async def get_confirmed_data(dialog_manager: DialogManager, **kwargs):
     deadline = dialog_manager.dialog_data['deadline']
     is_active = dialog_manager.dialog_data['is_active']
     is_active_text = 'Да' if is_active else 'Нет'
-    status_id = dialog_manager.find('status_id').get_value()
+    status_id = dialog_manager.dialog_data['status_id']
     status = await TaskStatusDAO.find_one_or_none_by_id(session, status_id)
-    priority_id = dialog_manager.find('priority_id').get_value()
+    priority_id = dialog_manager.dialog_data['priority_id']
     priority = await TaskPriorityDAO.find_one_or_none_by_id(session, priority_id)
     region_id = dialog_manager.dialog_data['region_id']
     region = await RegionDAO.find_one_or_none_by_id(session, region_id)

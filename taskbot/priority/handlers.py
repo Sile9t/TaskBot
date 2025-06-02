@@ -26,10 +26,13 @@ async def cancel_logic(callback: CallbackQuery, button: Button, dialog_manager: 
 async def on_priority_selected(call: CallbackQuery, widget, dialog_manager: DialogManager, item_id: str):
     session = dialog_manager.middleware_data.get("session_without_commit")
     priority_id = int(item_id)
-    selected_priority = await TaskPriorityDAO(session).find_one_or_none_by_id(priority_id)
+    selected_priority = await TaskPriorityDAO.find_one_or_none_by_id(session, priority_id)
+    if (selected_priority is None):
+        return call.answer(f"Выбраная запись №{priority_id} не существует. Выберите еще раз")
 
+    dialog_manager.dialog_data['priority_id'] = priority_id
     dialog_manager.dialog_data["selected_priority"] = selected_priority
-    await call.answer(f"Выбрана запись приоритета №{priority_id}")
+    await call.answer(f"Выбрана запись №{priority_id}")
     await dialog_manager.next()
 
 

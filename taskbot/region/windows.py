@@ -77,24 +77,24 @@ def get_region_selection_window(*widgets: WidgetSrc, state: State = RegionUpdate
             width=1,
             height=5,
             hide_pager=True,
-            id='scroll_no_pager',
+            id='scroll_region',
         ),
 
         Row(
             FirstPage(
-                scroll="scroll_no_pager", text=Format("⏮️ {target_page1}"),
+                scroll="scroll_region", text=Format("⏮️ {target_page1}"),
             ),
             PrevPage(
-                scroll="scroll_no_pager", text=Format("◀️"),
+                scroll="scroll_region", text=Format("◀️"),
             ),
             CurrentPage(
-                scroll="scroll_no_pager", text=Format("{current_page1}"),
+                scroll="scroll_region", text=Format("{current_page1}"),
             ),
             NextPage(
-                scroll="scroll_no_pager", text=Format("▶️"),
+                scroll="scroll_region", text=Format("▶️"),
             ),
             LastPage(
-                scroll="scroll_no_pager", text=Format("{target_page1} ⏭️"),
+                scroll="scroll_region", text=Format("{target_page1} ⏭️"),
             ),
         ),
 

@@ -12,6 +12,20 @@ async def get_all_priorities(dialog_manager: DialogManager, **kwargs):
     }
 
 
+async def get_priority_id_tuples(dialog_manager: DialogManager, **kwargs):
+    session = dialog_manager.middleware_data.get("session_without_commit")
+    priorities = await TaskPriorityDAO.find_all(session)
+    
+    caption = []
+    for priority in priorities:
+        caption.append((priority.title, priority.id))
+
+    return {
+        "priority_id_tuples": caption, 
+        "text_table" : f"Всего найдено {len(priorities)} приоритетов."
+    }
+
+
 async def get_confirmed_data(dialog_manager: DialogManager, **kwargs):
     value = dialog_manager.find("value").get_value()
     title = dialog_manager.find("title").get_value()
