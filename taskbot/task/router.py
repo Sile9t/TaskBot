@@ -5,8 +5,8 @@ from aiogram.fsm.context import FSMContext
 from aiogram.types import Message, CallbackQuery, ReplyKeyboardRemove
 from aiogram.filters import Command
 from aiogram_dialog import DialogManager, StartMode
-from taskbot.task.state import TaskCreate, TaskRead, TaskUpdate, TaskDelete
-from taskbot.task.kbs import task_menu_kb
+from taskbot.task.state import TaskCreate, TaskRead, TaskUpdate, TaskDelete, TaskStatusUpdate, TaskPriorityUpdate, TaskRegionUpdate
+from taskbot.task.kbs import task_menu_kb, task_update_menu
 
 task_router = Router()
 
@@ -71,8 +71,52 @@ async def task_update(call: CallbackQuery, dialog_manager: DialogManager):
     logger.info("Вызов кнопки admin/task_update")
 
     await call.answer("Изменение задачи")
+    await call.message.edit_text(
+        text=f"Меню для изменения задачи",
+        reply_markup=task_update_menu()
+    )
+
+
+@task_router.callback_query(F.data == "task_full_update")
+async def task_full_update(call: CallbackQuery, dialog_manager: DialogManager):
+    logger.info("Вызов кнопки admin/task_full_update")
+
+    await call.answer("Изменение задачи")
     await dialog_manager.start(
         state=TaskUpdate.id,
+        mode=StartMode.RESET_STACK
+    )
+
+
+@task_router.callback_query(F.data == "task_status_update")
+async def task_status_update(call: CallbackQuery, dialog_manager: DialogManager):
+    logger.info("Вызов кнопки admin/task_status_update")
+
+    await call.answer("Изменение статуса задачи")
+    await dialog_manager.start(
+        state=TaskStatusUpdate.id,
+        mode=StartMode.RESET_STACK
+    )
+
+
+@task_router.callback_query(F.data == "task_priority_update")
+async def task_priority_update(call: CallbackQuery, dialog_manager: DialogManager):
+    logger.info("Вызов кнопки admin/task_priority_update")
+
+    await call.answer("Изменение приоритета задачи")
+    await dialog_manager.start(
+        state=TaskPriorityUpdate.id,
+        mode=StartMode.RESET_STACK
+    )
+
+
+@task_router.callback_query(F.data == "task_region_update")
+async def task_region_update(call: CallbackQuery, dialog_manager: DialogManager):
+    logger.info("Вызов кнопки admin/task_region_update")
+
+    await call.answer("Изменение региона задачи")
+    await dialog_manager.start(
+        state=TaskRegionUpdate.id,
         mode=StartMode.RESET_STACK
     )
 

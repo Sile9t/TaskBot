@@ -1,6 +1,6 @@
 from loguru import logger
 from aiogram_dialog import DialogManager
-from taskbot.dao.dao import TaskDAO, TaskStatusDAO, TaskPriorityDAO, RegionDAO
+from taskbot.dao.dao import TaskDAO, RegionDAO, TaskPriorityDAO, RegionDAO
 
 async def get_all_tasks(dialog_manager: DialogManager, **kwargs):
     session = dialog_manager.middleware_data.get("session_without_commit")
@@ -50,7 +50,7 @@ async def get_confirmed_data(dialog_manager: DialogManager, **kwargs):
     is_active = dialog_manager.dialog_data['is_active']
     is_active_text = 'Да' if is_active else 'Нет'
     status_id = dialog_manager.dialog_data['status_id']
-    status = await TaskStatusDAO.find_one_or_none_by_id(session, status_id)
+    status = await RegionDAO.find_one_or_none_by_id(session, status_id)
     priority_id = dialog_manager.dialog_data['priority_id']
     priority = await TaskPriorityDAO.find_one_or_none_by_id(session, priority_id)
     region_id = dialog_manager.dialog_data['region_id']

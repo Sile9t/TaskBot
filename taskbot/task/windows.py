@@ -10,9 +10,10 @@ from taskbot.status.windows import get_statuses_window, get_status_selection_win
 from taskbot.priority.windows import get_priorities_window, get_priority_selection_window 
 from taskbot.region.windows import get_regions_window, get_region_selection_window
 from taskbot.task.handlers import (
-    go_menu, cancel_logic, on_task_selected, on_startline_selected, on_deadline_selected, on_is_active_selected, on_status_selected, on_priority_selected, on_region_selected, on_create_confirmation, on_update_confirmation, process_delete_task, on_task_id_input_error
+    go_menu, cancel_logic, on_task_selected, on_startline_selected, on_deadline_selected, on_is_active_selected, on_status_selected, on_priority_selected, on_region_selected, on_create_confirmation, on_update_confirmation, process_delete_task, on_task_id_input_error,
+    on_status_change_selected, on_priority_change_selected, on_region_change_selected
 )
-from taskbot.task.state import TaskCreate, TaskRead, TaskUpdate, TaskDelete
+from taskbot.task.state import TaskCreate, TaskRead, TaskUpdate, TaskDelete, TaskPriorityUpdate, TaskStatusUpdate, TaskRegionUpdate
 
 MAIN_BTNS = Row(
             Cancel(Const("В меню"), on_click=go_menu),
@@ -170,16 +171,6 @@ def get_task_status_window(stateGroup: StatesGroup = TaskCreate):
         state=stateGroup.status,
         main_btns=MAIN_BTNS
     )
-    return get_statuses_window(
-        Const("Введите номер статуса."),
-        
-        TextInput(
-            id="status_id",
-            on_success=Next()
-        ),
-        
-        state=stateGroup.status
-    )
 
 
 def get_task_priority_window(stateGroup: StatesGroup = TaskCreate):
@@ -188,16 +179,6 @@ def get_task_priority_window(stateGroup: StatesGroup = TaskCreate):
         on_priority_click=on_priority_selected,
         state=stateGroup.priority,
         main_btns=MAIN_BTNS
-    )
-    return get_priorities_window(
-        Const("Введите номер приоритета."),
-        
-        TextInput(
-            id="priority_id",
-            on_success=Next()
-        ),
-        
-        state=stateGroup.priority
     )
 
 
@@ -247,4 +228,31 @@ def get_delete_window():
             on_success=Next(on_click=process_delete_task)
         ),
         state=TaskDelete.id
+    )
+
+
+def get_update_task_status_window(stateGroup: StatesGroup = TaskStatusUpdate):
+    return get_status_selection_window(
+        Const("Выберите статус"),
+        on_status_click=on_status_change_selected,
+        state=stateGroup.status,
+        main_btns=MAIN_BTNS
+    )
+
+
+def get_update_task_priority_window(stateGroup: StatesGroup = TaskPriorityUpdate):
+    return get_priority_selection_window(
+        Const("Выберите приоритет"),
+        on_priority_click=on_priority_change_selected,
+        state=stateGroup.priority,
+        main_btns=MAIN_BTNS
+    )
+
+
+def get_update_task_region_window(stateGroup: StatesGroup = TaskRegionUpdate):
+    return get_region_selection_window(
+        Const("Выберите регион"),
+        on_region_click=on_region_change_selected,
+        state=stateGroup.region,
+        main_btns=MAIN_BTNS
     )

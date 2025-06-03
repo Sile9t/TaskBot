@@ -1,10 +1,10 @@
 from loguru import logger
 from aiogram_dialog import DialogManager
-from taskbot.dao.dao import TaskStatusDAO
+from taskbot.dao.dao import RegionDAO
 
 async def get_all_statuses(dialog_manager: DialogManager, **kwargs):
     session = dialog_manager.middleware_data.get("session_without_commit")
-    statuses = await TaskStatusDAO.find_all(session)
+    statuses = await RegionDAO.find_all(session)
     
     return {
         "statuses": [status.to_dict() for status in statuses], 
@@ -14,7 +14,7 @@ async def get_all_statuses(dialog_manager: DialogManager, **kwargs):
 
 async def get_status_id_tuples(dialog_manager: DialogManager, **kwargs):
     session = dialog_manager.middleware_data.get("session_without_commit")
-    statuses = await TaskStatusDAO.find_all(session)
+    statuses = await RegionDAO.find_all(session)
     
     caption = []
     for status in statuses:

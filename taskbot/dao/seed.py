@@ -2,7 +2,7 @@ from typing import List
 from loguru import logger
 from sqlalchemy.ext.asyncio import AsyncSession
 from taskbot.dao.session_maker import connection
-from taskbot.dao.dao import RoleDAO, RegionDAO, TaskStatusDAO, TaskPriorityDAO
+from taskbot.dao.dao import RoleDAO, RegionDAO, RegionDAO, TaskPriorityDAO
 from taskbot.dao.schemas import RoleDto, RegionDto, TaskStatusDto, TaskPriorityDto 
 
 
@@ -537,12 +537,12 @@ defaultStatuses = [
 
 @connection
 async def seedTaskStatuses(session: AsyncSession, data: List[TaskStatusDto] = defaultStatuses):
-    count = await TaskStatusDAO.count(session)
+    count = await RegionDAO.count(session)
 
     if (count == 0):
         try:
             for item in data:
-                await TaskStatusDAO.add(session, item)
+                await RegionDAO.add(session, item)
             
             await session.commit()
         except Exception as e:

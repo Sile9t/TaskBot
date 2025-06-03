@@ -2,7 +2,7 @@ from typing import Any
 from aiogram.types import CallbackQuery, Message
 from aiogram_dialog import DialogManager
 from aiogram_dialog.widgets.kbd import Button
-from taskbot.dao.dao import TaskStatusDAO
+from taskbot.dao.dao import RegionDAO
 from taskbot.dao.schemas import TaskStatusDto, TaskStatusDtoBase
 from taskbot.admin.kbs import main_admin_kb
 from taskbot.status.kbs import status_menu_kb
@@ -26,7 +26,7 @@ async def cancel_logic(callback: CallbackQuery, button: Button, dialog_manager: 
 async def on_status_selected(call: CallbackQuery, widget, dialog_manager: DialogManager, item_id: str):
     session = dialog_manager.middleware_data.get("session_without_commit")
     status_id = int(item_id)
-    selected_status = await TaskStatusDAO.find_one_or_none_by_id(session, status_id)
+    selected_status = await RegionDAO.find_one_or_none_by_id(session, status_id)
     if (selected_status is None):
         return call.answer(f"Выбраная запись №{status_id} не существует. Выберите еще раз")
 
@@ -65,10 +65,10 @@ async def on_create_confirmation(callback: CallbackQuery, widget, dialog_manager
         description=description
     )
 
-    check = await TaskStatusDAO.find_one_or_none(session, newstatus)
+    check = await RegionDAO.find_one_or_none(session, newstatus)
     if not check:
         await callback.answer("Сохранение")
-        await TaskStatusDAO.add(session, newstatus)
+        await RegionDAO.add(session, newstatus)
         await callback.answer(f"Запись статуса успешно создана!")
         text = "Запись статуса успешно сохранена"
         await callback.message.answer(text, reply_markup=main_admin_kb())
@@ -87,7 +87,7 @@ async def on_update_confirmation(callback: CallbackQuery, widget, dialog_manager
     title = dialog_manager.find('title').get_value()
     description = dialog_manager.find('description').get_value()
     
-    check = await TaskStatusDAO.find_one_or_none_by_id(session, id)
+    check = await RegionDAO.find_one_or_none_by_id(session, id)
     if check:
         await callback.answer("Сохранение")
         
@@ -110,7 +110,7 @@ async def process_delete_status(call: CallbackQuery, widget, dialog_manager: Dia
     session = dialog_manager.middleware_data.get("session_with_commit")
 
     id = dialog_manager.find("id").get_value()
-    status = await TaskStatusDAO.find_one_or_none_by_id(session, id)
+    status = await RegionDAO.find_one_or_none_by_id(session, id)
     
     if status:
         await call.answer("Удаление записи")
@@ -119,7 +119,7 @@ async def process_delete_status(call: CallbackQuery, widget, dialog_manager: Dia
             title=status.title,
             description=status.description
         )
-        count = await TaskStatusDAO.delete(session, statusDto)
+        count = await RegionDAO.delete(session, statusDto)
         text = f"Удалено {count} записей"
         await session.commit()
         await call.answer(text)

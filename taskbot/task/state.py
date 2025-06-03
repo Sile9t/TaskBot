@@ -28,3 +28,16 @@ class TaskUpdate(StatesGroup):
 
 class TaskDelete(StatesGroup):
     id = State()
+
+class TaskPriorityUpdate(StatesGroup):
+    id = State()
+    priority = State()
+
+class TaskStatusUpdate(StatesGroup):
+    id = State()
+    status = State()
+
+class TaskRegionUpdate(StatesGroup):
+    id = State()
+    region = State()
+

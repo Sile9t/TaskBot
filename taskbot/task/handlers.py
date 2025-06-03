@@ -4,7 +4,7 @@ from typing import Any
 from aiogram.types import CallbackQuery, Message
 from aiogram_dialog import DialogManager
 from aiogram_dialog.widgets.kbd import Button
-from taskbot.dao.dao import TaskDAO, RegionDAO, TaskStatusDAO, TaskPriorityDAO
+from taskbot.dao.dao import TaskDAO, RegionDAO, RegionDAO, TaskPriorityDAO
 from taskbot.dao.schemas import TaskDto, TaskDtoBase
 from taskbot.admin.kbs import main_admin_kb
 from taskbot.task.kbs import task_menu_kb
@@ -73,7 +73,7 @@ async def on_is_active_selected(call: CallbackQuery, widger, dialog_manager: Dia
 async def on_status_selected(call: CallbackQuery, widget, dialog_manager: DialogManager, item_id: str):
     session = dialog_manager.middleware_data.get("session_without_commit")
     status_id = int(item_id)
-    selected_status = await TaskStatusDAO.find_one_or_none_by_id(session, status_id)
+    selected_status = await RegionDAO.find_one_or_none_by_id(session, status_id)
     if (selected_status is None):
         return call.answer(f"Выбраная запись №{status_id} не существует. Выберите еще раз")
 
@@ -120,7 +120,7 @@ async def on_create_confirmation(callback: CallbackQuery, widget, dialog_manager
     is_active = dialog_manager.dialog_data['is_active']
 
     status_id = dialog_manager.dialog_data['status_id']
-    status = await TaskStatusDAO.find_one_or_none_by_id(session, status_id)
+    status = await RegionDAO.find_one_or_none_by_id(session, status_id)
     if status is None:
         await callback.message.answer("Такого статуса не существует!")
         return await dialog_manager.switch_to(TaskCreate.status)
@@ -173,19 +173,19 @@ async def on_update_confirmation(callback: CallbackQuery, widget, dialog_manager
     deadline = dialog_manager.dialog_data['deadline']
     is_active = dialog_manager.dialog_data['is_active']
 
-    status_id = dialog_manager.find('status_id').get_value()
-    status = await TaskStatusDAO.find_one_or_none_by_id(session, status_id)
+    status_id = dialog_manager.dialog_data['status_id']
+    status = await RegionDAO.find_one_or_none_by_id(session, status_id)
     if status is None:
         await callback.message.answer("Такого статуса не существует!")
         return await dialog_manager.switch_to(TaskCreate.status)
 
-    priority_id = dialog_manager.find('priority_id').get_value()
+    priority_id = dialog_manager.dialog_data['priority_id']
     priority = await TaskPriorityDAO.find_one_or_none_by_id(session, priority_id)
     if priority is None:
         await callback.message.answer("Такого приоритета не существует!")
         return await dialog_manager.switch_to(TaskCreate.priority)
 
-    region_id = dialog_manager.find('region_id').get_value()
+    region_id = dialog_manager.dialog_data['region_id']
     region = await RegionDAO.find_one_or_none_by_id(session, region_id)
     if region is None:
         await callback.message.answer("Такого региона не существует!")
@@ -242,3 +242,90 @@ async def process_delete_task(call: CallbackQuery, widget, dialog_manager: Dialo
         await dialog_manager.done()
     else:
         await call.answer("Запись задачи не найдена!\nВведите другой id.")
+
+
+async def on_status_change_selected(call: CallbackQuery, widget, dialog_manager: DialogManager, item_id: str):
+    session = dialog_manager.middleware_data.get("session_without_commit")
+    
+    user_id = call.from_user.id
+    id = dialog_manager.find('id').get_value()
+
+    status_id = int(item_id)
+    selected_status = await RegionDAO.find_one_or_none_by_id(session, status_id)
+    if (selected_status is None):
+        return call.answer(f"Выбраная запись №{status_id} не существует. Выберите еще раз")
+    
+    check = await TaskDAO.find_one_or_none_by_id(session, id)
+    if check:
+        await call.answer("Сохранение")
+
+        check.status_id = status_id
+        
+        await session.commit()
+
+        await call.answer(f"Запись задачи успешно обновлена!")
+        text = "Запись задачи успешно сохранена"
+        await call.message.answer(text, reply_markup=main_admin_kb())
+
+        await dialog_manager.done()
+    else:
+        await call.message.answer("Запись задачи не найдена!")
+        await dialog_manager.switch_to(TaskUpdate.status)
+
+
+async def on_priority_change_selected(call: CallbackQuery, widget, dialog_manager: DialogManager, item_id: str):
+    session = dialog_manager.middleware_data.get("session_without_commit")
+
+    user_id = call.from_user.id
+    id = dialog_manager.find('id').get_value()
+
+    priority_id = int(item_id)
+    selected_priority = await TaskPriorityDAO.find_one_or_none_by_id(session, priority_id)
+    if (selected_priority is None):
+        return call.answer(f"Выбраная запись №{priority_id} не существует. Выберите еще раз")
+    
+    check = await TaskDAO.find_one_or_none_by_id(session, id)
+    if check:
+        await call.answer("Сохранение")
+
+        check.priority_id = priority_id
+        
+        await session.commit()
+
+        await call.answer(f"Запись задачи успешно обновлена!")
+        text = "Запись задачи успешно сохранена"
+        await call.message.answer(text, reply_markup=main_admin_kb())
+
+        await dialog_manager.done()
+    else:
+        await call.message.answer("Запись задачи не найдена!")
+        await dialog_manager.switch_to(TaskUpdate.priority)
+
+
+async def on_region_change_selected(call: CallbackQuery, widget, dialog_manager: DialogManager, item_id: str):
+    session = dialog_manager.middleware_data.get("session_without_commit")
+
+    user_id = call.from_user.id
+    id = dialog_manager.find('id').get_value()
+
+    region_id = int(item_id)
+    selected_region = await RegionDAO.find_one_or_none_by_id(session, region_id)
+    if (selected_region is None):
+        return call.answer(f"Выбраная запись №{region_id} не существует. Выберите еще раз")
+    
+    check = await TaskDAO.find_one_or_none_by_id(session, id)
+    if check:
+        await call.answer("Сохранение")
+
+        check.region_id = region_id
+        
+        await session.commit()
+
+        await call.answer(f"Запись задачи успешно обновлена!")
+        text = "Запись задачи успешно сохранена"
+        await call.message.answer(text, reply_markup=main_admin_kb())
+
+        await dialog_manager.done()
+    else:
+        await call.message.answer("Запись задачи не найдена!")
+        await dialog_manager.switch_to(TaskUpdate.region)
