@@ -27,7 +27,7 @@ async def cancel_handler(message: Message, state: FSMContext) -> None:
 
 @user_router.message(Command('user_menu'))
 async def user_menu(message: Message):
-    logger.info("Вызов кнопки admin/user_menu")
+    logger.info(f"chat#{message.chat.id}|user#{message.from_user.id}: Вызов кнопки admin/user_menu")
     await message.answer(
         text=f"Меню для сотрудников:",
         reply_markup=user_menu_kb()
@@ -36,7 +36,7 @@ async def user_menu(message: Message):
 
 @user_router.callback_query(F.data == 'user_menu')
 async def user_menu(call: CallbackQuery):
-    logger.info("Вызов кнопки admin/user_menu")
+    logger.info(f"chat#{call.message.chat.id}|user#{call.message.from_user.id}: Вызов кнопки admin/user_menu")
     await call.message.edit_text(
         text=f"Меню для сотрудников:",
         reply_markup=user_menu_kb()
@@ -46,7 +46,7 @@ async def user_menu(call: CallbackQuery):
 @user_router.message(F.text.startswith("user_list"))
 @user_router.callback_query(F.data.startswith("user_list"))
 async def user_list(call: CallbackQuery, dialog_manager: DialogManager):
-    logger.info("Вызов кнопки admin/user_list")
+    logger.info(f"chat#{call.message.chat.id}|user#{call.message.from_user.id}: Вызов кнопки admin/user_list")
 
     await call.answer()
     await dialog_manager.start(
@@ -57,7 +57,7 @@ async def user_list(call: CallbackQuery, dialog_manager: DialogManager):
 
 @user_router.callback_query(F.data == "user_add")
 async def user_add(call: CallbackQuery, dialog_manager: DialogManager):
-    logger.info(f"Вызов кнопки admin/user_add\nЗапуск сценария добавления должности")
+    logger.info(f"chat#{call.message.chat.id}|user#{call.message.from_user.id}: Вызов кнопки admin/user_add\nЗапуск сценария добавления должности")
 
     await call.answer("Добавление должности")
     await dialog_manager.start(
@@ -68,7 +68,7 @@ async def user_add(call: CallbackQuery, dialog_manager: DialogManager):
 
 @user_router.callback_query(F.data == "user_update")
 async def user_update(call: CallbackQuery, dialog_manager: DialogManager):
-    logger.info("Вызов кнопки admin/user_update")
+    logger.info(f"chat#{call.message.chat.id}|user#{call.message.from_user.id}: Вызов кнопки admin/user_update")
 
     await call.answer("Изменение должности")
     await dialog_manager.start(
@@ -79,7 +79,7 @@ async def user_update(call: CallbackQuery, dialog_manager: DialogManager):
 
 @user_router.callback_query(F.data == "user_delete")
 async def user_delete(call: CallbackQuery, dialog_manager: DialogManager):
-    logger.info("Вызов сценария удаления должности")
+    logger.info(f"chat#{call.message.chat.id}|user#{call.message.from_user.id}: Вызов сценария удаления должности")
 
     await call.answer("Удаление должности")
     await dialog_manager.start(

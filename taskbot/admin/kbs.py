@@ -36,43 +36,6 @@ def main_admin_kb(user_id: int = -1):
 
     return kb.as_markup()
 
-
-def task_kb():
-    kb = InlineKeyboardBuilder()
-
-    kb.button(text="📋 Список задач", callback_data="task_list")
-    kb.button(text="➕ Добавить задачу", callback_data="task_add")
-    kb.button(text="🖋 Редактировать задачу", callback_data="task_edit")
-    kb.button(text="➖ Удалить задачу", callback_data="task_delete")
-    kb.button(text="✔ Закрыть задачу", callback_data="task_close")
-    kb.button(text="Назад", callback_data="admin_panel")
-    kb.adjust(1, 2, 2, 1)
-
-    return kb.as_markup()
-
-
-def task_add_kb():
-    return ReplyKeyboardMarkup(
-        keyboard=None,
-        resize_keyboard=True,
-        one_time_keyboard=True,
-        input_field_placeholder=f"title: Название,\ndescription: Описание,\nstartline: Дата начала(дд.мм.гггг),\ndeadline: Дата окончания(дд.мм.гггг),\nis_active: Доступ бота к задаче(True/False),\nstatus_id: Статус задачи,\npriority_id: Приоритет задачи,\nregion_id: Регион"
-    )
-    
-
-def employee_kb():
-    kb = InlineKeyboardBuilder()
-    
-    kb.button(text="📋 Список сотрудников", callback_data="employee_list")
-    kb.button(text="➕ Добавить сотрудника", callback_data="employee_add")
-    kb.button(text="🖋 Редактировать информацию о сотруднике", callback_data="employee_edit")
-    kb.button(text="➖ Удалить информацию о сотруднике", callback_data="employee_delete")
-    kb.button(text="✔ Изменить роль сотрудника ", callback_data="employee_change_role")
-    kb.button(text="Назад", callback_data="admin_panel")
-    kb.adjust(1, 2, 2, 1)
-
-    return kb.as_markup()
-
 def employee_list_kb(page: int = 1, pageCount: int = 1):
     kb = InlineKeyboardBuilder()
     

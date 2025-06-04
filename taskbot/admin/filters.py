@@ -7,9 +7,9 @@ from taskbot.dao.dao import UserDAO
 from taskbot.admin.schemas import UserTelegramAndRoleIds
 
 class IsAdmin(BaseFilter):
-    def __init__(self, user_ids: int | List[int]):
-        self.user_ids = user_ids
-
+    def __init__(self, expected: bool):
+        self.expected = expected
+    
     async def __call__(self, message: Message, session_without_commit: AsyncSession):
         id = message.from_user.id
         user = await UserDAO.find_one_or_none(
@@ -20,7 +20,10 @@ class IsAdmin(BaseFilter):
             )
         )
         
-        return user != None
+        role = 'admin' if user else 'not admin'
+        logger.info(f"user#{id} is {role}")
+
+        return (user != None) == self.expected
         if isinstance(self.user_ids, int):
             return id == self.user_ids
         return id in self.user_ids
