@@ -117,7 +117,7 @@ async def admin_panel(message: Message, session_without_commit: AsyncSession):
 
 @admin_router.callback_query(F.data == "admin_panel")
 async def admin_panel(call: CallbackQuery, session_without_commit: AsyncSession):
-    logger.info(f"chat#{message.chat.id}|user#{message.from_user.id}: Вызов кнопки admin/admin_panel")
+    logger.info(f"chat#{call.message.chat.id}|user#{call.message.from_user.id}: Вызов кнопки admin/admin_panel")
     
     user_id = call.from_user.id
     user = await UserDAO.find_one_or_none(session_without_commit, UserTelegramId(telegram_id=user_id))
