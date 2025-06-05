@@ -14,9 +14,9 @@ class Region(Base):
     description: Mapped[Optional[str]]
     # chat_id: Mapped[Optional[int]]
 
-    users: Mapped[list["User"]] = relationship("User", back_populates="region", lazy='select')
+    users: Mapped[List["User"]] = relationship("User", back_populates="region", lazy='select')
     
-    tasks: Mapped[list["Task"]] = relationship("Task", back_populates="region", lazy='select')
+    tasks: Mapped[List["Task"]] = relationship("Task", back_populates="region", lazy='select')
     
 # #
 # Role class determines user right
@@ -30,7 +30,15 @@ class Role(Base):
     name: Mapped[str] = mapped_column(String(50))
     description: Mapped[Optional[str]]
     
-    users: Mapped[list["User"]] = relationship("User", back_populates="role", lazy='select')
+    users: Mapped[List["User"]] = relationship("User", back_populates="role", lazy='select')
+
+task_user_table = Table(
+    "task_user_table",
+    Base.metadata,
+    Column('user_id', ForeignKey('users.id')),
+    Column('task_id', ForeignKey('tasks.id')),
+)
+
 
 # #
 # User class describes system user
@@ -46,6 +54,12 @@ class User(Base):
     region_id: Mapped[Optional[int]] = mapped_column(ForeignKey("regions.id"))
     region: Mapped[Optional["Region"]] = relationship("Region", back_populates="users", foreign_keys="[User.region_id]", lazy="joined")
 
+    refer_links: Mapped[List["ReferLink"]] = relationship("ReferLink", back_populates="user")
+
+    created_tasks: Mapped[List["Task"]] = relationship("Task", back_populates="task.creator_id", lazy="joined")
+    
+    perform_tasks: Mapped[List["Task"]] = relationship(secondary=task_user_table, back_populates="users")
+
 # #
 # Task status class describes status of the task
 # 
@@ -59,7 +73,7 @@ class TaskStatus(Base):
     title: Mapped[str]
     description: Mapped[Optional[str]]
     
-    tasks: Mapped[list["Task"]] = relationship("Task", back_populates="status", lazy='select')
+    tasks: Mapped[List["Task"]] = relationship("Task", back_populates="status", lazy='select')
     
     @declared_attr
     def __tablename__(cls) -> str:
@@ -74,7 +88,7 @@ class TaskPriority(Base):
     title: Mapped[str]
     description: Mapped[Optional[str]]
     
-    tasks: Mapped[list["Task"]] = relationship("Task", back_populates="priority", lazy='select')
+    tasks: Mapped[List["Task"]] = relationship("Task", back_populates="priority", lazy='select')
 
     @declared_attr
     def __tablename__(cls) -> str:
@@ -104,15 +118,19 @@ class Task(Base):
     
     region_id: Mapped[int] = mapped_column(ForeignKey("regions.id"))
     region: Mapped["Region"] = relationship("Region", back_populates="tasks", foreign_keys="[Task.region_id]", lazy="joined")
+    
+    creator_id: Mapped[int] = mapped_column(ForeignKey("users.id"))
+    creator: Mapped["User"] = relationship("User", back_populates="created_tasks")
+
+    performers: Mapped[List["User"]] = relationship("User", secondary=task_user_table, back_populates="perform_tasks")
 
 
-# task_user_table = Table(
-#     "task_user_table",
-#     Base.metadata,
-#     Column('user_id', ForeignKey('users.id')),
-#     Column('task_id', ForeignKey('tasks.id')),
-# )
+class ReferLink(Base):
+    user_id: Mapped[int] = mapped_column(ForeignKey("users.id"))
+    user: Mapped["User"] = relationship("User", back_populates='refer_links')
+    link: Mapped[str]
 
-# class ReferLink(Base):
-#     user_id: Mapped[int]
-#     link: Mapped[str]
+
+    @declared_attr
+    def __tablename__(cls) -> str:
+        return "refer_links"
