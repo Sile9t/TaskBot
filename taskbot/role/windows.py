@@ -1,11 +1,14 @@
+from operator import itemgetter
 from aiogram.fsm.state import StatesGroup, State
 from aiogram.types import ContentType
 from aiogram_dialog import Window
 from aiogram_dialog.widgets.kbd import Button, Group, ScrollingGroup, Select, Calendar, CalendarConfig, Back, Cancel, NumberedPager, Row, Next, SwitchTo, CurrentPage, NextPage, PrevPage, FirstPage, LastPage
+from aiogram_dialog.widgets.kbd.select import OnItemClick
+from aiogram_dialog.widgets.widget_event import WidgetEventProcessor
 from aiogram_dialog.widgets.input import MessageInput, TextInput
 from aiogram_dialog.widgets.text import Const, Format, List
 from aiogram_dialog.widgets.utils import WidgetSrc
-from taskbot.role.getters import get_all_roles, get_confirmed_data
+from taskbot.role.getters import get_all_roles, get_confirmed_data, get_role_id_tuples
 from taskbot.role.handlers import (
     go_menu, cancel_logic, on_role_selected, on_create_confirmation, on_update_confirmation, process_delete_role, on_role_id_input_error
 )
@@ -16,7 +19,7 @@ MAIN_BTNS = Row(
             Cancel(Const("Отмена"), on_click=cancel_logic),
         )
 
-def get_roles_window(*widgets: WidgetSrc, state: State = RoleRead.id):
+def get_roles_window(*widgets: WidgetSrc, state: State = RoleRead.id, main_btns: Row = MAIN_BTNS):
     return Window(
         Format("{text_table}"),
         
@@ -51,9 +54,54 @@ def get_roles_window(*widgets: WidgetSrc, state: State = RoleRead.id):
 
         *widgets,
 
-        MAIN_BTNS,
+        main_btns,
         
         getter=get_all_roles,
+        state=state,
+    )
+
+
+def get_role_selection_window(*widgets: WidgetSrc, state: State = RoleUpdate.id, on_role_click: OnItemClick[Select[str], str] | WidgetEventProcessor | None = on_role_selected, main_btns: Row = MAIN_BTNS):
+    return Window(
+        Format("{text_table}"),
+
+        ScrollingGroup(
+            Select(
+                Format("{item[0]}"),
+                id='select_role',
+                items='role_id_tuples',
+                item_id_getter=itemgetter(1),
+                on_click=on_role_click
+            ),
+            width=1,
+            height=5,
+            hide_pager=True,
+            id='scroll_role',
+        ),
+
+        Row(
+            FirstPage(
+                scroll="scroll_role", text=Format("⏮️ {target_page1}"),
+            ),
+            PrevPage(
+                scroll="scroll_role", text=Format("◀️"),
+            ),
+            CurrentPage(
+                scroll="scroll_role", text=Format("{current_page1}"),
+            ),
+            NextPage(
+                scroll="scroll_role", text=Format("▶️"),
+            ),
+            LastPage(
+                scroll="scroll_role", text=Format("{target_page1} ⏭️"),
+            ),
+        ),
+
+        *widgets,
+
+        main_btns,
+        
+        getter=get_role_id_tuples,
         state=state,
     )
 

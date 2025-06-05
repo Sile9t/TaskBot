@@ -37,17 +37,18 @@ async def on_user_id_input_error(message: Message, dialog_: Any, dialog_manager:
     await message.answer("Номер должен быть числом!")
 
 
-# async def on_user_id_input(message: Message, dialog_: Any, dialog_manager: DialogManager):
-#     session = dialog_manager.middleware_data.get("session_without_commit")
+async def on_role_selected(call: CallbackQuery, widget, dialog_manager: DialogManager, item_id: str):
+    session = dialog_manager.middleware_data.get("session_without_commit")
+    role_id = int(item_id)
+    selected_role = await RoleDAO.find_one_or_none_by_id(session, role_id)
+    if (selected_role is None):
+        return call.answer(f"Выбраная запись №{role_id} не существует. Выберите еще раз")
 
-#     id = dialog_manager.find('id').get_value()
-#     user = await UserDAO.find_one_or_none_by_id(session, id)
 
-#     if user is None:
-#         await message.answer(f"Должности с таким номером не существует!\nВведите его еще раз.")
-#         return
-    
-#     await dialog_manager.next()
+    dialog_manager.dialog_data["role_id"] = role_id
+    dialog_manager.dialog_data["selected_role"] = selected_role
+    await call.answer(f"Выбрана должность №{role_id}")
+    await dialog_manager.next()
 
 
 async def on_create_confirmation(callback: CallbackQuery, widget, dialog_manager: DialogManager, **kwargs):
@@ -56,14 +57,14 @@ async def on_create_confirmation(callback: CallbackQuery, widget, dialog_manager
     user_id = callback.from_user.id
     first_name = dialog_manager.find("first_name").get_value()
     last_name = dialog_manager.find("last_name").get_value()
-    role_id = dialog_manager.find("role_id").get_value()
+    role_id = dialog_manager.dialog_data["role_id"]
     role = await RoleDAO.find_one_or_none_by_id(session, role_id)
     if role is None:
         await callback.message.answer("Такой должности не существует!")
         return await dialog_manager.switch_to(UserCreate.role)
 
-    if (dialog_manager.find("region_id")):
-        region_id = dialog_manager.find("region_id").get_value()
+    if (dialog_manager.dialog_data.get("region_id")):
+        region_id = dialog_manager.dialog_data.get("region_id")
         region = await RegionDAO.find_one_or_none_by_id(session, region_id)
         if region is None:
             await callback.message.answer("Такого региона не существует!")
@@ -97,14 +98,14 @@ async def on_update_confirmation(callback: CallbackQuery, widget, dialog_manager
     id = dialog_manager.find("id").get_value()
     first_name = dialog_manager.find("first_name").get_value()
     last_name = dialog_manager.find("last_name").get_value()
-    role_id = dialog_manager.find("role_id").get_value()
+    role_id = dialog_manager.dialog_data["role_id"]
     role = await RoleDAO.find_one_or_none_by_id(session, role_id)
     if role is None:
         await callback.message.answer("Такой должности не существует!")
         return await dialog_manager.switch_to(UserUpdate.role)
 
-    if (dialog_manager.find("region_id")):
-        region_id = dialog_manager.find("region_id").get_value()
+    if (dialog_manager.dialog_data.get("region_id")):
+        region_id = dialog_manager.dialog_data.get("region_id")
         region = await RegionDAO.find_one_or_none_by_id(session, region_id)
         if region is None:
             await callback.message.answer("Такого региона не существует!")
@@ -117,9 +118,7 @@ async def on_update_confirmation(callback: CallbackQuery, widget, dialog_manager
         check.first_name = first_name
         check.last_name = last_name
         check.role_id = role_id
-        # check.role = role
         check.region_id = region_id
-        # check.region = region
 
         await session.commit()
 

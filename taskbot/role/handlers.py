@@ -26,7 +26,7 @@ async def cancel_logic(callback: CallbackQuery, button: Button, dialog_manager: 
 async def on_role_selected(call: CallbackQuery, widget, dialog_manager: DialogManager, item_id: str):
     session = dialog_manager.middleware_data.get("session_without_commit")
     role_id = int(item_id)
-    selected_role = await RoleDAO(session).find_one_or_none_by_id(role_id)
+    selected_role = await RoleDAO.find_one_or_none_by_id(session, role_id)
 
     dialog_manager.dialog_data["selected_role"] = selected_role
     await call.answer(f"Выбрана должность №{role_id}")

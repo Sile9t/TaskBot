@@ -30,10 +30,10 @@ async def get_confirmed_data(dialog_manager: DialogManager, **kwargs):
 
     first_name = dialog_manager.find("first_name").get_value()
     last_name = dialog_manager.find("last_name").get_value()
-    role_id = dialog_manager.find("role_id").get_value()
+    role_id = dialog_manager.dialog_data["role_id"]
     role = await RoleDAO.find_one_or_none_by_id(session, role_id)
-    if (dialog_manager.find("region_id")):
-        region_id = dialog_manager.find("region_id").get_value()
+    if (dialog_manager.dialog_data.get("region_id")):
+        region_id = dialog_manager.dialog_data.get("region_id")
         region = await RegionDAO.find_one_or_none_by_id(session, region_id)
     
     confirmed_text = (
@@ -41,7 +41,7 @@ async def get_confirmed_data(dialog_manager: DialogManager, **kwargs):
         f" Имя: {first_name}\n"
         f" Фамилия: {last_name}\n"
         f" Должность: {role.name}\n"
-        f" Регион: {region.name}\n\n"
+        f" Регион: {region.name if region else None}\n\n"
         "✅ Все ли верно?"
     )
 

@@ -5,10 +5,11 @@ from aiogram_dialog.widgets.input import MessageInput, TextInput
 from aiogram_dialog.widgets.text import Const, Format, List
 from aiogram_dialog.widgets.utils import WidgetSrc
 from taskbot.user.getters import get_all_users, get_confirmed_data
-from taskbot.role.windows import get_roles_window
-from taskbot.region.windows import get_regions_window
+from taskbot.role.windows import get_roles_window, get_role_selection_window
+from taskbot.region.windows import get_regions_window, get_region_selection_window
+from taskbot.region.handlers import on_region_selected
 from taskbot.user.handlers import (
-    go_menu, cancel_logic, on_user_selected, on_create_confirmation, on_update_confirmation, process_delete_user, on_user_id_input_error
+    go_menu, cancel_logic, on_user_selected, on_role_selected, on_create_confirmation, on_update_confirmation, process_delete_user, on_user_id_input_error
 )
 from taskbot.user.state import UserCreate, UserRead, UserUpdate, UserDelete
 
@@ -63,7 +64,7 @@ def get_users_window(*widgets: WidgetSrc, state: State = UserRead.id):
 
 def get_user_id_window(stateGroup: StatesGroup = UserUpdate):
     return get_users_window(
-        Const("Введите номер должности для изменения."),
+        Const("Введите номер пользователя для изменения."),
         
         TextInput(
             id="id",
@@ -106,57 +107,20 @@ def get_user_last_name_window(stateGroup: StatesGroup = UserCreate):
 
 
 def get_user_role_window(stateGroup: StatesGroup = UserCreate):
-    return get_roles_window(
-        Const("Введите номер должности."),
-        
-        TextInput(
-            id="role_id",
-            on_success=Next()
-        ),
-        
-        state=stateGroup.role
-    )
-    return Window(
-        Const("Введите название должности."),
-        
-        TextInput(
-            id="",
-            on_success=Next()
-        ),
-
-        Group(
-            Next(Const("Пропустить")),         
-            MAIN_BTNS,
-        ),
-        state=stateGroup.region,
+    return get_role_selection_window(
+        Const("Выберите должность пользователя"),
+        state=stateGroup.role,
+        on_role_click=on_role_selected,
+        main_btns=MAIN_BTNS
     )
 
 
 def get_user_region_window(stateGroup: StatesGroup = UserCreate):
-    return get_regions_window(
-        Const("Введите номер региона."),
-        
-        TextInput(
-            id="region_id",
-            on_success=Next()
-        ),
-        Next(Const("Пропустить")),         
-        
-        state=stateGroup.region
-    )
-    return Window(
-        Const("Введите название должности."),
-        
-        TextInput(
-            id="",
-            on_success=Next()
-        ),
-
-        Group(
-            Next(Const("Пропустить")),         
-            MAIN_BTNS,
-        ),
+    return get_region_selection_window(
+        Const("Выберите регион пользователя"),
+        on_region_click=on_region_selected,
         state=stateGroup.region,
+        main_btns=MAIN_BTNS
     )
 
 

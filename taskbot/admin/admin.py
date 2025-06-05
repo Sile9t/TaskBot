@@ -19,7 +19,7 @@ async def getAdminFromMessage(message: Message, session_without_commit: AsyncSes
     role = await RoleDAO.find_one_or_none_by_id(session_without_commit, 1)
     return UserDtoBase(
         first_name=message.from_user.first_name,
-        last_name=message.from_user.last_name,
+        last_name=message.from_user.last_name if message.from_user.last_name is not None else "Нет фамилии",
         telegram_id=message.from_user.id,
         role_id=1,
         region_id=1

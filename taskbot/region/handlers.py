@@ -26,7 +26,7 @@ async def cancel_logic(callback: CallbackQuery, button: Button, dialog_manager: 
 async def on_region_selected(call: CallbackQuery, widget, dialog_manager: DialogManager, item_id: str):
     session = dialog_manager.middleware_data.get("session_without_commit")
     region_id = int(item_id)
-    selected_region = await RegionDAO(session).find_one_or_none_by_id(region_id)
+    selected_region = await RegionDAO.find_one_or_none_by_id(session, region_id)
     if (selected_region is None):
         return call.answer(f"Выбраная запись №{region_id} не существует. Выберите еще раз")
 
