@@ -1,15 +1,20 @@
+# Ignore chache
+__pycache__/
+*.pytest_cache/
 *.pyc
-__pycache__
-*.pytest_cache
+*.pyo
 
+# Ignore virtual environments
 .env
 .venv
 
-log.*
+# Ignore log files
+log.txt
+*.log
 
 credentials.json
 
-instance
-
+# Ignore database files
+instance/
 *.db
 *.sqlite

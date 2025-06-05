@@ -1,6 +1,6 @@
 from datetime import datetime, timedelta
 from typing import Annotated, List, Optional
-from sqlalchemy import String, Boolean, Integer, TIMESTAMP, func, ForeignKey, text
+from sqlalchemy import String, Boolean, Integer, TIMESTAMP, func, ForeignKey, text, Table, Column
 from sqlalchemy.orm import Mapped, mapped_column, relationship, declared_attr
 
 from .database import Base, DeclarativeBase
@@ -104,3 +104,15 @@ class Task(Base):
     
     region_id: Mapped[int] = mapped_column(ForeignKey("regions.id"))
     region: Mapped["Region"] = relationship("Region", back_populates="tasks", foreign_keys="[Task.region_id]", lazy="joined")
+
+
+# task_user_table = Table(
+#     "task_user_table",
+#     Base.metadata,
+#     Column('user_id', ForeignKey('users.id')),
+#     Column('task_id', ForeignKey('tasks.id')),
+# )
+
+# class ReferLink(Base):
+#     user_id: Mapped[int]
+#     link: Mapped[str]

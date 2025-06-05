@@ -3,7 +3,7 @@ from datetime import datetime, timedelta
 from loguru import logger
 from typing import List
 from aiogram import Router, F
-from aiogram.filters import CommandStart, Command
+from aiogram.filters import CommandStart, Command, CommandObject
 from aiogram.types import CallbackQuery, Message, ChatJoinRequest
 from aiogram.exceptions import TelegramBadRequest
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -22,14 +22,14 @@ async def getAdminFromMessage(message: Message, session_without_commit: AsyncSes
         last_name=message.from_user.last_name,
         telegram_id=message.from_user.id,
         role_id=1,
-        region_id=None
+        region_id=1
     )
 
 async def getEmployeeFromMessage(message: Message, session_without_commit: AsyncSession):
     role = await RoleDAO.find_one_or_none_by_id(session_without_commit, 3)
     return UserDtoBase(
         first_name=message.from_user.first_name,
-        last_name=message.from_user.last_name,
+        last_name=message.from_user.last_name if message.from_user.last_name is not None else "Нет фамилии",
         telegram_id=message.from_user.id,
         role_id=3,
         region_id=None
@@ -50,7 +50,7 @@ async def cmd_help(message: Message):
 
 
 @admin_router.message(CommandStart())
-async def cmd_start(message: Message, session_with_commit: AsyncSession):
+async def cmd_start(message: Message, session_with_commit: AsyncSession, command: CommandObject = None):
     logger.info(f"chat#{message.chat.id}|user#{message.from_user.id}: Вызов команды admin/start")
     
     tgIdFilter = UserTelegramId(
