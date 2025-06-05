@@ -22,6 +22,8 @@ def task_update_menu():
     kb.button(text="✔ Изменить статус", callback_data="task_status_update")
     kb.button(text="🔥 Изменить приоритет", callback_data="task_priority_update")
     kb.button(text="🌍 Изменить регион", callback_data="task_region_update")
+    kb.button(text="В меню", callback_data="admin_panel")
+    kb.button(text="Назад", callback_data="task_menu")
     kb.adjust(2, 2, 2)
 
     return kb.as_markup()

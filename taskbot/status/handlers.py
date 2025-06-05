@@ -39,20 +39,6 @@ async def on_status_selected(call: CallbackQuery, widget, dialog_manager: Dialog
 async def on_status_id_input_error(message: Message, dialog_: Any, dialog_manager: DialogManager, error_: ValueError):
     await message.answer("Номер должен быть числом!")
 
-{    
-# async def on_status_id_input(message: Message, dialog_: Any, dialog_manager: DialogManager):
-#     session = dialog_manager.middleware_data.get("session_without_commit")
-
-#     id = dialog_manager.find('id').get_value()
-#     status = await TaskStatusDAO.find_one_or_none_by_id(session, id)
-
-#     if status is None:
-#         await message.answer(f"Должности с таким номером не существует!\nВведите его еще раз.")
-#         return
-    
-#     await dialog_manager.next()
-}
-
 
 async def on_create_confirmation(callback: CallbackQuery, widget, dialog_manager: DialogManager, **kwargs):
     session = dialog_manager.middleware_data.get("session_with_commit")

@@ -38,19 +38,6 @@ async def on_task_selected(call: CallbackQuery, widget, dialog_manager: DialogMa
 async def on_task_id_input_error(message: Message, dialog_: Any, dialog_manager: DialogManager, error_: ValueError):
     await message.answer("Номер должен быть числом!")
 
-{
-# async def on_task_id_input(message: Message, dialog_: Any, dialog_manager: DialogManager):
-#     session = dialog_manager.middleware_data.get("session_without_commit")
-
-#     id = dialog_manager.find('id').get_value()
-#     task = await TaskDAO.find_one_or_none_by_id(session, id)
-
-#     if task is None:
-#         await message.answer(f"Должности с таким номером не существует!\nВведите его еще раз.")
-#         return
-    
-#     await dialog_manager.next()
-}
 
 async def on_startline_selected(call: CallbackQuery, widget, dialog_manager: DialogManager, selected_date: date):
     dialog_manager.dialog_data['startline'] = selected_date
@@ -67,45 +54,6 @@ async def on_deadline_selected(call: CallbackQuery, widget, dialog_manager: Dial
 async def on_is_active_selected(call: CallbackQuery, widger, dialog_manager: DialogManager, is_active: bool):
     dialog_manager.dialog_data['is_active'] = str(is_active)
     logger.info(f"Is_active value: {is_active}")
-    await dialog_manager.next()
-
-
-async def on_status_selected(call: CallbackQuery, widget, dialog_manager: DialogManager, item_id: str):
-    session = dialog_manager.middleware_data.get("session_without_commit")
-    status_id = int(item_id)
-    selected_status = await RegionDAO.find_one_or_none_by_id(session, status_id)
-    if (selected_status is None):
-        return call.answer(f"Выбраная запись №{status_id} не существует. Выберите еще раз")
-
-    dialog_manager.dialog_data['status_id'] = status_id
-    dialog_manager.dialog_data["selected_status"] = selected_status
-    await call.answer(f"Выбрана запись №{status_id}")
-    await dialog_manager.next()
-
-
-async def on_priority_selected(call: CallbackQuery, widget, dialog_manager: DialogManager, item_id: str):
-    session = dialog_manager.middleware_data.get("session_without_commit")
-    priority_id = int(item_id)
-    selected_priority = await TaskPriorityDAO.find_one_or_none_by_id(session, priority_id)
-    if (selected_priority is None):
-        return call.answer(f"Выбраная запись №{priority_id} не существует. Выберите еще раз")
-
-    dialog_manager.dialog_data['priority_id'] = priority_id
-    dialog_manager.dialog_data["selected_priority"] = selected_priority
-    await call.answer(f"Выбрана запись №{priority_id}")
-    await dialog_manager.next()
-
-
-async def on_region_selected(call: CallbackQuery, widget, dialog_manager: DialogManager, item_id: str):
-    session = dialog_manager.middleware_data.get("session_without_commit")
-    region_id = int(item_id)
-    selected_region = await RegionDAO.find_one_or_none_by_id(session, region_id)
-    if (selected_region is None):
-        return call.answer(f"Выбраная запись №{region_id} не существует. Выберите еще раз")
-
-    dialog_manager.dialog_data['region_id'] = region_id
-    dialog_manager.dialog_data["selected_region"] = selected_region
-    await call.answer(f"Выбрана запись №{region_id}")
     await dialog_manager.next()
 
 

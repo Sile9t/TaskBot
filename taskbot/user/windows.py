@@ -5,11 +5,12 @@ from aiogram_dialog.widgets.input import MessageInput, TextInput
 from aiogram_dialog.widgets.text import Const, Format, List
 from aiogram_dialog.widgets.utils import WidgetSrc
 from taskbot.user.getters import get_all_users, get_confirmed_data
-from taskbot.role.windows import get_roles_window, get_role_selection_window
-from taskbot.region.windows import get_regions_window, get_region_selection_window
+from taskbot.role.windows import get_role_selection_window
+from taskbot.role.handlers import on_role_selected
+from taskbot.region.windows import get_region_selection_window
 from taskbot.region.handlers import on_region_selected
 from taskbot.user.handlers import (
-    go_menu, cancel_logic, on_user_selected, on_role_selected, on_create_confirmation, on_update_confirmation, process_delete_user, on_user_id_input_error
+    go_menu, cancel_logic, on_user_selected, on_create_confirmation, on_update_confirmation, process_delete_user, on_user_id_input_error
 )
 from taskbot.user.state import UserCreate, UserRead, UserUpdate, UserDelete
 

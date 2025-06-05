@@ -27,7 +27,11 @@ async def on_role_selected(call: CallbackQuery, widget, dialog_manager: DialogMa
     session = dialog_manager.middleware_data.get("session_without_commit")
     role_id = int(item_id)
     selected_role = await RoleDAO.find_one_or_none_by_id(session, role_id)
+    if (selected_role is None):
+        return call.answer(f"Выбраная запись №{role_id} не существует. Выберите еще раз")
 
+
+    dialog_manager.dialog_data["role_id"] = role_id
     dialog_manager.dialog_data["selected_role"] = selected_role
     await call.answer(f"Выбрана должность №{role_id}")
     await dialog_manager.next()
@@ -35,19 +39,6 @@ async def on_role_selected(call: CallbackQuery, widget, dialog_manager: DialogMa
 
 async def on_role_id_input_error(message: Message, dialog_: Any, dialog_manager: DialogManager, error_: ValueError):
     await message.answer("Номер должен быть числом!")
-
-
-# async def on_role_id_input(message: Message, dialog_: Any, dialog_manager: DialogManager):
-#     session = dialog_manager.middleware_data.get("session_without_commit")
-
-#     id = dialog_manager.find('id').get_value()
-#     role = await RoleDAO.find_one_or_none_by_id(session, id)
-
-#     if role is None:
-#         await message.answer(f"Должности с таким номером не существует!\nВведите его еще раз.")
-#         return
-    
-#     await dialog_manager.next()
 
 
 async def on_create_confirmation(callback: CallbackQuery, widget, dialog_manager: DialogManager, **kwargs):

@@ -6,11 +6,14 @@ from aiogram_dialog.widgets.input import MessageInput, TextInput
 from aiogram_dialog.widgets.text import Const, Format, List
 from aiogram_dialog.widgets.utils import WidgetSrc
 from taskbot.task.getters import get_all_tasks, get_confirmed_data, get_is_active_variants
-from taskbot.status.windows import get_statuses_window, get_status_selection_window
-from taskbot.priority.windows import get_priorities_window, get_priority_selection_window 
-from taskbot.region.windows import get_regions_window, get_region_selection_window
+from taskbot.status.windows import get_status_selection_window
+from taskbot.status.handlers import on_status_selected
+from taskbot.priority.windows import get_priority_selection_window
+from taskbot.priority.handlers import on_priority_selected
+from taskbot.region.windows import get_region_selection_window
+from taskbot.region.handlers import on_region_selected
 from taskbot.task.handlers import (
-    go_menu, cancel_logic, on_task_selected, on_startline_selected, on_deadline_selected, on_is_active_selected, on_status_selected, on_priority_selected, on_region_selected, on_create_confirmation, on_update_confirmation, process_delete_task, on_task_id_input_error,
+    go_menu, cancel_logic, on_task_selected, on_startline_selected, on_deadline_selected, on_is_active_selected, on_create_confirmation, on_update_confirmation, process_delete_task, on_task_id_input_error,
     on_status_change_selected, on_priority_change_selected, on_region_change_selected
 )
 from taskbot.task.state import TaskCreate, TaskRead, TaskUpdate, TaskDelete, TaskPriorityUpdate, TaskStatusUpdate, TaskRegionUpdate

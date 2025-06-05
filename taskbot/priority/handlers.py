@@ -39,20 +39,6 @@ async def on_priority_selected(call: CallbackQuery, widget, dialog_manager: Dial
 async def on_priority_id_input_error(message: Message, dialog_: Any, dialog_manager: DialogManager, error_: ValueError):
     await message.answer("Номер должен быть числом!")
 
-{    
-# async def on_priority_id_input(message: Message, dialog_: Any, dialog_manager: DialogManager):
-#     session = dialog_manager.middleware_data.get("session_without_commit")
-
-#     id = dialog_manager.find('id').get_value()
-#     priority = await TaskPriorityDAO.find_one_or_none_by_id(session, id)
-
-#     if priority is None:
-#         await message.answer(f"Должности с таким номером не существует!\nВведите его еще раз.")
-#         return
-    
-#     await dialog_manager.next()
-}
-
 
 async def on_create_confirmation(callback: CallbackQuery, widget, dialog_manager: DialogManager, **kwargs):
     session = dialog_manager.middleware_data.get("session_with_commit")
