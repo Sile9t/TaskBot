@@ -43,6 +43,7 @@ storage = MemoryStorage()
 dp = Dispatcher(storage=storage)
 admins = settings.ADMIN_IDS
 
+#TODO: change to log folder where will be log files for every day
 log_file_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "dump.log")
 logger.add(log_file_path, format=settings.FORMAT_LOG, level="INFO", rotation=settings.LOG_ROTATION)
 database_url = settings.get_db_url()
