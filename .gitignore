@@ -7,9 +7,10 @@ __pycache__/
 # Ignore virtual environments
 .env
 .venv
+config.ini
 
 # Ignore log files
-log.txt
+log.*
 *.log
 
 credentials.json
