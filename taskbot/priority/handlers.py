@@ -15,14 +15,6 @@ async def go_menu(call: CallbackQuery, button: Button, dialog_manager: DialogMan
         reply_markup=priority_menu_kb()
     )
 
-async def cancel_logic(callback: CallbackQuery, button: Button, dialog_manager: DialogManager):
-    await callback.answer("Сценарий отменен!")
-    await callback.message.answer(
-        "Вы отменили сценарий.", 
-        reply_markup=main_admin_kb(callback.from_user.id)
-    )
-
-
 async def on_priority_selected(call: CallbackQuery, widget, dialog_manager: DialogManager, item_id: str):
     session = dialog_manager.middleware_data.get("session_without_commit")
     priority_id = int(item_id)

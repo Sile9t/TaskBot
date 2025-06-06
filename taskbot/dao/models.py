@@ -56,9 +56,9 @@ class User(Base):
 
     refer_links: Mapped[List["ReferLink"]] = relationship("ReferLink", back_populates="user")
 
-    created_tasks: Mapped[List["Task"]] = relationship("Task", back_populates="task.creator_id", lazy="joined")
+    created_tasks: Mapped[List["Task"]] = relationship("Task", back_populates="creator", lazy="joined")
     
-    perform_tasks: Mapped[List["Task"]] = relationship(secondary=task_user_table, back_populates="users")
+    perform_tasks: Mapped[List["Task"]] = relationship(secondary=task_user_table, back_populates="performers")
 
 # #
 # Task status class describes status of the task

@@ -66,6 +66,7 @@ class TaskDtoBase(BaseModel):
     status_id: int
     priority_id: int
     region_id: int
+    creator_id: int
 
     model_config = ConfigDict(from_attributes=True)
 
@@ -74,6 +75,7 @@ class TaskDto(TaskDtoBase):
 
 
 class ReferDtoBase(BaseModel):
+    chat_id: int
     user_id: int
     link: str
 

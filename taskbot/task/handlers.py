@@ -4,9 +4,10 @@ from typing import Any
 from aiogram.types import CallbackQuery, Message
 from aiogram_dialog import DialogManager
 from aiogram_dialog.widgets.kbd import Button
-from taskbot.dao.dao import TaskDAO, RegionDAO, RegionDAO, TaskPriorityDAO
+from taskbot.dao.dao import TaskDAO, RegionDAO, RegionDAO, TaskPriorityDAO, UserDAO
 from taskbot.dao.schemas import TaskDto, TaskDtoBase
 from taskbot.admin.kbs import main_admin_kb
+from taskbot.admin.schemas import UserTelegramId
 from taskbot.task.kbs import task_menu_kb
 from taskbot.task.state import TaskCreate, TaskUpdate
 
@@ -57,10 +58,13 @@ async def on_is_active_selected(call: CallbackQuery, widger, dialog_manager: Dia
     await dialog_manager.next()
 
 
-async def on_create_confirmation(callback: CallbackQuery, widget, dialog_manager: DialogManager, **kwargs):
+async def on_create_confirmation(call: CallbackQuery, widget, dialog_manager: DialogManager, **kwargs):
     session = dialog_manager.middleware_data.get("session_with_commit")
 
-    user_id = callback.from_user.id
+    creator = await UserDAO.find_one_or_none(
+        session,
+        UserTelegramId(telegram_id=call.from_user.id)
+    )
     title = dialog_manager.find('title').get_value()
     description = dialog_manager.find('description').get_value()
     startline = dialog_manager.dialog_data['startline']
@@ -70,19 +74,19 @@ async def on_create_confirmation(callback: CallbackQuery, widget, dialog_manager
     status_id = dialog_manager.dialog_data['status_id']
     status = await RegionDAO.find_one_or_none_by_id(session, status_id)
     if status is None:
-        await callback.message.answer("Такого статуса не существует!")
+        await call.message.answer("Такого статуса не существует!")
         return await dialog_manager.switch_to(TaskCreate.status)
 
     priority_id = dialog_manager.dialog_data['priority_id']
     priority = await TaskPriorityDAO.find_one_or_none_by_id(session, priority_id)
     if priority is None:
-        await callback.message.answer("Такого приоритета не существует!")
+        await call.message.answer("Такого приоритета не существует!")
         return await dialog_manager.switch_to(TaskCreate.priority)
 
     region_id = dialog_manager.dialog_data['region_id']
     region = await RegionDAO.find_one_or_none_by_id(session, region_id)
     if region is None:
-        await callback.message.answer("Такого региона не существует!")
+        await call.message.answer("Такого региона не существует!")
         return await dialog_manager.switch_to(TaskCreate.region)
 
     newTask = TaskDtoBase(
@@ -93,20 +97,21 @@ async def on_create_confirmation(callback: CallbackQuery, widget, dialog_manager
         is_active=is_active,
         status_id=status_id,
         priority_id=priority_id,
-        region_id=region_id
+        region_id=region_id,
+        creator_id=creator.id
     )
 
     check = await TaskDAO.find_one_or_none(session, newTask)
     if not check:
-        await callback.answer("Приступаю к сохранению")
+        await call.answer("Приступаю к сохранению")
         await TaskDAO.add(session, newTask)
-        await callback.answer(f"Задача успешно добавлена!")
+        await call.answer(f"Задача успешно добавлена!")
         text = "Задача успешно добавлена"
-        await callback.message.answer(text, reply_markup=main_admin_kb())
+        await call.message.answer(text, reply_markup=main_admin_kb())
 
         await dialog_manager.done()
     else:
-        await callback.message.answer("Этот задача уже существует!")
+        await call.message.answer("Этот задача уже существует!")
         await dialog_manager.back()
 
     

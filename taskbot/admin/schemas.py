@@ -9,5 +9,6 @@ class UserRoleId(BaseModel):
 class UserTelegramAndRoleIds(UserTelegramId):
     role_id: int
 
-class ReferLinkUserIdFilter(BaseModel):
+class ReferLinkFilterByChatAndUserIds(BaseModel):
+    chat_id: int
     user_id: int

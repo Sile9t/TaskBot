@@ -9,8 +9,9 @@ from aiogram_dialog.widgets.input import MessageInput, TextInput
 from aiogram_dialog.widgets.text import Const, Format, List
 from aiogram_dialog.widgets.utils import WidgetSrc
 from taskbot.priority.getters import get_all_priorities, get_priority_id_tuples, get_confirmed_data
+from taskbot.general.handlers import cancel_logic
 from taskbot.priority.handlers import (
-    go_menu, cancel_logic, on_priority_selected, on_create_confirmation, on_update_confirmation, process_delete_priority, on_priority_id_input_error
+    go_menu, on_priority_selected, on_create_confirmation, on_update_confirmation, process_delete_priority, on_priority_id_input_error
 )
 from taskbot.priority.state import PriorityCreate, PriorityRead, PriorityUpdate, PriorityDelete
 

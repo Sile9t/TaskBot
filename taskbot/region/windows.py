@@ -10,8 +10,9 @@ from aiogram_dialog.widgets.text import Const, Format, List
 from aiogram_dialog.widgets.utils import WidgetSrc
 from taskbot.region.kbs import region_menu_kb
 from taskbot.region.getters import get_all_regions, get_region_id_tuples, get_confirmed_data
+from taskbot.general.handlers import cancel_logic
 from taskbot.region.handlers import (
-    go_menu, cancel_logic, on_region_selected, on_create_confirmation, on_update_confirmation, process_delete_region, on_region_id_input_error
+    go_menu, on_region_selected, on_create_confirmation, on_update_confirmation, process_delete_region, on_region_id_input_error
 )
 from taskbot.region.state import RegionCreate, RegionRead, RegionUpdate, RegionDelete
 

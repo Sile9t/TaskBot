@@ -13,21 +13,6 @@ priority_router = Router()
 priority_router.message.filter(IsAdmin)
 
 
-@priority_router.message(Command("cancel"))
-@priority_router.message(F.text.casefold() == "cancel")
-async def cancel_handler(message: Message, state: FSMContext) -> None:
-    current_state = await state.get_state()
-    if current_state is None:
-        return
-
-    logger.info("Сброс состояния %r", current_state)
-    await state.clear()
-    await message.answer(
-        "Отменено.",
-        reply_markup=ReplyKeyboardRemove(),
-    )
-
-
 @priority_router.message(Command('priority_menu'))
 async def priority_menu(message: Message):
     logger.info(f"chat#{message.chat.id}|user#{message.from_user.id}: Вызов кнопки admin/priority_menu")

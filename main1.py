@@ -7,7 +7,7 @@ from config import bot, dp
 from taskbot.dao.database_middleware import DatabaseMiddlewareWithCommit, DatabaseMiddlewareWithoutCommit
 from taskbot.dao.seed import seed
 
-from taskbot.admin.admin import admin_router
+from taskbot.admin.router import admin_router
 
 from taskbot.region.dialog import region_create_dialog, regions_read_dialog, region_update_dialog, region_delete_dialog
 from taskbot.region.router import region_router
@@ -31,7 +31,7 @@ from taskbot.task.dialog import task_create_dialog, tasks_read_dialog, task_upda
 
 async def set_commands():
     commands = [
-        BotCommand(command='help', description='Список команд'),
+        # BotCommand(command='help', description='Список команд'),
         BotCommand(command='start', description='Старт'),
         BotCommand(command='admin_panel', description='Панель администрирования'),
         BotCommand(command='role_menu', description='Меню для должностей'),
