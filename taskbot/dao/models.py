@@ -126,6 +126,7 @@ class Task(Base):
 
 
 class ReferLink(Base):
+    chat_id: Mapped[int]
     user_id: Mapped[int] = mapped_column(ForeignKey("users.id"))
     user: Mapped["User"] = relationship("User", back_populates='refer_links')
     link: Mapped[str]

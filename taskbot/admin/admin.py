@@ -9,9 +9,9 @@ from aiogram.exceptions import TelegramBadRequest
 from sqlalchemy.ext.asyncio import AsyncSession
 from taskbot.admin.kbs import main_admin_kb
 from taskbot.dao.models import User
-from taskbot.dao.dao import UserDAO, RoleDAO
-from taskbot.dao.schemas import UserDtoBase, RoleDto
-from taskbot.admin.schemas import UserTelegramId, UserRoleId
+from taskbot.dao.dao import UserDAO, RoleDAO, ReferDAO
+from taskbot.dao.schemas import UserDtoBase, RoleDto, ReferDtoBase
+from taskbot.admin.schemas import UserTelegramId, UserRoleId, ReferLinkUserIdFilter
 from taskbot.admin.filters import IsAdmin
 
 
@@ -136,7 +136,7 @@ async def admin_panel(call: CallbackQuery, session_without_commit: AsyncSession)
 
 
 @admin_router.message(Command('refer_link'))
-async def refer_link(message: Message):
+async def refer_link(message: Message, session_with_commit: AsyncSession):
     logger.info(f"chat#{message.chat.id}|user#{message.from_user.id}: Command - admin/refer_link")
 
     if (message.chat.type == 'private'):
@@ -153,8 +153,13 @@ async def refer_link(message: Message):
             member_limit=1
         )
         #TODO: add invite link to database for revoke passibility
-        
         invite_link = invite_link_obj.invite_link
+        
+        referDto = ReferDtoBase(
+            chat_id=message.chat.id,
+            link=invite_link
+        )
+        await ReferDAO.add(session_with_commit, referDto)
     except Exception as e:        
         return message.answer(
             text=e.message
@@ -173,10 +178,16 @@ async def refer_link(message: Message):
 
 
 @admin_router.message(Command('cancel_all_refer_links'))
-async def cancel_all_refer_links(message: Message):
+async def cancel_all_refer_links(message: Message, session_with_commit: AsyncSession):
     logger.info(f"chat#{message.chat.id}|user#{message.from_user.id}: Command - admin/cancel_all_refer_links")
     #TODO: get all invite link for user, revoke them all and delete from db
-    message.bot.revoke_chat_invite_link()
+
+    refers = await ReferDAO.find_all(
+        session_with_commit,
+        ReferLinkUserIdFilter(user_id=message.from_user.id)
+    )
+    for refer in refers:
+        message.bot.revoke_chat_invite_link()
 
 
 #TODO:

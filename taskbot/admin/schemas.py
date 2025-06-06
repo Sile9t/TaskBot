@@ -8,3 +8,6 @@ class UserRoleId(BaseModel):
 
 class UserTelegramAndRoleIds(UserTelegramId):
     role_id: int
+
+class ReferLinkUserIdFilter(BaseModel):
+    user_id: int
