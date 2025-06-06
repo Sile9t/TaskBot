@@ -1,7 +1,7 @@
 from loguru import logger
 from sqlalchemy.ext.asyncio import AsyncSession 
 from .base import BaseDAO
-from .models import User, Region, Role, TaskStatus, TaskPriority, Task
+from .models import User, Region, Role, TaskStatus, TaskPriority, Task, ReferLink
 
 class RegionDAO(BaseDAO[Region]):
     model = Region
@@ -45,3 +45,6 @@ class TaskPriorityDAO(BaseDAO[TaskPriority]):
 
 class TaskDAO(BaseDAO[Task]):
     model = Task
+
+class ReferDAO(BaseDAO[ReferLink]):
+    model = ReferLink

@@ -10,7 +10,7 @@ class RegionDtoBase(BaseModel):
     model_config = ConfigDict(from_attributes=True)
 
 class RegionDto(RegionDtoBase):
-    id: int = Field(frozen = True)
+    id: int = Field(frozen=True)
 
 class RoleDtoBase(BaseModel):
     name: str
@@ -19,7 +19,7 @@ class RoleDtoBase(BaseModel):
     model_config = ConfigDict(from_attributes=True)
 
 class RoleDto(RoleDtoBase):
-    id: int = Field(frozen = True)
+    id: int = Field(frozen=True)
     
 
 class UserDtoBase(BaseModel):
@@ -30,7 +30,7 @@ class UserDtoBase(BaseModel):
     region_id: Optional[int]
 
 class UserDto(UserDtoBase):
-    id: int = Field(frozen = True)
+    id: int = Field(frozen=True)
 
     model_config = ConfigDict(from_attributes=True)
 
@@ -42,7 +42,7 @@ class TaskStatusDtoBase(BaseModel):
     model_config = ConfigDict(from_attributes=True)
 
 class TaskStatusDto(TaskStatusDtoBase):
-    id: int = Field(frozen = True)
+    id: int = Field(frozen=True)
 
 
 class TaskPriorityDtoBase(BaseModel):
@@ -70,4 +70,12 @@ class TaskDtoBase(BaseModel):
     model_config = ConfigDict(from_attributes=True)
 
 class TaskDto(TaskDtoBase):
-    id: int = Field(frozen = True)
+    id: int = Field(frozen=True)
+
+
+class ReferDtoBase(BaseModel):
+    user_id: int
+    link: str
+
+class ReferDto(ReferDtoBase):
+    id: int = Field(frozen=True)

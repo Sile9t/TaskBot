@@ -12,7 +12,7 @@ from .database import Base, DeclarativeBase
 class Region(Base):
     name: Mapped[str]
     description: Mapped[Optional[str]]
-    # chat_id: Mapped[Optional[int]]
+    chat_id: Mapped[Optional[int]]
 
     users: Mapped[List["User"]] = relationship("User", back_populates="region", lazy='select')
     
