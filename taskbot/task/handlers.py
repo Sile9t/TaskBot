@@ -3,13 +3,13 @@ from datetime import date
 from typing import Any
 from aiogram.types import CallbackQuery, Message
 from aiogram_dialog import DialogManager
-from aiogram_dialog.widgets.kbd import Button
+from aiogram_dialog.widgets.kbd import Button, ManagedMultiselect
 from taskbot.dao.dao import TaskDAO, RegionDAO, RegionDAO, TaskPriorityDAO, UserDAO
 from taskbot.dao.schemas import TaskDto, TaskDtoBase
 from taskbot.admin.kbs import main_admin_kb
 from taskbot.admin.schemas import UserTelegramId
 from taskbot.task.kbs import task_menu_kb
-from taskbot.task.state import TaskCreate, TaskUpdate
+from taskbot.task.state import TaskCreate, TaskUpdate, TaskPerformersUpdate
 
 async def go_menu(call: CallbackQuery, button: Button, dialog_manager: DialogManager):
     await call.answer("Сценарий отменен!")
@@ -56,6 +56,52 @@ async def on_is_active_selected(call: CallbackQuery, widger, dialog_manager: Dia
     dialog_manager.dialog_data['is_active'] = str(is_active)
     logger.info(f"Is_active value: {is_active}")
     await dialog_manager.next()
+
+
+async def on_performers_selected(call: CallbackQuery, widget, dialog_manager: DialogManager):
+    session = dialog_manager.middleware_data.get("session_with_commit")
+    performers = dialog_manager.dialog_data.get('selected_performers')
+    
+    logger.info("Performers: ", performers)
+    # if (performers is None):
+    #     raise Exception("Performers list is empty")
+    
+    task_id = dialog_manager.find('id').get_value()
+    task = await TaskDAO.find_one_or_none_by_id(session, task_id)
+
+    if (task is None):
+        await call.answer("Такой задачи не существует")
+        return await dialog_manager.switch_to(TaskPerformersUpdate.id)
+
+    # users = task.performers
+    # namesArray = []
+    # for user in users:
+    #     namesArray.append(f"{user.role.name} {user.first_name} {user.last_name}")
+    # caption = ".\n".join(namesArray)
+    caption = task.getPerformersCaption()
+    await call.message.edit_text(
+        text=f"Исполнители задачи {task.title} назначены",
+        reply_markup=None
+    )
+    await call.message.answer(f"Исполнители задачи:\n{caption}")
+    dialog_manager.done()
+
+
+async def on_performer_state_change(call: CallbackQuery, select: ManagedMultiselect, dialog_manager: DialogManager, item: int):
+    session = dialog_manager.middleware_data.get("session_with_commit")
+    task_id = dialog_manager.find('id').get_value()
+    task = await TaskDAO.find_one_or_none_by_id(session, task_id)
+    user = await UserDAO.find_one_or_none_by_id(session, item)
+    logger.info(f"Select item: {select.get_checked()}")
+    logger.info(f"Select item is checked: {select.is_checked(item)}")
+    logger.info(f"Item with changed state: {item}")
+
+
+    if (select.is_checked(item)):
+        task.performers.append(user)
+    else:
+        task.performers.remove(user)
+    await session.commit()
 
 
 async def on_create_confirmation(call: CallbackQuery, widget, dialog_manager: DialogManager, **kwargs):

@@ -5,7 +5,7 @@ from aiogram.fsm.context import FSMContext
 from aiogram.types import Message, CallbackQuery, ReplyKeyboardRemove
 from aiogram.filters import Command
 from aiogram_dialog import DialogManager, StartMode
-from taskbot.task.state import TaskCreate, TaskRead, TaskUpdate, TaskDelete, TaskStatusUpdate, TaskPriorityUpdate, TaskRegionUpdate
+from taskbot.task.state import TaskCreate, TaskRead, TaskUpdate, TaskDelete, TaskStatusUpdate, TaskPriorityUpdate, TaskRegionUpdate, TaskPerformersUpdate
 from taskbot.task.kbs import task_menu_kb, task_update_menu
 
 task_router = Router()
@@ -117,6 +117,17 @@ async def task_region_update(call: CallbackQuery, dialog_manager: DialogManager)
     await call.answer("Изменение региона задачи")
     await dialog_manager.start(
         state=TaskRegionUpdate.id,
+        mode=StartMode.RESET_STACK
+    )
+
+
+@task_router.callback_query(F.data == "task_set_performers")
+async def task_set_performers(call: CallbackQuery, dialog_manager: DialogManager):
+    logger.info(f"chat#{call.message.chat.id}|user#{call.message.from_user.id}: Вызов кнопки admin/task_set_performers")
+
+    await call.answer("Назначение исполнителей")
+    await dialog_manager.start(
+        state=TaskPerformersUpdate.id,
         mode=StartMode.RESET_STACK
     )
 

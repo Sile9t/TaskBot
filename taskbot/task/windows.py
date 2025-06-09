@@ -1,7 +1,9 @@
 import operator
 from aiogram.fsm.state import StatesGroup, State
 from aiogram_dialog import Window
-from aiogram_dialog.widgets.kbd import Button, Group, ScrollingGroup, Select, Calendar, CalendarConfig, Back, Cancel, NumberedPager, Row, Next, SwitchTo, CurrentPage, NextPage, PrevPage, FirstPage, LastPage
+from aiogram_dialog.widgets.kbd import Button, Group, ScrollingGroup, Select, Calendar, CalendarConfig, Back, Cancel, NumberedPager, Row, Next, SwitchTo, CurrentPage, NextPage, PrevPage, FirstPage, LastPage, Checkbox, Radio, Multiselect
+from aiogram_dialog.widgets.kbd.select import OnItemClick
+from aiogram_dialog.widgets.widget_event import WidgetEventProcessor
 from aiogram_dialog.widgets.input import MessageInput, TextInput
 from aiogram_dialog.widgets.text import Const, Format, List
 from aiogram_dialog.widgets.utils import WidgetSrc
@@ -12,11 +14,12 @@ from taskbot.priority.windows import get_priority_selection_window
 from taskbot.priority.handlers import on_priority_selected
 from taskbot.region.windows import get_region_selection_window
 from taskbot.region.handlers import on_region_selected
+from taskbot.user.getters import get_performer_id_tuples
 from taskbot.task.handlers import (
     go_menu, cancel_logic, on_task_selected, on_startline_selected, on_deadline_selected, on_is_active_selected, on_create_confirmation, on_update_confirmation, process_delete_task, on_task_id_input_error,
-    on_status_change_selected, on_priority_change_selected, on_region_change_selected
+    on_status_change_selected, on_priority_change_selected, on_region_change_selected, on_performers_selected, on_performer_state_change
 )
-from taskbot.task.state import TaskCreate, TaskRead, TaskUpdate, TaskDelete, TaskPriorityUpdate, TaskStatusUpdate, TaskRegionUpdate
+from taskbot.task.state import TaskCreate, TaskRead, TaskUpdate, TaskDelete, TaskPriorityUpdate, TaskStatusUpdate, TaskRegionUpdate, TaskPerformersUpdate
 
 MAIN_BTNS = Row(
             Cancel(Const("В меню"), on_click=go_menu),
@@ -38,6 +41,7 @@ def get_tasks_window(*widgets: WidgetSrc, state: State = TaskRead.id):
                     "Статус: {item[status]}\n"
                     "Приоритет: {item[priority]}\n"
                     "Регион: {item[region]}\n"
+                    "Исполнители: {item[performers]}\n"
             ),
             items="tasks",
             id='tasks_list',
@@ -68,6 +72,54 @@ def get_tasks_window(*widgets: WidgetSrc, state: State = TaskRead.id):
         
         getter=get_all_tasks,
         state=state,
+    )
+
+
+def get_task_performers_select_window(*widgets: WidgetSrc, stateGroup: State = TaskPerformersUpdate, main_btns: Row = MAIN_BTNS):
+    return Window(
+        Format("{text_table}"),
+
+        ScrollingGroup(
+            Multiselect(
+                Format("✔ {item[0]}"),
+                Format(" {item[0]} "),
+                id='selected_performers',
+                items='performer_id_tuples',
+                item_id_getter=operator.itemgetter(1),
+                on_state_changed=on_performer_state_change
+            ),
+            width=1,
+            height=5,
+            hide_pager=True,
+            id='scroll_performers',
+        ),
+
+        Row(
+            FirstPage(
+                scroll="scroll_performers", text=Format("⏮️ {target_page1}"),
+            ),
+            PrevPage(
+                scroll="scroll_performers", text=Format("◀️"),
+            ),
+            CurrentPage(
+                scroll="scroll_performers", text=Format("{current_page1}"),
+            ),
+            NextPage(
+                scroll="scroll_performers", text=Format("▶️"),
+            ),
+            LastPage(
+                scroll="scroll_performers", text=Format("{target_page1} ⏭️"),
+            ),
+        ),
+
+        *widgets,
+
+        Button(Const("Подтвердить"), id="confirm", on_click=on_performers_selected),
+
+        main_btns,
+        
+        getter=get_performer_id_tuples,
+        state=stateGroup.performers,
     )
 
 
@@ -193,6 +245,12 @@ def get_task_region_window(stateGroup: StatesGroup = TaskCreate):
         main_btns=MAIN_BTNS
     )
 
+
+def get_task_performers_window(stateGroup: StatesGroup = TaskPerformersUpdate):
+    return get_task_performers_select_window(
+        Const("Выберите исполнителей задания"),
+        stateGroup
+    )
 
 def get_create_confirmation_window():
     return Window(

@@ -54,15 +54,9 @@ async def cmd_start(message: Message, session_with_commit: AsyncSession, command
     if check is None:
         filterModel = UserRoleId(role_id=1)
         admins = await UserDAO.find_all(session_with_commit, filterModel)
+        logger.info("Admins:", admins)
 
-        logger.info(
-            f"\n\tUser:\n"
-            f"\t\t{message.from_user.first_name}\n"
-            f"\t\t{message.from_user.last_name}\n"
-            f"\t\t{message.from_user.id}\n"
-        )
-        
-        if (admins.count == 0):
+        if (len(admins) == 0):
             newUser = await getAdminFromMessage(message, session_with_commit)
         else:
             newUser = await getEmployeeFromMessage(message, session_with_commit)

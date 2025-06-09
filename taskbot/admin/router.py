@@ -18,53 +18,6 @@ admin_router = Router()
 admin_router.message.filter(IsAdmin)
 
 
-@admin_router.message(CommandStart())
-async def cmd_start(message: Message, session_with_commit: AsyncSession, command: CommandObject = None):
-    logger.info(f"chat#{message.chat.id}|user#{message.from_user.id}: Вызов команды admin/start")
-    
-    tgIdFilter = UserTelegramId(
-        telegram_id=message.from_user.id
-    )
-    check = await UserDAO.find_one_or_none(session_with_commit, tgIdFilter)
-    
-    if check is None:
-        filterModel = UserRoleId(role_id=1)
-        admins = await UserDAO.find_all(session_with_commit, filterModel)
-
-        logger.info(
-            f"\n\tUser:\n"
-            f"\t\t{message.from_user.first_name}\n"
-            f"\t\t{message.from_user.last_name}\n"
-            f"\t\t{message.from_user.id}\n"
-        )
-        
-        if (admins.count == 0):
-            newUser = await getAdminFromMessage(message, session_with_commit)
-        else:
-            newUser = await getEmployeeFromMessage(message, session_with_commit)
-
-        await UserDAO.add(session_with_commit, newUser)
-        
-        for admin in admins:
-            if (admin.telegram_id == message.from_user.id):
-                return await message.answer(
-                    f"Сотрудник {message.from_user.full_name} зарегистрирован.",
-                    reply_markup=None
-                )
-        
-        userRole = await RoleDAO.find_one_or_none_by_id(session_with_commit, newUser.role_id)
-
-        return await message.answer(
-            f"👋🏻 Привет, {message.from_user.full_name}!\nВы зарегистрированы как {userRole.name}.",
-            reply_markup=None
-        )
-
-    await message.answer(
-        f"👋🏻 Привет, {message.from_user.full_name}!\nВы зарегистрированы как {check.role.name}.",
-        reply_markup=main_admin_kb()
-    )
-
-
 @admin_router.message(Command('admin_panel'))
 async def admin_panel(message: Message, session_without_commit: AsyncSession):
     logger.info(f"chat#{message.chat.id}|user#{message.from_user.id}: Вызов команды admin/admin_panel")

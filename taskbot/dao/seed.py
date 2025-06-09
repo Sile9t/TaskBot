@@ -2,7 +2,7 @@ from typing import List
 from loguru import logger
 from sqlalchemy.ext.asyncio import AsyncSession
 from taskbot.dao.session_maker import connection
-from taskbot.dao.dao import RoleDAO, RegionDAO, RegionDAO, TaskPriorityDAO
+from taskbot.dao.dao import RoleDAO, RegionDAO, RegionDAO, TaskPriorityDAO, TaskStatusDAO
 from taskbot.dao.schemas import RoleDto, RegionDto, TaskStatusDto, TaskPriorityDto 
 
 
@@ -515,34 +515,34 @@ async def seedRegions(session: AsyncSession, data: List[RegionDto] = defaultRegi
 defaultStatuses = [
     TaskStatusDto(
         id=1,
-        title='Создана',
-        description='Задача недавно создана'
+        title='Закрыта',
+        description='Задача закрыта'
     ),
     TaskStatusDto(
         id=2,
-        title='В работе',
-        description='Задача находиться в работе'
-    ),
-    TaskStatusDto(
-        id=3,
         title='На проверке',
         description='Задача находиться на проверке'
     ),
     TaskStatusDto(
+        id=3,
+        title='В работе',
+        description='Задача находиться в работе'
+    ),
+    TaskStatusDto(
         id=4,
-        title='Закрыта',
-        description='Задача закрыта'
+        title='Создана',
+        description='Задача недавно создана'
     ),
 ]
 
 @connection
 async def seedTaskStatuses(session: AsyncSession, data: List[TaskStatusDto] = defaultStatuses):
-    count = await RegionDAO.count(session)
+    count = await TaskStatusDAO.count(session)
 
     if (count == 0):
         try:
             for item in data:
-                await RegionDAO.add(session, item)
+                await TaskStatusDAO.add(session, item)
             
             await session.commit()
         except Exception as e:

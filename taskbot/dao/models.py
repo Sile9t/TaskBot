@@ -17,6 +17,9 @@ class Region(Base):
     users: Mapped[List["User"]] = relationship("User", back_populates="region", lazy='select')
     
     tasks: Mapped[List["Task"]] = relationship("Task", back_populates="region", lazy='select')
+
+    def getNameAndIdTuple(self):
+        return (self.name, self.id)
     
 # #
 # Role class determines user right
@@ -31,6 +34,9 @@ class Role(Base):
     description: Mapped[Optional[str]]
     
     users: Mapped[List["User"]] = relationship("User", back_populates="role", lazy='select')
+
+    def getNameAndIdTuple(self):
+        return (self.name, self.id)
 
 task_user_table = Table(
     "task_user_table",
@@ -58,8 +64,25 @@ class User(Base):
 
     created_tasks: Mapped[List["Task"]] = relationship("Task", back_populates="creator", lazy="joined")
     
-    perform_tasks: Mapped[List["Task"]] = relationship(secondary=task_user_table, back_populates="performers")
+    perform_tasks: Mapped[List["Task"]] = relationship(secondary=task_user_table, back_populates="performers", lazy="selectin")
 
+    def getRoleTitleAndFullNameCaption(self):
+        return f"{self.role.name} {self.first_name} {self.last_name}"
+    
+    def getRoleTitleFullNameAndIdTuple(self):
+        return (self.getRoleTitleAndFullNameCaption(), self.id)
+    
+    def getFullCaption(self):
+        return { 
+            "id": str(self.id), 
+            "telegram_id": self.telegram_id,
+            "first_name": self.first_name,
+            "last_name": self.last_name,
+            "role": self.role.name,
+            "region": self.region.name if self.region else None,
+            'updated_at': self.updated_at,
+            'created_at': self.created_at
+        }
 # #
 # Task status class describes status of the task
 # 
@@ -78,6 +101,9 @@ class TaskStatus(Base):
     @declared_attr
     def __tablename__(cls) -> str:
         return "task_statuses"
+    
+    def getTitleAndIdTuple(self):
+        return (self.title, self.id)
 
 # #
 # Task priority class describes priority of the task
@@ -93,6 +119,9 @@ class TaskPriority(Base):
     @declared_attr
     def __tablename__(cls) -> str:
         return "task_priorities"
+    
+    def getTitleAndIdTuple(self):
+        return (self.title, self.id)
 
 # #
 # Task class describes task as an object wich store information
@@ -122,7 +151,17 @@ class Task(Base):
     creator_id: Mapped[int] = mapped_column(ForeignKey("users.id"))
     creator: Mapped["User"] = relationship("User", back_populates="created_tasks")
 
-    performers: Mapped[List["User"]] = relationship("User", secondary=task_user_table, back_populates="perform_tasks")
+    performers: Mapped[List["User"]] = relationship("User", secondary=task_user_table, back_populates="perform_tasks", lazy="selectin")
+
+    def getPerformersCaption(self):
+        users = self.performers
+        namesArray = []
+        for user in users:
+            namesArray.append(user.getRoleTitleAndFullNameCaption())
+        return ",\n".join(namesArray) + '.'
+
+    def getTitleAndIdTuple(self):
+        return (self.title, self.id)
 
 
 class ReferLink(Base):

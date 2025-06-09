@@ -41,3 +41,6 @@ class TaskRegionUpdate(StatesGroup):
     id = State()
     region = State()
 
+class TaskPerformersUpdate(StatesGroup):
+    id = State()
+    performers = State()

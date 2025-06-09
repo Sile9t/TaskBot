@@ -7,6 +7,8 @@ from config import bot, dp
 from taskbot.dao.database_middleware import DatabaseMiddlewareWithCommit, DatabaseMiddlewareWithoutCommit
 from taskbot.dao.seed import seed
 
+from taskbot.general.router import general_router
+
 from taskbot.admin.router import admin_router
 
 from taskbot.region.dialog import region_create_dialog, regions_read_dialog, region_update_dialog, region_delete_dialog
@@ -26,7 +28,7 @@ from taskbot.priority.router import priority_router
 from taskbot.priority.dialog import priority_create_dialog, priorities_read_dialog, priority_update_dialog, priority_delete_dialog
 
 from taskbot.task.router import task_router
-from taskbot.task.dialog import task_create_dialog, tasks_read_dialog, task_update_dialog, task_delete_dialog, task_status_change_dialog, task_priority_change_dialog, task_region_change_dialog
+from taskbot.task.dialog import task_create_dialog, tasks_read_dialog, task_update_dialog, task_delete_dialog, task_status_change_dialog, task_priority_change_dialog, task_region_change_dialog, task_set_performers_dialog
 
 
 async def set_commands():
@@ -87,7 +89,9 @@ async def main():
 
     dp.include_routers(priority_router, priority_create_dialog, priorities_read_dialog, priority_update_dialog, priority_delete_dialog)
 
-    dp.include_routers(task_router, task_create_dialog, tasks_read_dialog, task_update_dialog, task_delete_dialog, task_status_change_dialog, task_priority_change_dialog, task_region_change_dialog)
+    dp.include_routers(task_router, task_create_dialog, tasks_read_dialog, task_update_dialog, task_delete_dialog, task_status_change_dialog, task_priority_change_dialog, task_region_change_dialog, task_set_performers_dialog)
+
+    dp.include_router(general_router)
         
     # dp.include_router(user_router)
 

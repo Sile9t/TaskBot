@@ -1,6 +1,7 @@
 from loguru import logger
 from aiogram_dialog import DialogManager
 from taskbot.dao.dao import UserDAO, RoleDAO, RegionDAO
+from taskbot.admin.schemas import UserTelegramId
 
 async def get_all_users(dialog_manager: DialogManager, **kwargs):
     session = dialog_manager.middleware_data.get("session_without_commit")
@@ -8,19 +9,26 @@ async def get_all_users(dialog_manager: DialogManager, **kwargs):
     
     caption = []
     for user in users:
-        caption.append({
-                "id": str(user.id), 
-                "telegram_id": user.telegram_id,
-                "first_name": user.first_name,
-                "last_name": user.last_name,
-                "role": user.role.name,
-                "region": user.region.name if user.region else None,
-                'updated_at': user.updated_at,
-                'created_at': user.created_at
-            })
+        caption.append(user.getFullCaption())
         
     return {
         "users": caption, 
+        "text_table" : f"Всего найдено {len(users)} пользователей."
+    }
+
+
+async def get_performer_id_tuples(dialog_manager: DialogManager, **kwargs):
+    session = dialog_manager.middleware_data.get("session_without_commit")
+    
+    users = await UserDAO.find_all(session)
+    caption = []
+    for user in users: 
+        caption.append(
+            user.getRoleTitleFullNameAndIdTuple()
+        )
+
+    return {
+        "performer_id_tuples": caption,
         "text_table" : f"Всего найдено {len(users)} пользователей."
     }
 

@@ -5,15 +5,17 @@ from aiogram.types import Message
 from sqlalchemy.ext.asyncio import AsyncSession
 from taskbot.dao.dao import UserDAO
 from taskbot.admin.schemas import UserTelegramAndRoleIds
+from taskbot.dao.session_maker import connection
 
 class IsAdmin(BaseFilter):
     def __init__(self, expected: bool):
         self.expected = expected
-    
-    async def __call__(self, message: Message, session_without_commit: AsyncSession):
+
+    @connection    
+    async def __call__(self, message: Message, session: AsyncSession):
         id = message.from_user.id
         user = await UserDAO.find_one_or_none(
-            session_without_commit,
+            session,
             UserTelegramAndRoleIds(
                 telegram_id=id,
                 role_id=1
