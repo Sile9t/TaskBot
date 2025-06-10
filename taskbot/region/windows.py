@@ -9,12 +9,12 @@ from aiogram_dialog.widgets.input import MessageInput, TextInput
 from aiogram_dialog.widgets.text import Const, Format, List
 from aiogram_dialog.widgets.utils import WidgetSrc
 from taskbot.region.kbs import region_menu_kb
-from taskbot.region.getters import get_all_regions, get_region_id_tuples, get_confirmed_data
+from taskbot.region.getters import get_all_regions, get_region_id_tuples, get_confirmed_data, get_wire_confirmed_data
 from taskbot.general.handlers import cancel_logic
 from taskbot.region.handlers import (
-    go_menu, on_region_selected, on_create_confirmation, on_update_confirmation, process_delete_region, on_region_id_input_error
+    go_menu, on_region_selected, on_create_confirmation, on_update_confirmation, process_delete_region, on_region_id_input_error, on_region_wire_confirmation
 )
-from taskbot.region.state import RegionCreate, RegionRead, RegionUpdate, RegionDelete
+from taskbot.region.state import RegionCreate, RegionRead, RegionUpdate, RegionDelete, RegionWireChat
 
 MAIN_BTNS = Row(
             Cancel(Const("В меню"), on_click=go_menu),
@@ -110,7 +110,7 @@ def get_region_selection_window(*widgets: WidgetSrc, state: State = RegionUpdate
 
 def get_region_id_window(stateGroup: StatesGroup = RegionUpdate, ):
     return get_regions_window(
-        Const("Введите номер региона для изменения."),
+        Const("Введите номер региона."),
         
         TextInput(
             id="id",
@@ -194,32 +194,15 @@ def get_delete_window():
         ),
         state=RegionDelete.id
     )
+
+def get_wire_confirmation_window():
     return Window(
-        Format("{text_table}"),
-        
-        List(
-            Format(
-                "Регион №{item[id]}\n"
-                    "Название: {item[name]}\n"
-                    "Описание: {item[description]}\n"
-            ),
-            items="regions",
-            id='regions_list',
-            page_size=10
-        ),
-        NumberedPager(
-            scroll='regions_list'
-        ),
-        
-        Const("Введите номер региона."),
-        TextInput(
-            id="id",
-            type_factory=int,
-            on_success=Next(on_click=process_delete_region)
-        ),
+        Format("{confirmed_text}"),
 
-        MAIN_BTNS,
-
-        getter=get_all_regions,
-        state=RegionDelete.id,
+        Group(
+            Button(Const("Да"), id="confirm", on_click=on_region_wire_confirmation),
+            MAIN_BTNS,
+        ),
+        state=RegionWireChat.confirmation,
+        getter=get_wire_confirmed_data
     )

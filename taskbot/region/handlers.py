@@ -113,3 +113,18 @@ async def process_delete_region(call: CallbackQuery, widget, dialog_manager: Dia
         await dialog_manager.done()
     else:
         await call.answer("Такая запись не существует!\nВведите другой номер.")
+
+async def on_region_wire_confirmation(call: CallbackQuery, widget, dialog_manager: DialogManager, **kwargs):
+    session = dialog_manager.middleware_data.get('session_with_commit')
+    id = dialog_manager.find('id').get_value()
+    
+    region = await RegionDAO.find_one_or_none_by_id(session, id)
+    region.chat_id = call.message.chat.id
+    regionName = region.name
+    
+    await session.commit()
+
+    await call.message.delete_reply_markup()
+    await call.message.answer(
+        text=f"Текущий чат привязан к {regionName}"
+    )

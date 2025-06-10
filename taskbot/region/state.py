@@ -16,3 +16,7 @@ class RegionUpdate(StatesGroup):
 
 class RegionDelete(StatesGroup):
     id = State()
+
+class RegionWireChat(StatesGroup):
+    id = State()
+    confirmation = State() 

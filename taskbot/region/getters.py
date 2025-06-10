@@ -36,3 +36,23 @@ async def get_confirmed_data(dialog_manager: DialogManager, **kwargs):
     )
 
     return {"confirmed_text": confirmed_text}
+
+async def get_wire_confirmed_data(dialog_manager: DialogManager, **kwargs):
+    session = dialog_manager.middleware_data.get('session_without_commit')
+    id = dialog_manager.find('id').get_value()
+    region = await RegionDAO.find_one_or_none_by_id(session, id)
+    
+    if (region.chat_id is None):
+        confirmed_text = (
+            f"<b>Подтверждение привязки данного чата к региону {region.name}</b>\n"
+            "✅ Все ли верно?"
+        )
+    else:
+        confirmed_text = (
+            f"<b>Регион {region.name} привязан к другому чату."
+            "Уверены что хотите его перепривязать к этому чату?</b>"
+        )
+
+    return {
+        "confirmed_text": confirmed_text
+    }
