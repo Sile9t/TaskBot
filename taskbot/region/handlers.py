@@ -1,3 +1,4 @@
+from loguru import logger
 from typing import Any
 from aiogram.types import CallbackQuery, Message
 from aiogram_dialog import DialogManager
@@ -30,14 +31,20 @@ async def on_region_selected(call: CallbackQuery, widget, dialog_manager: Dialog
     if (selected_region is None):
         return call.answer(f"Выбраная запись №{region_id} не существует. Выберите еще раз")
 
-    dialog_manager.dialog_data['region_id'] = region_id
-    dialog_manager.dialog_data["selected_region"] = selected_region
+    dialog_manager.dialog_data["region"] = selected_region
     await call.answer(f"Выбрана запись №{region_id}")
     await dialog_manager.next()
 
 
 async def on_region_id_input_error(message: Message, dialog_: Any, dialog_manager: DialogManager, error_: ValueError):
     await message.answer("Номер должен быть числом!")
+
+async def add_selected_region_to_dialog(call: CallbackQuery, widget, dialog_manager: DialogManager, **kwargs):
+    session = dialog_manager.middleware_data.get('session_without_commit')
+    id = dialog_manager.find('id').get_value()
+    region = await RegionDAO.find_one_or_none_by_id(session, id)
+
+    dialog_manager.dialog_data['region'] = region
 
 
 async def on_create_confirmation(callback: CallbackQuery, widget, dialog_manager: DialogManager, **kwargs):
@@ -69,50 +76,42 @@ async def on_update_confirmation(callback: CallbackQuery, widget, dialog_manager
     session = dialog_manager.middleware_data.get("session_with_commit")
     
     user_id = callback.from_user.id
-    id = dialog_manager.find('id').get_value()
+    region = dialog_manager.dialog_data.get('region')
     name = dialog_manager.find('name').get_value()
     description = dialog_manager.find('description').get_value()
     
-    check = await RegionDAO.find_one_or_none_by_id(session, id)
-    if check:
-        await callback.answer("Приступаю к сохранению")
-        
-        check.name = name
-        check.description = description
+    await callback.answer("Приступаю к сохранению")
+    
+    region.name = name
+    region.description = description
 
-        await session.commit()
+    await session.commit()
 
-        await callback.answer(f"Запись успешно обновлена!")
-        text = "Запись успешно сохранена"
-        await callback.message.answer(text, reply_markup=main_admin_kb())
+    await callback.answer(f"Запись успешно обновлена!")
+    text = "Запись успешно сохранена"
+    await callback.message.answer(text, reply_markup=main_admin_kb())
 
-        await dialog_manager.done()
-    else:
-        await callback.message.answer("Такой записи не существует!")
-        await dialog_manager.switch_to(RegionUpdate.id)
+    await dialog_manager.done()
 
 
 async def process_delete_region(call: CallbackQuery, widget, dialog_manager: DialogManager, **kwargs):
     session = dialog_manager.middleware_data.get("session_with_commit")
 
-    id = dialog_manager.find("id").get_value()
-    region = await RegionDAO.find_one_or_none_by_id(session, id)
+    region = dialog_manager.dialog_data.get('region')
     
-    if region:
-        await call.answer("Удаление записи")
-        record = RegionDto(
-            id=region.id,
-            name=region.name,
-            description=region.description
-        )
-        count = await RegionDAO.delete(session, record)
-        text = f"Удалено {count} записей"
-        await session.commit()
-        await call.answer(text)
-        
-        await dialog_manager.done()
-    else:
-        await call.answer("Такая запись не существует!\nВведите другой номер.")
+    await call.answer("Удаление записи")
+    record = RegionDto(
+        id=region.id,
+        name=region.name,
+        description=region.description
+    )
+    count = await RegionDAO.delete(session, record)
+    text = f"Удалено {count} записей"
+    await session.commit()
+    await call.answer(text)
+    
+    await dialog_manager.done()
+
 
 async def on_region_wire_confirmation(call: CallbackQuery, widget, dialog_manager: DialogManager, **kwargs):
     session = dialog_manager.middleware_data.get('session_with_commit')

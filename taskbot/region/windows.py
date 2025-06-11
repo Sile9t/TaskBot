@@ -12,7 +12,8 @@ from taskbot.region.kbs import region_menu_kb
 from taskbot.region.getters import get_all_regions, get_region_id_tuples, get_confirmed_data, get_wire_confirmed_data
 from taskbot.general.handlers import cancel_logic
 from taskbot.region.handlers import (
-    go_menu, on_region_selected, on_create_confirmation, on_update_confirmation, process_delete_region, on_region_id_input_error, on_region_wire_confirmation
+    go_menu, on_region_selected, on_create_confirmation, on_update_confirmation, process_delete_region, on_region_id_input_error, on_region_wire_confirmation,
+    add_selected_region_to_dialog
 )
 from taskbot.region.state import RegionCreate, RegionRead, RegionUpdate, RegionDelete, RegionWireChat
 
@@ -109,23 +110,20 @@ def get_region_selection_window(*widgets: WidgetSrc, state: State = RegionUpdate
 
 
 def get_region_id_window(stateGroup: StatesGroup = RegionUpdate, ):
-    return get_regions_window(
-        Const("Введите номер региона."),
-        
-        TextInput(
-            id="id",
-            type_factory=int,
-            on_error=on_region_id_input_error,
-            on_success=Next()
-        ),
-        state=stateGroup.id
+    return get_region_selection_window(
+        Const("Выберите регион для редактирования"),
+
+        state=stateGroup.id,
+        on_region_click=on_region_selected,
+        main_btns=MAIN_BTNS
     )
 
 
 def get_region_name_window(stateGroup: StatesGroup = RegionCreate):
     return Window(
         Const("Введите название региона."),
-        
+        Format("Текущее значение: <code>{dialog_data[region].name}</code>", when='update'),
+
         TextInput(
             id="name",
             on_success=Next()
@@ -140,6 +138,7 @@ def get_region_name_window(stateGroup: StatesGroup = RegionCreate):
 def get_region_description_window(stateGroup: StatesGroup = RegionCreate):
     return Window(
         Const("Введите название региона."),
+        Format("Текущее значение: <code>{dialog_data[region].description}</code>", when='update'),
         
         TextInput(
             id="description",
@@ -185,15 +184,14 @@ def get_update_confirmation_window():
 
 
 def get_delete_window():
-    return get_regions_window(
-        Const("Введите номер региона."),
-        TextInput(
-            id="id",
-            type_factory=int,
-            on_success=Next(on_click=process_delete_region)
-        ),
-        state=RegionDelete.id
+    return get_region_selection_window(
+        Const("Выберите регион для редактирования"),
+
+        state=RegionDelete.id,
+        on_region_click=on_region_selected,
+        main_btns=MAIN_BTNS
     )
+
 
 def get_wire_confirmation_window():
     return Window(
