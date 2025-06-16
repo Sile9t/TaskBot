@@ -11,7 +11,7 @@ from aiogram_dialog.widgets.utils import WidgetSrc
 from taskbot.role.getters import get_all_roles, get_confirmed_data, get_role_id_tuples
 from taskbot.general.handlers import cancel_logic
 from taskbot.role.handlers import (
-    go_menu, on_role_selected, on_create_confirmation, on_update_confirmation, process_delete_role, on_role_id_input_error
+    go_menu, on_role_selected, on_role_delete_selected, on_create_confirmation, on_update_confirmation, process_delete_role, on_role_id_input_error
 )
 from taskbot.role.state import RoleCreate, RoleRead, RoleUpdate, RoleDelete
 
@@ -108,22 +108,19 @@ def get_role_selection_window(*widgets: WidgetSrc, state: State = RoleUpdate.id,
 
 
 def get_role_id_window(stateGroup: StatesGroup = RoleUpdate):
-    return get_roles_window(
-        Const("Введите номер должности для изменения."),
-        
-        TextInput(
-            id="id",
-            type_factory=int,
-            on_error=on_role_id_input_error,
-            on_success=Next()
-        ),
-        state=stateGroup.id
+    return get_role_selection_window(
+        Const("Выберите должность для редактирования"),
+
+        state=stateGroup.id,
+        on_role_click=on_role_selected,
+        main_btns=MAIN_BTNS
     )
 
 
 def get_role_name_window(stateGroup: StatesGroup = RoleCreate):
     return Window(
         Const("Введите название должности."),
+        Format("Текущее значение: <code>{dialog_data[role].name}</code>", when='update'),
         
         TextInput(
             id="name",
@@ -139,6 +136,7 @@ def get_role_name_window(stateGroup: StatesGroup = RoleCreate):
 def get_role_description_window(stateGroup: StatesGroup = RoleCreate):
     return Window(
         Const("Введите название должности."),
+        Format("Текущее значение: <code>{dialog_data[role].description}</code>", when='update'),
         
         TextInput(
             id="description",
@@ -182,12 +180,10 @@ def get_update_confirmation_window():
 
 
 def get_delete_window():
-    return get_roles_window(
-        Const("Введите номер должности."),
-        TextInput(
-            id="id",
-            type_factory=int,
-            on_success=Next(on_click=process_delete_role)
-        ),
-        state=RoleDelete.id
+    return get_role_selection_window(
+        Const("Выберите должность для удаления"),
+
+        state=RoleDelete.id,
+        on_role_click=on_role_delete_selected,
+        main_btns=MAIN_BTNS
     )

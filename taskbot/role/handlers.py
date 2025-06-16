@@ -22,11 +22,30 @@ async def on_role_selected(call: CallbackQuery, widget, dialog_manager: DialogMa
     if (selected_role is None):
         return call.answer(f"Выбраная запись №{role_id} не существует. Выберите еще раз")
 
-
-    dialog_manager.dialog_data["role_id"] = role_id
-    dialog_manager.dialog_data["selected_role"] = selected_role
+    dialog_manager.dialog_data["role"] = selected_role
     await call.answer(f"Выбрана должность №{role_id}")
     await dialog_manager.next()
+
+async def on_role_delete_selected(call: CallbackQuery, widget, dialog_manager: DialogManager, item_id: str):
+    session = dialog_manager.middleware_data.get("session_without_commit")
+    role_id = int(item_id)
+    role = await RoleDAO.find_one_or_none_by_id(session, role_id)
+    if (role is None):
+        return call.message.answer(f"Выбраная запись №{role_id} не существует. Выберите еще раз")
+
+    dialog_manager.dialog_data["role"] = role
+
+    roleDto = RoleDto(
+        id=role.id,
+        name=role.name,
+        description=role.description
+    )
+    count = await RoleDAO.delete(session, roleDto)
+    text = f"Удалено {count} записей"
+    await session.commit()
+    await call.message.answer(text)
+    
+    await dialog_manager.done()
 
 
 async def on_role_id_input_error(message: Message, dialog_: Any, dialog_manager: DialogManager, error_: ValueError):
@@ -62,27 +81,22 @@ async def on_update_confirmation(callback: CallbackQuery, widget, dialog_manager
     session = dialog_manager.middleware_data.get("session_with_commit")
     
     user_id = callback.from_user.id
-    id = dialog_manager.find('id').get_value()
+    role = await RoleDAO.find_one_or_none_by_id(session ,dialog_manager.dialog_data['role'].id)
     name = dialog_manager.find('name').get_value()
     description = dialog_manager.find('description').get_value()
     
-    check = await RoleDAO.find_one_or_none_by_id(session, id)
-    if check:
-        await callback.answer("Приступаю к сохранению")
+    await callback.answer("Приступаю к сохранению")
         
-        check.name = name
-        check.description = description
+    role.name = name
+    role.description = description
 
-        await session.commit()
+    await session.commit()
 
-        await callback.answer(f"Должность успешно обновлена!")
-        text = "Должность успешно сохранена"
-        await callback.message.answer(text, reply_markup=main_admin_kb())
+    await callback.answer(f"Должность успешно обновлена!")
+    text = "Должность успешно сохранена"
+    await callback.message.answer(text, reply_markup=main_admin_kb())
 
-        await dialog_manager.done()
-    else:
-        await callback.message.answer("Такая должность не существует!")
-        await dialog_manager.switch_to(RoleUpdate.id)
+    await dialog_manager.done()
 
 
 async def process_delete_role(call: CallbackQuery, widget, dialog_manager: DialogManager, **kwargs):
