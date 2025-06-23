@@ -31,6 +31,7 @@ async def on_region_selected(call: CallbackQuery, widget, dialog_manager: Dialog
     if (selected_region is None):
         return call.answer(f"Выбраная запись №{region_id} не существует. Выберите еще раз")
 
+    dialog_manager.dialog_data["region_id"] = region_id
     dialog_manager.dialog_data["region"] = selected_region
     await call.answer(f"Выбрана запись №{region_id}")
     await dialog_manager.next()

@@ -19,3 +19,6 @@ credentials.json
 instance/
 *.db
 *.sqlite
+
+# Ignore jobs storage
+jobs/

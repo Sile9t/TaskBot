@@ -8,20 +8,7 @@ async def get_all_tasks(dialog_manager: DialogManager, **kwargs):
     
     caption = []
     for task in tasks:
-        caption.append({
-                "id": str(task.id), 
-                "title": task.title,
-                "description": task.description,
-                "startline": task.startline,
-                "deadline": task.deadline,
-                "is_active": 'Да' if task.is_active else 'Нет',
-                "status": task.status.title,
-                "priority": task.priority.title,
-                "region": task.region.name if task.region else None,
-                "performers": task.getPerformersCaption(),
-                'updated_at': task.updated_at,
-                'created_at': task.created_at
-            })
+        caption.append(task.getFullCaption())
         
     return {
         "tasks": caption, 
@@ -54,8 +41,7 @@ async def get_confirmed_data(dialog_manager: DialogManager, **kwargs):
     status = await TaskStatusDAO.find_one_or_none_by_id(session, status_id)
     priority_id = dialog_manager.dialog_data['priority_id']
     priority = await TaskPriorityDAO.find_one_or_none_by_id(session, priority_id)
-    region_id = dialog_manager.dialog_data['region_id']
-    region = await RegionDAO.find_one_or_none_by_id(session, region_id)
+    region = dialog_manager.dialog_data['region']
 
     confirmed_text = (
         f"<b>Подтверждение добавления задачи</b>\n\n"

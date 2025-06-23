@@ -28,6 +28,7 @@ class TaskUpdate(StatesGroup):
 
 class TaskDelete(StatesGroup):
     id = State()
+    confirmation = State()
 
 class TaskPriorityUpdate(StatesGroup):
     id = State()

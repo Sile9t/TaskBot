@@ -1,9 +1,10 @@
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, date
 from typing import Annotated, List, Optional
 from sqlalchemy import String, Boolean, Integer, TIMESTAMP, func, ForeignKey, text, Table, Column
 from sqlalchemy.orm import Mapped, mapped_column, relationship, declared_attr
 
 from .database import Base, DeclarativeBase
+
 
 # #
 # Region class intepreting region separation of users 
@@ -20,7 +21,8 @@ class Region(Base):
 
     def getNameAndIdTuple(self):
         return (self.name, self.id)
-    
+
+
 # #
 # Role class determines user right
 #
@@ -37,6 +39,7 @@ class Role(Base):
 
     def getNameAndIdTuple(self):
         return (self.name, self.id)
+
 
 task_user_table = Table(
     "task_user_table",
@@ -83,6 +86,8 @@ class User(Base):
             'updated_at': self.updated_at,
             'created_at': self.created_at
         }
+    
+
 # #
 # Task status class describes status of the task
 # 
@@ -105,6 +110,7 @@ class TaskStatus(Base):
     def getTitleAndIdTuple(self):
         return (self.title, self.id)
 
+
 # #
 # Task priority class describes priority of the task
 # #
@@ -122,6 +128,7 @@ class TaskPriority(Base):
     
     def getTitleAndIdTuple(self):
         return (self.title, self.id)
+
 
 # #
 # Task class describes task as an object wich store information
@@ -149,19 +156,51 @@ class Task(Base):
     region: Mapped["Region"] = relationship("Region", back_populates="tasks", foreign_keys="[Task.region_id]", lazy="joined")
     
     creator_id: Mapped[int] = mapped_column(ForeignKey("users.id"))
-    creator: Mapped["User"] = relationship("User", back_populates="created_tasks")
+    creator: Mapped["User"] = relationship("User", back_populates="created_tasks", lazy='selectin')
 
     performers: Mapped[List["User"]] = relationship("User", secondary=task_user_table, back_populates="perform_tasks", lazy="selectin")
 
     def getPerformersCaption(self):
-        users = self.performers
-        namesArray = []
-        for user in users:
-            namesArray.append(user.getRoleTitleAndFullNameCaption())
-        return ",\n".join(namesArray) + '.'
+        return ",\n".join(user.getRoleTitleAndFullNameCaption() for  user in self.performers) or '—'
 
     def getTitleAndIdTuple(self):
         return (self.title, self.id)
+
+    def getFullCaption(self):
+        return {
+                "id": str(self.id), 
+                "title": self.title,
+                "description": self.description,
+                "startline": self.startline,
+                "deadline": self.deadline,
+                "is_active": 'Да' if self.is_active else 'Нет',
+                "status": self.status.title,
+                "priority": self.priority.title,
+                "region": self.region.name if self.region else None,
+                "performers": self.getPerformersCaption(),
+                'updated_at': self.updated_at,
+                'created_at': self.created_at
+            }
+    
+    def toBeautifiedText(self):
+        days_left = (self.deadline.date() - date.today()).days
+        
+        days_left_text = 'сегодня крайний срок'
+        if (days_left < 0):
+            days_left_text = f"на {((-1) * days_left)} дней просрочена"
+        elif (days_left > 0):
+            days_left_text = f"{days_left} дней осталось"
+
+        performersCaption = self.getPerformersCaption()
+        return (
+                f"📌 <b>{self.title}</b> (ID: {self.id})\n"
+                f"📝 Описание: {self.description or 'Без описания'}\n"
+                f"🗓 Сроки: с {self.startline.strftime('%d.%m.%Y')} по {self.deadline.strftime('%d.%m.%Y')} ({days_left_text})\n"
+                f"✔ Статус: {self.status.title}\n"
+                f"🔥 Приоритет: {self.priority.title}\n"
+                f"🌍 Регион: {self.region.name}\n"
+                f"👷 Исполнители:\n{performersCaption}\n"
+            )
 
 
 class ReferLink(Base):

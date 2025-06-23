@@ -1,10 +1,21 @@
 import asyncio
 import locale
 from loguru import logger
+from aiogram import Bot, Dispatcher
+from aiogram.enums import ParseMode
 from aiogram.types import BotCommand, BotCommandScopeDefault
+from aiogram.client.default import DefaultBotProperties
 from aiogram_dialog import setup_dialogs
-from config import bot, dp
+from apscheduler.schedulers.asyncio import AsyncIOScheduler
+from apscheduler.jobstores.sqlalchemy import SQLAlchemyJobStore
+from apscheduler.executors.asyncio import AsyncIOExecutor
+from apscheduler.triggers.cron import CronTrigger
+from config import settings, dp
+from taskbot.dao.database import engine, async_session_maker
 from taskbot.dao.database_middleware import DatabaseMiddlewareWithCommit, DatabaseMiddlewareWithoutCommit
+from taskbot.scheduler.scheduler_midddleware import SchedulerMiddleware, NotifierMiddleware
+from taskbot.scheduler.scheduler import TaskNotifier
+from taskbot.jobs.jobs import send_daily_digest
 from taskbot.dao.seed import seed
 
 from taskbot.general.router import general_router
@@ -14,7 +25,6 @@ from taskbot.admin.router import admin_router
 from taskbot.region.dialog import region_create_dialog, regions_read_dialog, region_update_dialog, region_delete_dialog, region_wire_chat_dialog
 from taskbot.region.router import region_router
 
-# from taskbot.user.user import user_router
 from taskbot.user.router import user_router
 from taskbot.user.dialog import user_create_dialog, users_read_dialog, user_update_dialog, user_delete_dialog 
 
@@ -30,8 +40,9 @@ from taskbot.priority.dialog import priority_create_dialog, priorities_read_dial
 from taskbot.task.router import task_router
 from taskbot.task.dialog import task_create_dialog, tasks_read_dialog, task_update_dialog, task_delete_dialog, task_status_change_dialog, task_priority_change_dialog, task_region_change_dialog, task_set_performers_dialog
 
+from taskbot.scheduler.router import notification_router
 
-async def set_commands():
+async def set_commands(bot: Bot):
     commands = [
         # BotCommand(command='help', description='Список команд'),
         BotCommand(command='start', description='Старт'),
@@ -61,8 +72,8 @@ def set_russian_locale():
             # Игнорируем ошибку, если локаль не поддерживается
             pass
 
-async def start_bot():
-    await set_commands()
+async def start_bot(bot: Bot):
+    await set_commands(bot)
     logger.success("Бот успешно запущен.")
 
 async def stop_bot():
@@ -70,6 +81,25 @@ async def stop_bot():
 
 #TODO: fix tasks cancellation on bot stoping
 async def main():
+    bot = Bot(token=settings.BOT_TOKEN, default=DefaultBotProperties(parse_mode=ParseMode.HTML))
+    jobstores = {
+        'default': SQLAlchemyJobStore(settings.get_jobs_url())
+    }
+    executors = {
+        'default': AsyncIOExecutor()
+    }
+    
+    scheduler = AsyncIOScheduler(timezone="Europe/Moscow", jobstores=jobstores, executors=executors)
+    
+    scheduler.add_job(
+        send_daily_digest,
+        trigger=CronTrigger(second=10),
+        # trigger=CronTrigger(hour=8, minute=0),
+        id="daily_task_digest",
+        name='Ежедневная рассылка задач',
+        replace_existing=True,
+    )
+    
     set_russian_locale()
     await seed()
 
@@ -91,15 +121,16 @@ async def main():
 
     dp.include_routers(task_router, task_create_dialog, tasks_read_dialog, task_update_dialog, task_delete_dialog, task_status_change_dialog, task_priority_change_dialog, task_region_change_dialog, task_set_performers_dialog)
 
+    dp.include_router(notification_router)
+
     dp.include_router(general_router)
         
-    # dp.include_router(user_router)
-
     dp.startup.register(start_bot)
     dp.shutdown.register(stop_bot)
     
     try:
         await bot.delete_webhook(drop_pending_updates=True)
+        scheduler.start()
         await dp.start_polling(bot, allowed_updates=dp.resolve_used_update_types())
     except asyncio.exceptions.CancelledError:
         pass
@@ -107,4 +138,7 @@ async def main():
         await bot.session.close()
 
 if __name__ == "__main__":
-    asyncio.run(main())
+    try:
+        asyncio.run(main())
+    except (KeyboardInterrupt, SystemExit):
+        pass

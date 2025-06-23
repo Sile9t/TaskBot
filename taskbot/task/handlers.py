@@ -10,6 +10,8 @@ from taskbot.admin.kbs import main_admin_kb
 from taskbot.admin.schemas import UserTelegramId
 from taskbot.task.kbs import task_menu_kb
 from taskbot.task.state import TaskCreate, TaskUpdate, TaskPerformersUpdate
+from taskbot.scheduler.scheduler import TaskNotifier
+
 
 async def go_menu(call: CallbackQuery, button: Button, dialog_manager: DialogManager):
     await call.answer("Сценарий отменен!")
@@ -60,12 +62,7 @@ async def on_is_active_selected(call: CallbackQuery, widger, dialog_manager: Dia
 
 async def on_performers_selected(call: CallbackQuery, widget, dialog_manager: DialogManager):
     session = dialog_manager.middleware_data.get("session_with_commit")
-    performers = dialog_manager.dialog_data.get('selected_performers')
-    
-    logger.info("Performers: ", performers)
-    # if (performers is None):
-    #     raise Exception("Performers list is empty")
-    
+
     task_id = dialog_manager.find('id').get_value()
     task = await TaskDAO.find_one_or_none_by_id(session, task_id)
 
@@ -73,16 +70,18 @@ async def on_performers_selected(call: CallbackQuery, widget, dialog_manager: Di
         await call.answer("Такой задачи не существует")
         return await dialog_manager.switch_to(TaskPerformersUpdate.id)
 
-    # users = task.performers
-    # namesArray = []
-    # for user in users:
-    #     namesArray.append(f"{user.role.name} {user.first_name} {user.last_name}")
-    # caption = ".\n".join(namesArray)
     caption = task.getPerformersCaption()
     await call.message.edit_text(
-        text=f"Исполнители задачи {task.title} назначены",
+        text=f"Задаче {task.title} назначено {len(task.performers)} исполнителей",
         reply_markup=None
     )
+
+    if (len(task.performers) > 0):
+        notificationText = f"Вам назначили задачу#{task.id} \"{task.title}\""
+        performer_id = task.performers[0].telegram_id
+        chatId = f"{performer_id}{performer_id}"
+        await call.bot.send_message(performer_id,notificationText)
+
     await call.message.answer(f"Исполнители задачи:\n{caption}")
     dialog_manager.done()
 
@@ -129,8 +128,7 @@ async def on_create_confirmation(call: CallbackQuery, widget, dialog_manager: Di
         await call.message.answer("Такого приоритета не существует!")
         return await dialog_manager.switch_to(TaskCreate.priority)
 
-    region_id = dialog_manager.dialog_data['region_id']
-    region = await RegionDAO.find_one_or_none_by_id(session, region_id)
+    region = dialog_manager.dialog_data['region']
     if region is None:
         await call.message.answer("Такого региона не существует!")
         return await dialog_manager.switch_to(TaskCreate.region)
@@ -143,21 +141,22 @@ async def on_create_confirmation(call: CallbackQuery, widget, dialog_manager: Di
         is_active=is_active,
         status_id=status_id,
         priority_id=priority_id,
-        region_id=region_id,
+        region_id=region.id,
         creator_id=creator.id
     )
 
     check = await TaskDAO.find_one_or_none(session, newTask)
     if not check:
         await call.answer("Приступаю к сохранению")
-        await TaskDAO.add(session, newTask)
+        task = await TaskDAO.add(session, newTask)
         await call.answer(f"Задача успешно добавлена!")
         text = "Задача успешно добавлена"
         await call.message.answer(text, reply_markup=main_admin_kb())
 
         await dialog_manager.done()
+        await session.commit()
     else:
-        await call.message.answer("Этот задача уже существует!")
+        await call.message.answer("Эта задача уже существует!")
         await dialog_manager.back()
 
     
@@ -203,11 +202,10 @@ async def on_update_confirmation(callback: CallbackQuery, widget, dialog_manager
         check.priority_id = priority_id
         check.region_id = region_id
 
-        await session.commit()
-
-        await callback.answer(f"Запись задачи успешно обновлена!")
-        text = "Запись задачи успешно сохранена"
-        await callback.message.answer(text, reply_markup=main_admin_kb())
+        confirmText = f"Запись задачи#{check.id} \"{check.title}\" успешно обновлена!"
+        logger.info(confirmText)
+        await callback.answer(confirmText)
+        await callback.message.answer(confirmText, reply_markup=main_admin_kb())
 
         await dialog_manager.done()
     else:
@@ -231,7 +229,8 @@ async def process_delete_task(call: CallbackQuery, widget, dialog_manager: Dialo
             is_active=task.is_active,
             status_id=task.status_id,
             priority_id=task.priority_id,
-            region_id=task.region_id
+            region_id=task.region_id,
+            creator_id=task.creator_id
         )
         count = await TaskDAO.delete(session, taskDto)
         text = f"Удалено {count} записей"
