@@ -7,7 +7,8 @@ from aiogram_dialog.widgets.widget_event import WidgetEventProcessor
 from aiogram_dialog.widgets.input import MessageInput, TextInput
 from aiogram_dialog.widgets.text import Const, Format, List
 from aiogram_dialog.widgets.utils import WidgetSrc
-from taskbot.task.getters import get_all_tasks, get_confirmed_data, get_is_active_variants
+
+from taskbot.task.getters import get_all_tasks, get_confirmed_data, get_is_active_variants, get_changed_dates_data
 from taskbot.status.windows import get_status_selection_window
 from taskbot.status.handlers import on_status_selected
 from taskbot.priority.windows import get_priority_selection_window
@@ -19,7 +20,7 @@ from taskbot.task.handlers import (
     go_menu, cancel_logic, on_task_selected, on_startline_selected, on_deadline_selected, on_is_active_selected, on_create_confirmation, on_update_confirmation, process_delete_task, on_task_id_input_error,
     on_status_change_selected, on_priority_change_selected, on_region_change_selected, on_performers_selected, on_performer_state_change
 )
-from taskbot.task.state import TaskCreate, TaskRead, TaskUpdate, TaskDelete, TaskPriorityUpdate, TaskStatusUpdate, TaskRegionUpdate, TaskPerformersUpdate
+from taskbot.task.state import TaskCreate, TaskRead, TaskUpdate, TaskDelete, TaskPriorityUpdate, TaskStatusUpdate, TaskRegionUpdate, TaskPerformersUpdate, TaskDatesUpdate
 
 MAIN_BTNS = Row(
             Cancel(Const("В меню"), on_click=go_menu),
@@ -172,7 +173,7 @@ def get_task_description_window(stateGroup: StatesGroup = TaskCreate):
 
 def get_task_startline_window(stateGroup: StatesGroup = TaskCreate):
     return Window(
-        Const("Введите дату начала."),
+        Const("Выберите дату начала."),
         
         Calendar(
             id='startline',
@@ -187,7 +188,7 @@ def get_task_startline_window(stateGroup: StatesGroup = TaskCreate):
 
 def get_task_deadline_window(stateGroup: StatesGroup = TaskCreate):
     return Window(
-        Const("Введите дату окончания."),
+        Const("Выберите дату окончания."),
         
         Calendar(
             id='deadline',
@@ -316,4 +317,15 @@ def get_update_task_region_window(stateGroup: StatesGroup = TaskRegionUpdate):
         on_region_click=on_region_change_selected,
         state=stateGroup.region,
         main_btns=MAIN_BTNS
+    )
+
+
+def get_dates_update_confirmation_window(stateGroup: StatesGroup = TaskDatesUpdate):
+    return Window(
+        Format("{confirmed_data}"),
+
+        MAIN_BTNS,
+
+        state=stateGroup.confirmation,
+        getter=get_changed_dates_data
     )

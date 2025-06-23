@@ -45,3 +45,9 @@ class TaskRegionUpdate(StatesGroup):
 class TaskPerformersUpdate(StatesGroup):
     id = State()
     performers = State()
+
+class TaskDatesUpdate(StatesGroup):
+    id = State()
+    startline = State()
+    deadline = State()
+    confirmation = State()

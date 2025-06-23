@@ -19,6 +19,7 @@ def task_update_menu():
     kb = InlineKeyboardBuilder()
 
     kb.button(text="📋 Изменить полностью", callback_data="task_full_update")
+    kb.button(text="🗓 Изменить даты", callback_data="task_dates_update")
     kb.button(text="✔ Изменить статус", callback_data="task_status_update")
     kb.button(text="🔥 Изменить приоритет", callback_data="task_priority_update")
     kb.button(text="🌍 Изменить регион", callback_data="task_region_update")

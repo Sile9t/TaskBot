@@ -47,12 +47,25 @@ async def get_confirmed_data(dialog_manager: DialogManager, **kwargs):
         f"<b>Подтверждение добавления задачи</b>\n\n"
         f" Название: {title}\n"
         f" Описание: {description}\n"
-        f" Дата начала: {startline}\n"
-        f" Дата окончания: {deadline}\n"
+        f" Дата начала: {startline.strftime('%d.%m.%Y')}\n"
+        f" Дата окончания: {deadline.strftime('%d.%m.%Y')}\n"
         f" Активна: {is_active_text}\n"
         f" Статус: {status.title}\n"
         f" Приоритет: {priority.title}\n"
         f" Регион: {region.name}\n\n"
+        "✅ Все ли верно?"
+    )
+
+    return {"confirmed_text": confirmed_text}
+
+async def get_changed_dates_data(dialog_manager: DialogManager, **kwargs):
+    startline = dialog_manager.dialog_data['startline']
+    deadline = dialog_manager.dialog_data['deadline']
+
+    confirmed_text = (
+        f"<b>Подтвердите изменение дат</b>\n\n"
+        f" Дата начала: {startline.strftime('%d.%m.%Y')}\n"
+        f" Дата окончания: {deadline.strftime('%d.%m.%Y')}\n"
         "✅ Все ли верно?"
     )
 

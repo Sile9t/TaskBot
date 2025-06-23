@@ -38,7 +38,7 @@ from taskbot.priority.router import priority_router
 from taskbot.priority.dialog import priority_create_dialog, priorities_read_dialog, priority_update_dialog, priority_delete_dialog
 
 from taskbot.task.router import task_router
-from taskbot.task.dialog import task_create_dialog, tasks_read_dialog, task_update_dialog, task_delete_dialog, task_status_change_dialog, task_priority_change_dialog, task_region_change_dialog, task_set_performers_dialog
+from taskbot.task.dialog import task_create_dialog, tasks_read_dialog, task_update_dialog, task_delete_dialog, task_status_change_dialog, task_priority_change_dialog, task_region_change_dialog, task_set_performers_dialog, task_change_dates_dialog
 
 from taskbot.scheduler.router import notification_router
 
@@ -119,7 +119,7 @@ async def main():
 
     dp.include_routers(priority_router, priority_create_dialog, priorities_read_dialog, priority_update_dialog, priority_delete_dialog)
 
-    dp.include_routers(task_router, task_create_dialog, tasks_read_dialog, task_update_dialog, task_delete_dialog, task_status_change_dialog, task_priority_change_dialog, task_region_change_dialog, task_set_performers_dialog)
+    dp.include_routers(task_router, task_create_dialog, tasks_read_dialog, task_update_dialog, task_delete_dialog, task_status_change_dialog, task_priority_change_dialog, task_region_change_dialog, task_set_performers_dialog, task_change_dates_dialog)
 
     dp.include_router(notification_router)
 

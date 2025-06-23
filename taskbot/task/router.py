@@ -5,7 +5,7 @@ from aiogram.fsm.context import FSMContext
 from aiogram.types import Message, CallbackQuery, ReplyKeyboardRemove
 from aiogram.filters import Command
 from aiogram_dialog import DialogManager, StartMode
-from taskbot.task.state import TaskCreate, TaskRead, TaskUpdate, TaskDelete, TaskStatusUpdate, TaskPriorityUpdate, TaskRegionUpdate, TaskPerformersUpdate
+from taskbot.task.state import TaskCreate, TaskRead, TaskUpdate, TaskDelete, TaskStatusUpdate, TaskPriorityUpdate, TaskRegionUpdate, TaskPerformersUpdate, TaskDatesUpdate
 from taskbot.task.kbs import task_menu_kb, task_update_menu
 
 task_router = Router()
@@ -84,6 +84,17 @@ async def task_full_update(call: CallbackQuery, dialog_manager: DialogManager):
     await call.answer("Изменение задачи")
     await dialog_manager.start(
         state=TaskUpdate.id,
+        mode=StartMode.RESET_STACK
+    )
+
+
+@task_router.callback_query(F.data == "task_dates_update")
+async def task_dates_update(call: CallbackQuery, dialog_manager: DialogManager):
+    logger.info(f"chat#{call.message.chat.id}|user#{call.message.from_user.id}: Вызов кнопки admin/task_dates_update")
+
+    await call.answer("Изменение дат задачи")
+    await dialog_manager.start(
+        state=TaskDatesUpdate.id,
         mode=StartMode.RESET_STACK
     )
 

@@ -28,13 +28,13 @@ async def cancel_logic(callback: CallbackQuery, button: Button, dialog_manager: 
     )
 
 
-async def on_task_selected(call: CallbackQuery, widget, dialog_manager: DialogManager, item_id: str):
+async def on_task_selected(call: CallbackQuery, widget, dialog_manager: DialogManager):
     session = dialog_manager.middleware_data.get("session_without_commit")
-    task_id = int(item_id)
-    selected_task = await TaskDAO(session).find_one_or_none_by_id(task_id)
+    task_id = int(dialog_manager.find("id").get_value())
+    selected_task = await TaskDAO.find_one_or_none_by_id(session, task_id)
 
     dialog_manager.dialog_data["selected_task"] = selected_task
-    await call.answer(f"Выбрана должность №{task_id}")
+    await call.answer(f"Выбрана задача №{task_id}")
     await dialog_manager.next()
 
 
