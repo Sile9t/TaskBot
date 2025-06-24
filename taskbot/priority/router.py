@@ -10,7 +10,7 @@ from taskbot.priority.kbs import priority_menu_kb
 from ..admin.filters import IsAdmin
 
 priority_router = Router()
-priority_router.message.filter(IsAdmin)
+priority_router.message.filter(IsAdmin())
 
 
 @priority_router.message(Command('priority_menu'))

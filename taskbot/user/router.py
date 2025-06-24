@@ -7,23 +7,10 @@ from aiogram.filters import Command
 from aiogram_dialog import DialogManager, StartMode
 from taskbot.user.state import UserCreate, UserRead, UserUpdate, UserDelete
 from taskbot.user.kbs import user_menu_kb
+from taskbot.admin.filters import IsAdmin
 
 user_router = Router()
-
-@user_router.message(Command("cancel"))
-@user_router.message(F.text.casefold() == "cancel")
-async def cancel_handler(message: Message, state: FSMContext) -> None:
-    current_state = await state.get_state()
-    if current_state is None:
-        return
-
-    logger.info("Сброс состояния %r", current_state)
-    await state.clear()
-    await message.answer(
-        "Отменено.",
-        reply_markup=ReplyKeyboardRemove(),
-    )
-
+user_router.message.filter(IsAdmin())
 
 @user_router.message(Command('user_menu'))
 async def user_menu(message: Message):

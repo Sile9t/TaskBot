@@ -5,6 +5,7 @@ from aiogram import Bot
 from aiogram.enums import ParseMode
 from aiogram.types import BotCommand, BotCommandScopeDefault
 from aiogram.client.default import DefaultBotProperties
+from aiogram.utils.chat_action import ChatActionMiddleware
 from aiogram_dialog import setup_dialogs
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
 from apscheduler.jobstores.sqlalchemy import SQLAlchemyJobStore
@@ -101,6 +102,7 @@ async def main():
     await seed()
 
     setup_dialogs(dp)
+    dp.update.middleware(ChatActionMiddleware())
     dp.update.middleware.register(DatabaseMiddlewareWithCommit())
     dp.update.middleware.register(DatabaseMiddlewareWithoutCommit())
 
@@ -133,6 +135,7 @@ async def main():
         pass
     finally:
         await bot.session.close()
+
 
 if __name__ == "__main__":
     try:

@@ -1,9 +1,7 @@
-from datetime import datetime, timedelta
 from loguru import logger
-from typing import List
 from aiogram import Router, F
 from aiogram.filters import CommandStart, Command, CommandObject
-from aiogram.types import CallbackQuery, Message, ChatJoinRequest
+from aiogram.types import Message
 from sqlalchemy.ext.asyncio import AsyncSession
 from taskbot.admin.kbs import main_admin_kb
 from taskbot.dao.dao import UserDAO, RoleDAO

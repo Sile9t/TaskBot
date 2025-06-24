@@ -1,8 +1,7 @@
-import asyncio
 from loguru import logger
 from sqlalchemy.ext.asyncio import AsyncSession
 from aiogram import Router, F
-from aiogram.types import Message, CallbackQuery, ReplyKeyboardRemove
+from aiogram.types import Message, CallbackQuery
 from aiogram.filters import Command
 from aiogram_dialog import DialogManager, StartMode
 from taskbot.dao.dao import RegionDAO
@@ -12,7 +11,7 @@ from .shemas import RegionChatIdFilter
 from ..admin.filters import IsAdmin
 
 region_router = Router()
-region_router.message.filter(IsAdmin)
+region_router.message.filter(IsAdmin())
 
 @region_router.message(Command('region_menu'))
 async def region_menu(message: Message):

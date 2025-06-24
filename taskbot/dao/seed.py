@@ -19,7 +19,7 @@ defaultRoles = [
     ),
     RoleDto(
         id=3,
-        name='Сотрудник(Исполнитель)',
+        name='Сотрудник (Исполнитель)',
         description=None
     )
 ]
@@ -525,11 +525,21 @@ defaultStatuses = [
     ),
     TaskStatusDto(
         id=3,
-        title='В работе',
+        title='Доработать',
         description='Задача находиться в работе'
     ),
     TaskStatusDto(
         id=4,
+        title='Дозаполнить',
+        description='Задача находиться в работе'
+    ),
+    TaskStatusDto(
+        id=5,
+        title='Активна',
+        description='Задача находиться в работе'
+    ),
+    TaskStatusDto(
+        id=6,
         title='Создана',
         description='Задача недавно создана'
     ),

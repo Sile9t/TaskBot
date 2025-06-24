@@ -11,22 +11,7 @@ from ..admin.filters import IsAdmin
 
 
 status_router = Router()
-status_router.message.filter(IsAdmin)
-
-
-@status_router.message(Command("cancel"))
-@status_router.message(F.text.casefold() == "cancel")
-async def cancel_handler(message: Message, state: FSMContext) -> None:
-    current_state = await state.get_state()
-    if current_state is None:
-        return
-
-    logger.info("Сброс состояния %r", current_state)
-    await state.clear()
-    await message.answer(
-        "Отменено.",
-        reply_markup=ReplyKeyboardRemove(),
-    )
+status_router.message.filter(IsAdmin())
 
 
 @status_router.message(Command('status_menu'))

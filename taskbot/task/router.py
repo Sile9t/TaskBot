@@ -7,22 +7,9 @@ from aiogram.filters import Command
 from aiogram_dialog import DialogManager, StartMode
 from taskbot.task.state import TaskCreate, TaskRead, TaskUpdate, TaskDelete, TaskStatusUpdate, TaskPriorityUpdate, TaskRegionUpdate, TaskPerformersUpdate, TaskDatesUpdate
 from taskbot.task.kbs import task_menu_kb, task_update_menu
+from taskbot.admin.filters import IsAdmin
 
 task_router = Router()
-
-@task_router.message(Command("cancel"))
-@task_router.message(F.text.casefold() == "cancel")
-async def cancel_handler(message: Message, state: FSMContext) -> None:
-    current_state = await state.get_state()
-    if current_state is None:
-        return
-
-    logger.info("Сброс состояния %r", current_state)
-    await state.clear()
-    await message.answer(
-        "Отменено.",
-        reply_markup=ReplyKeyboardRemove(),
-    )
 
 
 @task_router.message(Command('task_menu'))

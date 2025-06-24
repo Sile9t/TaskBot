@@ -10,22 +10,7 @@ from taskbot.role.kbs import role_menu_kb
 from ..admin.filters import IsAdmin
 
 role_router = Router()
-role_router.message.filter(IsAdmin)
-
-@role_router.message(Command("cancel"))
-@role_router.message(F.text.casefold() == "cancel")
-async def cancel_handler(message: Message, state: FSMContext) -> None:
-    current_state = await state.get_state()
-    if current_state is None:
-        return
-
-    logger.info("Сброс состояния %r", current_state)
-    await state.clear()
-    await message.answer(
-        "Отменено.",
-        reply_markup=ReplyKeyboardRemove(),
-    )
-
+role_router.message.filter(IsAdmin())
 
 @role_router.message(Command('role_menu'))
 async def role_menu(message: Message):
