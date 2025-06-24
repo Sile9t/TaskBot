@@ -125,17 +125,3 @@ async def admin_panel(call: CallbackQuery, session_without_commit: AsyncSession)
 #         text="Все ссылки-приглашения от бота были удалены."
 #     )
 }
-
-
-#TODO:
-# #
-# Message routes
-# #
-@admin_router.callback_query(F.data == "send_messages")
-async def send_messages(call: CallbackQuery):
-    logger.info(f"chat#{call.message.chat.id}|user#{call.message.from_user.id}: Вызов кнопки admin/messages")
-    await call.message.edit_text(
-        text=f"Послать рассылку:",
-        reply_markup=None
-    )
-

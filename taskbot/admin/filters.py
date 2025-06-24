@@ -8,7 +8,7 @@ from taskbot.admin.schemas import UserTelegramAndRoleIds
 from taskbot.dao.session_maker import connection
 
 class IsAdmin(BaseFilter):
-    def __init__(self, expected: bool):
+    def __init__(self, expected: bool = True):
         self.expected = expected
 
     @connection    
@@ -22,10 +22,7 @@ class IsAdmin(BaseFilter):
             )
         )
         
-        role = 'admin' if user else 'not admin'
-        logger.info(f"user#{id} is {role}")
+        isAdminOrNotText = 'admin' if user else 'not admin'
+        logger.info(f"user#{id} is {isAdminOrNotText}")
 
         return (user != None) == self.expected
-        if isinstance(self.user_ids, int):
-            return id == self.user_ids
-        return id in self.user_ids

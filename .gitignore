@@ -22,3 +22,4 @@ instance/
 
 # Ignore jobs storage
 jobs/
+!taskbot/jobs
