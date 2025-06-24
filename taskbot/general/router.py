@@ -31,7 +31,7 @@ async def getEmployeeFromMessage(message: Message, session_without_commit: Async
 
 general_router = Router()
 
-@general_router.message(Command("help"))
+@general_router.message(Command("help") | F.data == "/help")
 async def cmd_help(message: Message):
     logger.info(f"chat#{message.chat.id}|user#{message.from_user.id}: Вызов команды admin/help")
     await message.answer(
