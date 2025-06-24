@@ -1,13 +1,10 @@
-from datetime import date, datetime, timedelta
+from datetime import date
 from aiogram import Bot
 from aiogram.enums import ParseMode
 from aiogram.client.default import DefaultBotProperties
-from sqlalchemy import select
-from sqlalchemy.orm import selectinload
 from loguru import logger
 
 from taskbot.dao.database import async_session_maker
-from taskbot.dao.models import Task
 from taskbot.dao.dao import TaskDAO
 from config import settings
 

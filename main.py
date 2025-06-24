@@ -1,7 +1,7 @@
 import asyncio
 import locale
 from loguru import logger
-from aiogram import Bot, Dispatcher
+from aiogram import Bot
 from aiogram.enums import ParseMode
 from aiogram.types import BotCommand, BotCommandScopeDefault
 from aiogram.client.default import DefaultBotProperties
@@ -11,10 +11,7 @@ from apscheduler.jobstores.sqlalchemy import SQLAlchemyJobStore
 from apscheduler.executors.asyncio import AsyncIOExecutor
 from apscheduler.triggers.cron import CronTrigger
 from config import settings, dp
-from taskbot.dao.database import engine, async_session_maker
 from taskbot.dao.database_middleware import DatabaseMiddlewareWithCommit, DatabaseMiddlewareWithoutCommit
-from taskbot.scheduler.scheduler_midddleware import SchedulerMiddleware, NotifierMiddleware
-from taskbot.scheduler.scheduler import TaskNotifier
 from taskbot.jobs.jobs import send_daily_digest
 from taskbot.dao.seed import seed
 
