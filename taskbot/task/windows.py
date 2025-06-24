@@ -18,7 +18,8 @@ from taskbot.region.handlers import on_region_selected
 from taskbot.user.getters import get_performer_id_tuples
 from taskbot.task.handlers import (
     go_menu, cancel_logic, on_task_selected, on_startline_selected, on_deadline_selected, on_is_active_selected, on_create_confirmation, on_update_confirmation, process_delete_task, on_task_id_input_error,
-    on_status_change_selected, on_priority_change_selected, on_region_change_selected, on_performers_selected, on_performer_state_change
+    on_status_change_selected, on_priority_change_selected, on_region_change_selected, on_performers_selected, on_performer_state_change,
+    on_dates_change_confirmation
 )
 from taskbot.task.state import TaskCreate, TaskRead, TaskUpdate, TaskDelete, TaskPriorityUpdate, TaskStatusUpdate, TaskRegionUpdate, TaskPerformersUpdate, TaskDatesUpdate
 
@@ -322,9 +323,12 @@ def get_update_task_region_window(stateGroup: StatesGroup = TaskRegionUpdate):
 
 def get_dates_update_confirmation_window(stateGroup: StatesGroup = TaskDatesUpdate):
     return Window(
-        Format("{confirmed_data}"),
+        Format("{confirmed_text}"),
 
-        MAIN_BTNS,
+        Group(
+            Button(Const("Все верно"), id="confirm", on_click=on_dates_change_confirmation),
+            MAIN_BTNS,
+        ),
 
         state=stateGroup.confirmation,
         getter=get_changed_dates_data

@@ -77,7 +77,7 @@ async def on_performers_selected(call: CallbackQuery, widget, dialog_manager: Di
     )
 
     if (len(task.performers) > 0):
-        notificationText = f"Вам назначили задачу#{task.id} \"{task.title}\""
+        notificationText = f"Вам назначили задачу#{task.id} <b>{task.title}</b>"
         performer_id = task.performers[0].telegram_id
         chatId = f"{performer_id}{performer_id}"
         await call.bot.send_message(performer_id,notificationText)
@@ -327,3 +327,30 @@ async def on_region_change_selected(call: CallbackQuery, widget, dialog_manager:
     else:
         await call.message.answer("Запись задачи не найдена!")
         await dialog_manager.switch_to(TaskUpdate.region)
+
+async def on_dates_change_confirmation(call: CallbackQuery, widget, dialog_manager: DialogManager, *kwargs):
+    session = dialog_manager.middleware_data.get("session_without_commit")
+    
+    user_id = call.from_user.id
+    id = dialog_manager.find('id').get_value()
+
+    startline = dialog_manager.dialog_data['startline']
+    deadline = dialog_manager.dialog_data['deadline']
+
+    check = await TaskDAO.find_one_or_none_by_id(session, id)
+    if check:
+        await call.answer("Сохранение")
+
+        check.startline = startline
+        check.deadline = deadline
+        
+        await session.commit()
+
+        await call.answer(f"Запись задачи успешно обновлена!")
+        text = "Запись задачи успешно сохранена"
+        await call.message.answer(text, reply_markup=main_admin_kb())
+
+        await dialog_manager.done()
+    else:
+        await call.message.answer("Запись задачи не найдена!")
+        await dialog_manager.switch_to(TaskUpdate.status)
