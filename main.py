@@ -93,8 +93,8 @@ async def main():
     
     scheduler.add_job(
         send_daily_digest,
-        trigger=CronTrigger(second=10),
-        # trigger=CronTrigger(hour=8, minute=0),
+        # trigger=CronTrigger(second=10),
+        trigger=CronTrigger(hour=8, minute=0),
         id="daily_task_digest",
         name='Ежедневная рассылка задач',
         replace_existing=True,

@@ -11,9 +11,6 @@ from taskbot.dao.models import Task
 from taskbot.dao.dao import TaskDAO
 from config import settings
 
-def getTaskDeadlineDate(task: Task):
-    return task.deadline.date
-
 class DailyTaskDigestSender:
     def __init__(self, bot: Bot):
         self.bot = bot
