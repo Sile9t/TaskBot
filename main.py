@@ -16,6 +16,8 @@ from taskbot.dao.database_middleware import DatabaseMiddlewareWithCommit, Databa
 from taskbot.jobs.jobs import send_daily_digest
 from taskbot.dao.seed import seed
 
+from taskbot.auth.auth import AuthenticateMiddleware
+
 from taskbot.general.router import general_router
 
 from taskbot.admin.router import admin_router
@@ -103,6 +105,7 @@ async def main():
 
     setup_dialogs(dp)
     dp.update.middleware(ChatActionMiddleware())
+    dp.update.middleware.register(AuthenticateMiddleware())
     dp.update.middleware.register(DatabaseMiddlewareWithCommit())
     dp.update.middleware.register(DatabaseMiddlewareWithoutCommit())
 

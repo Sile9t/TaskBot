@@ -39,7 +39,7 @@ class IsAdmin(BaseFilter):
 
         return isAdmin == self.expected
 
-class FilterUserByRoleIds(BaseFilter):
+class PassUsersWithRoleIds(BaseFilter):
     def __init__(self, roleIds: List[int]):
         self.expectedRoleIds = roleIds
 
@@ -58,3 +58,24 @@ class FilterUserByRoleIds(BaseFilter):
             return False
         
         return True
+
+class FilterUserByRoles(BaseFilter):
+    def __init__(self, roles: List[str]):
+        self.expectedRoles = roles
+
+    @connection
+    async def __call__(self, message: Message, session: AsyncSession, *args, **kwargs):
+        user = await UserDAO.find_one_or_none(
+            session,
+            UserTelegramId(
+                    telegram_id=message.from_user.id
+                )
+            )
+
+        try:
+            self.expectedRoleIds.index(user.role_id)
+        except Exception as e:
+            return False
+        
+        return True
+

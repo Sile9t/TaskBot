@@ -7,7 +7,7 @@ from aiogram.filters import Command
 from aiogram_dialog import DialogManager, StartMode
 from taskbot.task.state import TaskCreate, TaskRead, TaskUpdate, TaskDelete, TaskStatusUpdate, TaskPriorityUpdate, TaskRegionUpdate, TaskPerformersUpdate, TaskDatesUpdate
 from taskbot.task.kbs import task_menu_kb, task_update_menu
-from taskbot.admin.filters import IsAdmin
+from taskbot.admin.filters import IsAdmin, PassUsersWithRoleIds
 
 task_router = Router()
 
@@ -53,7 +53,7 @@ async def task_add(call: CallbackQuery, dialog_manager: DialogManager):
     )
 
 
-@task_router.callback_query(F.data == "task_update")
+@task_router.callback_query(F.data == "task_update", PassUsersWithRoleIds([1, 2]))
 async def task_update(call: CallbackQuery, dialog_manager: DialogManager):
     logger.info(f"chat#{call.message.chat.id}|user#{call.message.from_user.id}: Вызов кнопки admin/task_update")
 
@@ -64,7 +64,7 @@ async def task_update(call: CallbackQuery, dialog_manager: DialogManager):
     )
 
 
-@task_router.callback_query(F.data == "task_full_update")
+@task_router.callback_query(F.data == "task_full_update", PassUsersWithRoleIds([1, 2]))
 async def task_full_update(call: CallbackQuery, dialog_manager: DialogManager):
     logger.info(f"chat#{call.message.chat.id}|user#{call.message.from_user.id}: Вызов кнопки admin/task_full_update")
 
@@ -97,7 +97,7 @@ async def task_status_update(call: CallbackQuery, dialog_manager: DialogManager)
     )
 
 
-@task_router.callback_query(F.data == "task_priority_update")
+@task_router.callback_query(F.data == "task_priority_update", PassUsersWithRoleIds([1, 2]))
 async def task_priority_update(call: CallbackQuery, dialog_manager: DialogManager):
     logger.info(f"chat#{call.message.chat.id}|user#{call.message.from_user.id}: Вызов кнопки admin/task_priority_update")
 
@@ -108,7 +108,7 @@ async def task_priority_update(call: CallbackQuery, dialog_manager: DialogManage
     )
 
 
-@task_router.callback_query(F.data == "task_region_update")
+@task_router.callback_query(F.data == "task_region_update", PassUsersWithRoleIds([1, 2]))
 async def task_region_update(call: CallbackQuery, dialog_manager: DialogManager):
     logger.info(f"chat#{call.message.chat.id}|user#{call.message.from_user.id}: Вызов кнопки admin/task_region_update")
 
@@ -119,7 +119,7 @@ async def task_region_update(call: CallbackQuery, dialog_manager: DialogManager)
     )
 
 
-@task_router.callback_query(F.data == "task_set_performers")
+@task_router.callback_query(F.data == "task_set_performers", PassUsersWithRoleIds([1, 2]))
 async def task_set_performers(call: CallbackQuery, dialog_manager: DialogManager):
     logger.info(f"chat#{call.message.chat.id}|user#{call.message.from_user.id}: Вызов кнопки admin/task_set_performers")
 
@@ -130,7 +130,7 @@ async def task_set_performers(call: CallbackQuery, dialog_manager: DialogManager
     )
 
 
-@task_router.callback_query(F.data == "task_delete")
+@task_router.callback_query(F.data == "task_delete", PassUsersWithRoleIds([1, 2]))
 async def task_delete(call: CallbackQuery, dialog_manager: DialogManager):
     logger.info(f"chat#{call.message.chat.id}|user#{call.message.from_user.id}: Вызов сценария удаления задачи")
 

@@ -2,6 +2,8 @@ from typing import List
 from aiogram.types import InlineKeyboardMarkup, ReplyKeyboardMarkup, KeyboardButton
 from aiogram.utils.keyboard import InlineKeyboardBuilder, ReplyKeyboardBuilder
 
+from taskbot.dao.models import User
+
 def yes_no_kb():
     kb = InlineKeyboardBuilder()
 
@@ -22,16 +24,17 @@ def pass_kb():
         one_time_keyboard=True
     )
 
-def main_admin_kb(user_id: int = -1):
+def main_admin_kb(userRoleId: int = 3):
     kb = InlineKeyboardBuilder()
     
-    kb.button(text="👩🏻‍💼👨🏻‍💼 Сотрудники", callback_data="user_menu")
     kb.button(text="📋 Задачи", callback_data="task_menu")
-    kb.button(text="🎭 Должности", callback_data="role_menu")
-    kb.button(text="🌍 Регионы", callback_data="region_menu")
-    kb.button(text="✔ Статусы задач", callback_data="status_menu")
-    kb.button(text="🔥 Приоритеты задач", callback_data="priority_menu")
-    kb.button(text="✉ Отправить рассылку", callback_data="send_messages")
+    if (userRoleId < 3):
+        kb.button(text="👩🏻‍💼👨🏻‍💼 Сотрудники", callback_data="user_menu")
+        if (userRoleId < 2):
+            kb.button(text="🎭 Должности", callback_data="role_menu")
+            kb.button(text="🌍 Регионы", callback_data="region_menu")
+            kb.button(text="✔ Статусы задач", callback_data="status_menu")
+            kb.button(text="🔥 Приоритеты задач", callback_data="priority_menu")
     kb.adjust(2, 2, 2, 1)
 
     return kb.as_markup()
