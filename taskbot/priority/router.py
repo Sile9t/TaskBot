@@ -7,10 +7,10 @@ from aiogram.filters import Command
 from aiogram_dialog import DialogManager, StartMode
 from taskbot.priority.state import PriorityCreate, PriorityRead, PriorityUpdate, PriorityDelete
 from taskbot.priority.kbs import priority_menu_kb
-from ..admin.filters import IsAdmin
+from ..admin.filters import PassUsersWithRoleIds
 
 priority_router = Router()
-priority_router.message.filter(IsAdmin())
+priority_router.message.filter(PassUsersWithRoleIds([1, 2]))
 
 
 @priority_router.message(Command('priority_menu'))

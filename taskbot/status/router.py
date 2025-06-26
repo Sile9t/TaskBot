@@ -7,11 +7,11 @@ from aiogram.filters import Command
 from aiogram_dialog import DialogManager, StartMode
 from taskbot.status.state import StatusCreate, StatusRead, StatusUpdate, StatusDelete
 from taskbot.status.kbs import status_menu_kb
-from ..admin.filters import IsAdmin
+from ..admin.filters import PassUsersWithRoleIds
 
 
 status_router = Router()
-status_router.message.filter(IsAdmin())
+status_router.message.filter(PassUsersWithRoleIds([1, 2]))
 
 
 @status_router.message(Command('status_menu'))

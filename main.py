@@ -40,7 +40,6 @@ from taskbot.priority.dialog import priority_create_dialog, priorities_read_dial
 from taskbot.task.router import task_router
 from taskbot.task.dialog import task_create_dialog, tasks_read_dialog, task_update_dialog, task_delete_dialog, task_status_change_dialog, task_priority_change_dialog, task_region_change_dialog, task_set_performers_dialog, task_change_dates_dialog
 
-from taskbot.scheduler.router import notification_router
 
 async def set_commands(bot: Bot):
     commands = [

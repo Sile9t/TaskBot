@@ -5,12 +5,11 @@ from aiogram.types import CallbackQuery, Message
 from aiogram_dialog import DialogManager
 from aiogram_dialog.widgets.kbd import Button, ManagedMultiselect
 from taskbot.dao.dao import TaskDAO, RegionDAO, RegionDAO, TaskPriorityDAO, UserDAO
-from taskbot.dao.schemas import TaskDto, TaskDtoBase
+from taskbot.dao.schemas import TaskDtoBase
 from taskbot.admin.kbs import main_admin_kb
 from taskbot.admin.schemas import UserTelegramId
 from taskbot.task.kbs import task_menu_kb
 from taskbot.task.state import TaskCreate, TaskUpdate, TaskPerformersUpdate
-from taskbot.scheduler.scheduler import TaskNotifier
 
 
 async def go_menu(call: CallbackQuery, button: Button, dialog_manager: DialogManager):
