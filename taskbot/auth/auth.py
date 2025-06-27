@@ -1,11 +1,13 @@
 from loguru import logger
 from typing import Callable, Dict, Any, Awaitable
+from sqlalchemy import select
 from aiogram import BaseMiddleware
 from aiogram.types import Message, CallbackQuery
 
-from taskbot.dao.database import async_session_maker
-from taskbot.dao.dao import UserDAO
-from taskbot.admin.schemas import UserTelegramId
+from ..dao.database import async_session_maker
+from ..dao.models import User
+from ..dao.dao import UserDAO
+from ..admin.schemas import UserTelegramId
 
 class AuthenticateMiddleware(BaseMiddleware):
     async def __call__(
@@ -21,10 +23,9 @@ class AuthenticateMiddleware(BaseMiddleware):
         
         if (userId is not None):
             async with async_session_maker() as session:
-                user = await UserDAO.find_one_or_none(
-                    session,
-                    UserTelegramId(telegram_id=userId)
-                )
+                query = select(User).filter_by(telegram_id=userId)
+                result = await session.execute(query)
+                user = result.unique().scalar_one_or_none()
 
             data['auth'] = user
         await handler(event, data)

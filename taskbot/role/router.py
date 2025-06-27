@@ -3,9 +3,11 @@ from aiogram import Router, F
 from aiogram.types import Message, CallbackQuery
 from aiogram.filters import Command
 from aiogram_dialog import DialogManager, StartMode
-from taskbot.role.state import RoleCreate, RoleRead, RoleUpdate, RoleDelete
-from taskbot.role.kbs import role_menu_kb
+
+from ..role.state import RoleCreate, RoleRead, RoleUpdate, RoleDelete
+from ..role.kbs import role_menu_kb
 from ..admin.filters import IsAdmin
+
 
 role_router = Router()
 role_router.message.filter(IsAdmin())

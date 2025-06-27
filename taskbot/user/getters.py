@@ -1,5 +1,6 @@
 from aiogram_dialog import DialogManager
-from taskbot.dao.dao import UserDAO, RoleDAO, RegionDAO
+
+from ..dao.dao import UserDAO, RoleDAO, RegionDAO
 
 async def get_all_users(dialog_manager: DialogManager, **kwargs):
     session = dialog_manager.middleware_data.get("session_without_commit")

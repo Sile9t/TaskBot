@@ -1,5 +1,6 @@
 from aiogram_dialog import DialogManager
-from taskbot.dao.dao import RegionDAO
+
+from ..dao.dao import RegionDAO
 
 async def get_all_regions(dialog_manager: DialogManager, **kwargs):
     session = dialog_manager.middleware_data.get("session_without_commit")

@@ -4,9 +4,9 @@ from aiogram.filters import Command
 from aiogram.types import CallbackQuery, Message
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from taskbot.admin.kbs import main_admin_kb
-from taskbot.dao.models import User
-from taskbot.admin.filters import IsAdmin
+from ..admin.kbs import main_admin_kb
+from ..dao.models import User
+from ..admin.filters import IsAdmin
 
 
 admin_router = Router()

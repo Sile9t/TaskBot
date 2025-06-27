@@ -1,6 +1,7 @@
 from aiogram_dialog import Dialog
-from taskbot.region.state import RegionCreate, RegionUpdate, RegionWireChat
-from taskbot.region.windows import get_regions_window, get_region_id_window, get_region_name_window, get_region_description_window, get_create_confirmation_window, get_update_confirmation_window, get_delete_window, get_wire_confirmation_window
+
+from ..region.state import RegionCreate, RegionUpdate, RegionWireChat
+from ..region.windows import get_regions_window, get_region_id_window, get_region_name_window, get_region_description_window, get_create_confirmation_window, get_update_confirmation_window, get_delete_window, get_wire_confirmation_window
 
 region_create_dialog = Dialog(
     get_region_name_window(RegionCreate),

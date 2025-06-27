@@ -1,6 +1,7 @@
 from aiogram_dialog import Dialog
-from taskbot.status.state import StatusCreate, StatusUpdate
-from taskbot.status.windows import get_statuses_window, get_status_id_window, get_status_title_window, get_status_description_window, get_create_confirmation_window, get_update_confirmation_window, get_delete_window
+
+from ..status.state import StatusCreate, StatusUpdate
+from ..status.windows import get_statuses_window, get_status_id_window, get_status_title_window, get_status_description_window, get_create_confirmation_window, get_update_confirmation_window, get_delete_window
 
 status_create_dialog = Dialog(
     get_status_title_window(StatusCreate),

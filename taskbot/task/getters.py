@@ -1,5 +1,6 @@
 from aiogram_dialog import DialogManager
-from taskbot.dao.dao import TaskDAO, TaskStatusDAO, TaskPriorityDAO
+
+from ..dao.dao import TaskDAO, TaskStatusDAO, TaskPriorityDAO
 
 async def get_all_tasks(dialog_manager: DialogManager, **kwargs):
     session = dialog_manager.middleware_data.get("session_without_commit")

@@ -1,7 +1,7 @@
 import re
+from loguru import logger
 from aiogram.fsm.context import FSMContext
 from aiogram.types import Message
-from loguru import logger
 
 def extract_number(text):
     match = re.search(r'\b(\d+)\b', text)

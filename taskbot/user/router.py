@@ -3,9 +3,11 @@ from aiogram import Router, F
 from aiogram.types import Message, CallbackQuery
 from aiogram.filters import Command
 from aiogram_dialog import DialogManager, StartMode
-from taskbot.user.state import UserCreate, UserRead, UserUpdate, UserDelete
-from taskbot.user.kbs import user_menu_kb
-from taskbot.admin.filters import IsAdmin
+
+from ..user.state import UserCreate, UserRead, UserUpdate, UserDelete
+from ..user.kbs import user_menu_kb
+from ..admin.filters import IsAdmin
+
 
 user_router = Router()
 user_router.message.filter(IsAdmin())

@@ -2,20 +2,22 @@ from typing import Any
 from aiogram.types import CallbackQuery, Message
 from aiogram_dialog import DialogManager
 from aiogram_dialog.widgets.kbd import Button
+
+from ..dao.models import User
 from taskbot.dao.dao import TaskPriorityDAO
 from taskbot.dao.schemas import TaskPriorityDto, TaskPriorityDtoBase
 from taskbot.admin.kbs import main_admin_kb
 from taskbot.priority.kbs import priority_menu_kb
 from taskbot.priority.state import PriorityUpdate
 
-async def go_menu(call: CallbackQuery, button: Button, dialog_manager: DialogManager):
+async def go_menu(call: CallbackQuery, button: Button, dialog_manager: DialogManager, **kwargs):
     await call.answer("Сценарий отменен!")
     await call.message.answer(
         "Вы отменили сценарий. Меню для приоритетов заданий:",
         reply_markup=priority_menu_kb()
     )
 
-async def on_priority_selected(call: CallbackQuery, widget, dialog_manager: DialogManager, item_id: str):
+async def on_priority_selected(call: CallbackQuery, widget, dialog_manager: DialogManager, item_id: str, **kwargs):
     session = dialog_manager.middleware_data.get("session_without_commit")
     priority_id = int(item_id)
     selected_priority = await TaskPriorityDAO.find_one_or_none_by_id(session, priority_id)
@@ -28,13 +30,14 @@ async def on_priority_selected(call: CallbackQuery, widget, dialog_manager: Dial
     await dialog_manager.next()
 
 
-async def on_priority_id_input_error(message: Message, dialog_: Any, dialog_manager: DialogManager, error_: ValueError):
+async def on_priority_id_input_error(message: Message, dialog_: Any, dialog_manager: DialogManager, error_: ValueError, **kwargs):
     await message.answer("Номер должен быть числом!")
 
 
-async def on_create_confirmation(callback: CallbackQuery, widget, dialog_manager: DialogManager, **kwargs):
+async def on_create_confirmation(callback: CallbackQuery, widget, dialog_manager: DialogManager, auth: User|None, **kwargs):
     session = dialog_manager.middleware_data.get("session_with_commit")
 
+    userRoleId = auth.role_id if auth else 3
     user_id = callback.from_user.id
     value = dialog_manager.find('value').get_value()
     title = dialog_manager.find("title").get_value()
@@ -51,7 +54,7 @@ async def on_create_confirmation(callback: CallbackQuery, widget, dialog_manager
         await TaskPriorityDAO.add(session, newpriority)
         await callback.answer(f"Запись приоритета успешно создана!")
         text = "Запись приоритета успешно сохранена"
-        await callback.message.answer(text, reply_markup=main_admin_kb())
+        await callback.message.answer(text, reply_markup=main_admin_kb(userRoleId))
 
         await dialog_manager.done()
     else:
@@ -59,9 +62,10 @@ async def on_create_confirmation(callback: CallbackQuery, widget, dialog_manager
         await dialog_manager.back()
 
     
-async def on_update_confirmation(callback: CallbackQuery, widget, dialog_manager: DialogManager, **kwargs):
+async def on_update_confirmation(callback: CallbackQuery, widget, dialog_manager: DialogManager, auth: User|None,**kwargs):
     session = dialog_manager.middleware_data.get("session_with_commit")
     
+    userRoleId = auth.role_id if auth else 3
     user_id = callback.from_user.id
     id = dialog_manager.find('id').get_value()
     value = dialog_manager.find('value').get_value()
@@ -80,7 +84,7 @@ async def on_update_confirmation(callback: CallbackQuery, widget, dialog_manager
 
         await callback.answer(f"Запись приоритета успешно обновлена!")
         text = "Запись приоритета успешно сохранена"
-        await callback.message.answer(text, reply_markup=main_admin_kb())
+        await callback.message.answer(text, reply_markup=main_admin_kb(userRoleId))
 
         await dialog_manager.done()
     else:
@@ -88,9 +92,10 @@ async def on_update_confirmation(callback: CallbackQuery, widget, dialog_manager
         await dialog_manager.switch_to(PriorityUpdate.id)
 
 
-async def process_delete_priority(call: CallbackQuery, widget, dialog_manager: DialogManager, **kwargs):
+async def process_delete_priority(call: CallbackQuery, widget, dialog_manager: DialogManager, auth: User|None, **kwargs):
     session = dialog_manager.middleware_data.get("session_with_commit")
 
+    userRoleId = auth.role_id if auth else 3
     id = dialog_manager.find("id").get_value()
     priority = await TaskPriorityDAO.find_one_or_none_by_id(session, id)
     
@@ -105,7 +110,10 @@ async def process_delete_priority(call: CallbackQuery, widget, dialog_manager: D
         count = await TaskPriorityDAO.delete(session, priorityDto)
         text = f"Удалено {count} записей"
         await session.commit()
-        await call.answer(text)
+        await call.message.answer(
+            text,
+            reply_markup=main_admin_kb(userRoleId)
+        )
         
         await dialog_manager.done()
     else:

@@ -8,12 +8,12 @@ from aiogram_dialog.widgets.input import TextInput
 from aiogram_dialog.widgets.text import Const, Format, List
 from aiogram_dialog.widgets.utils import WidgetSrc
 
-from taskbot.status.getters import get_all_statuses, get_status_id_tuples, get_confirmed_data
-from taskbot.general.handlers import cancel_logic
-from taskbot.status.handlers import (
+from ..status.getters import get_all_statuses, get_status_id_tuples, get_confirmed_data
+from ..general.handlers import cancel_logic
+from ..status.handlers import (
     go_menu, on_status_selected, on_create_confirmation, on_update_confirmation, process_delete_status, on_status_id_input_error
 )
-from taskbot.status.state import StatusCreate, StatusRead, StatusUpdate, StatusDelete
+from ..status.state import StatusCreate, StatusRead, StatusUpdate, StatusDelete
 
 
 MAIN_BTNS = Row(

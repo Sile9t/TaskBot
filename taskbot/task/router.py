@@ -4,10 +4,10 @@ from aiogram.types import Message, CallbackQuery
 from aiogram.filters import Command
 from aiogram_dialog import DialogManager, StartMode
 
-from taskbot.dao.models import User
-from taskbot.task.state import TaskCreate, TaskRead, TaskUpdate, TaskDelete, TaskStatusUpdate, TaskPriorityUpdate, TaskRegionUpdate, TaskPerformersUpdate, TaskDatesUpdate
-from taskbot.task.kbs import task_menu_kb, task_update_menu
-from taskbot.admin.filters import PassUsersWithRoleIds
+from ..dao.models import User
+from ..task.state import TaskCreate, TaskRead, TaskUpdate, TaskDelete, TaskStatusUpdate, TaskPriorityUpdate, TaskRegionUpdate, TaskPerformersUpdate, TaskDatesUpdate
+from ..task.kbs import task_menu_kb, task_update_menu
+from ..admin.filters import PassUsersWithRoleIds
 
 task_router = Router()
 

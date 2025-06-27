@@ -4,8 +4,8 @@ from aiogram.enums import ParseMode
 from aiogram.client.default import DefaultBotProperties
 from loguru import logger
 
-from taskbot.dao.database import async_session_maker
-from taskbot.dao.dao import TaskDAO
+from ..dao.database import async_session_maker
+from ..dao.dao import TaskDAO
 from config import settings
 
 

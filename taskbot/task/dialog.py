@@ -1,6 +1,7 @@
 from aiogram_dialog import Dialog
-from taskbot.task.state import TaskCreate, TaskUpdate, TaskPriorityUpdate, TaskStatusUpdate, TaskRegionUpdate, TaskPerformersUpdate, TaskDatesUpdate
-from taskbot.task.windows import get_tasks_window, get_task_id_window, get_task_title_window, get_task_description_window, get_task_startline_window, get_task_deadline_window, get_task_is_active_window, get_task_status_window, get_task_priority_window, get_task_region_window, get_create_confirmation_window, get_update_confirmation_window, get_delete_window, get_update_task_priority_window, get_update_task_status_window, get_update_task_region_window, get_task_performers_window, get_dates_update_confirmation_window
+
+from ..task.state import TaskCreate, TaskUpdate, TaskPriorityUpdate, TaskStatusUpdate, TaskRegionUpdate, TaskPerformersUpdate, TaskDatesUpdate
+from ..task.windows import get_tasks_window, get_task_id_window, get_task_title_window, get_task_description_window, get_task_startline_window, get_task_deadline_window, get_task_is_active_window, get_task_status_window, get_task_priority_window, get_task_region_window, get_create_confirmation_window, get_update_confirmation_window, get_delete_window, get_update_task_priority_window, get_update_task_status_window, get_update_task_region_window, get_task_performers_window, get_dates_update_confirmation_window
 
 
 task_create_dialog = Dialog(

@@ -6,20 +6,20 @@ from aiogram_dialog.widgets.input import TextInput
 from aiogram_dialog.widgets.text import Const, Format, List
 from aiogram_dialog.widgets.utils import WidgetSrc
 
-from taskbot.task.getters import get_all_tasks, get_confirmed_data, get_is_active_variants, get_changed_dates_data
-from taskbot.status.windows import get_status_selection_window
-from taskbot.status.handlers import on_status_selected
-from taskbot.priority.windows import get_priority_selection_window
-from taskbot.priority.handlers import on_priority_selected
-from taskbot.region.windows import get_region_selection_window
-from taskbot.region.handlers import on_region_selected
-from taskbot.user.getters import get_performer_id_tuples
-from taskbot.task.handlers import (
+from ..task.getters import get_all_tasks, get_confirmed_data, get_is_active_variants, get_changed_dates_data
+from ..status.windows import get_status_selection_window
+from ..status.handlers import on_status_selected
+from ..priority.windows import get_priority_selection_window
+from ..priority.handlers import on_priority_selected
+from ..region.windows import get_region_selection_window
+from ..region.handlers import on_region_selected
+from ..user.getters import get_performer_id_tuples
+from ..task.handlers import (
     go_menu, cancel_logic, on_startline_selected, on_deadline_selected, on_is_active_selected, on_create_confirmation, on_update_confirmation, process_delete_task, on_task_id_input_error,
     on_status_change_selected, on_priority_change_selected, on_region_change_selected, on_performers_selected, on_performer_state_change,
     on_dates_change_confirmation
 )
-from taskbot.task.state import TaskCreate, TaskRead, TaskUpdate, TaskDelete, TaskPriorityUpdate, TaskStatusUpdate, TaskRegionUpdate, TaskPerformersUpdate, TaskDatesUpdate
+from ..task.state import TaskCreate, TaskRead, TaskUpdate, TaskDelete, TaskPriorityUpdate, TaskStatusUpdate, TaskRegionUpdate, TaskPerformersUpdate, TaskDatesUpdate
 
 
 MAIN_BTNS = Row(

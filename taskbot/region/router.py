@@ -4,9 +4,10 @@ from aiogram import Router, F
 from aiogram.types import Message, CallbackQuery
 from aiogram.filters import Command
 from aiogram_dialog import DialogManager, StartMode
-from taskbot.dao.dao import RegionDAO
-from taskbot.region.kbs import region_menu_kb
-from taskbot.region.state import RegionCreate, RegionRead, RegionUpdate, RegionDelete, RegionWireChat
+
+from ..dao.dao import RegionDAO
+from ..region.kbs import region_menu_kb
+from ..region.state import RegionCreate, RegionRead, RegionUpdate, RegionDelete, RegionWireChat
 from .shemas import RegionChatIdFilter
 from ..admin.filters import IsAdmin
 
@@ -25,7 +26,7 @@ async def region_menu(message: Message):
 @region_router.callback_query(F.data == "region_menu")
 async def region_menu(call: CallbackQuery):
     logger.info(f"chat#{call.message.chat.id}|user#{call.message.from_user.id}: Вызов кнопки admin/region_menu")
-    await call.message.answer(
+    await call.message.edit_text(
         text=f"Меню для регионов:",
         reply_markup=region_menu_kb()
     )

@@ -4,30 +4,34 @@ from typing import Any
 from aiogram.types import CallbackQuery, Message
 from aiogram_dialog import DialogManager
 from aiogram_dialog.widgets.kbd import Button, ManagedMultiselect
-from taskbot.dao.dao import TaskDAO, RegionDAO, RegionDAO, TaskPriorityDAO, UserDAO
-from taskbot.dao.schemas import TaskDtoBase
-from taskbot.admin.kbs import main_admin_kb
-from taskbot.admin.schemas import UserTelegramId
-from taskbot.task.kbs import task_menu_kb
-from taskbot.task.state import TaskCreate, TaskUpdate, TaskPerformersUpdate
+
+from ..dao.models import User
+from ..dao.dao import TaskDAO, RegionDAO, RegionDAO, TaskPriorityDAO, UserDAO
+from ..dao.schemas import TaskDtoBase
+from ..admin.kbs import main_admin_kb
+from ..admin.schemas import UserTelegramId
+from ..task.kbs import task_menu_kb
+from ..task.state import TaskCreate, TaskUpdate, TaskPerformersUpdate
 
 
-async def go_menu(call: CallbackQuery, button: Button, dialog_manager: DialogManager):
+async def go_menu(call: CallbackQuery, button: Button, dialog_manager: DialogManager, auth: User|None, **kwargs):
+    userRoleId = auth.role_id if auth else 3
     await call.answer("Сценарий отменен!")
     await call.message.answer(
         "Вы отменили сценарий. Меню для задач:",
-        reply_markup=task_menu_kb()
+        reply_markup=task_menu_kb(userRoleId)
     )
 
-async def cancel_logic(callback: CallbackQuery, button: Button, dialog_manager: DialogManager):
+async def cancel_logic(callback: CallbackQuery, button: Button, dialog_manager: DialogManager, auth: User|None, **kwargs):
+    userRoleId = auth.role_id if auth else 3
     await callback.answer("Сценарий отменен!")
     await callback.message.answer(
         "Вы отменили сценарий.", 
-        reply_markup=main_admin_kb(callback.from_task.id)
+        reply_markup=main_admin_kb(userRoleId)
     )
 
 
-async def on_task_selected(call: CallbackQuery, widget, dialog_manager: DialogManager):
+async def on_task_selected(call: CallbackQuery, widget, dialog_manager: DialogManager, **kwargs):
     session = dialog_manager.middleware_data.get("session_without_commit")
     task_id = int(dialog_manager.find("id").get_value())
     selected_task = await TaskDAO.find_one_or_none_by_id(session, task_id)
@@ -37,29 +41,29 @@ async def on_task_selected(call: CallbackQuery, widget, dialog_manager: DialogMa
     await dialog_manager.next()
 
 
-async def on_task_id_input_error(message: Message, dialog_: Any, dialog_manager: DialogManager, error_: ValueError):
+async def on_task_id_input_error(message: Message, dialog_: Any, dialog_manager: DialogManager, error_: ValueError, **kwargs):
     await message.answer("Номер должен быть числом!")
 
 
-async def on_startline_selected(call: CallbackQuery, widget, dialog_manager: DialogManager, selected_date: date):
+async def on_startline_selected(call: CallbackQuery, widget, dialog_manager: DialogManager, selected_date: date, **kwargs):
     dialog_manager.dialog_data['startline'] = selected_date
     await call.answer(f"Выбранная дата: {str(selected_date)}")
     await dialog_manager.next()
 
 
-async def on_deadline_selected(call: CallbackQuery, widget, dialog_manager: DialogManager, selected_date: date):
+async def on_deadline_selected(call: CallbackQuery, widget, dialog_manager: DialogManager, selected_date: date, **kwargs):
     dialog_manager.dialog_data['deadline'] = selected_date
     await call.answer(f"Выбранная дата: {str(selected_date)}")
     await dialog_manager.next()
 
 
-async def on_is_active_selected(call: CallbackQuery, widger, dialog_manager: DialogManager, is_active: bool):
+async def on_is_active_selected(call: CallbackQuery, widger, dialog_manager: DialogManager, is_active: bool, **kwargs):
     dialog_manager.dialog_data['is_active'] = str(is_active)
     logger.info(f"Is_active value: {is_active}")
     await dialog_manager.next()
 
 
-async def on_performers_selected(call: CallbackQuery, widget, dialog_manager: DialogManager):
+async def on_performers_selected(call: CallbackQuery, widget, dialog_manager: DialogManager, **kwargs):
     session = dialog_manager.middleware_data.get("session_with_commit")
 
     task_id = dialog_manager.find('id').get_value()
@@ -85,7 +89,7 @@ async def on_performers_selected(call: CallbackQuery, widget, dialog_manager: Di
     dialog_manager.done()
 
 
-async def on_performer_state_change(call: CallbackQuery, select: ManagedMultiselect, dialog_manager: DialogManager, item: int):
+async def on_performer_state_change(call: CallbackQuery, select: ManagedMultiselect, dialog_manager: DialogManager, item: int, **kwargs):
     session = dialog_manager.middleware_data.get("session_with_commit")
     task_id = dialog_manager.find('id').get_value()
     task = await TaskDAO.find_one_or_none_by_id(session, task_id)
@@ -102,9 +106,10 @@ async def on_performer_state_change(call: CallbackQuery, select: ManagedMultisel
     await session.commit()
 
 
-async def on_create_confirmation(call: CallbackQuery, widget, dialog_manager: DialogManager, **kwargs):
+async def on_create_confirmation(call: CallbackQuery, widget, dialog_manager: DialogManager, auth: User|None, **kwargs):
     session = dialog_manager.middleware_data.get("session_with_commit")
 
+    userRoleId = auth.role_id if auth else 3
     creator = await UserDAO.find_one_or_none(
         session,
         UserTelegramId(telegram_id=call.from_user.id)
@@ -150,7 +155,7 @@ async def on_create_confirmation(call: CallbackQuery, widget, dialog_manager: Di
         task = await TaskDAO.add(session, newTask)
         await call.answer(f"Задача успешно добавлена!")
         text = "Задача успешно добавлена"
-        await call.message.answer(text, reply_markup=main_admin_kb())
+        await call.message.answer(text, reply_markup=main_admin_kb(userRoleId))
 
         await dialog_manager.done()
         await session.commit()
@@ -159,9 +164,10 @@ async def on_create_confirmation(call: CallbackQuery, widget, dialog_manager: Di
         await dialog_manager.back()
 
     
-async def on_update_confirmation(callback: CallbackQuery, widget, dialog_manager: DialogManager, **kwargs):
+async def on_update_confirmation(callback: CallbackQuery, widget, dialog_manager: DialogManager, auth: User|None, **kwargs):
     session = dialog_manager.middleware_data.get("session_with_commit")
     
+    userRoleId = auth.role_id if auth else 3
     user_id = callback.from_user.id
     id = dialog_manager.find('id').get_value()
     title = dialog_manager.find('title').get_value()
@@ -204,7 +210,7 @@ async def on_update_confirmation(callback: CallbackQuery, widget, dialog_manager
         confirmText = f"Запись задачи#{check.id} \"{check.title}\" успешно обновлена!"
         logger.info(confirmText)
         await callback.answer(confirmText)
-        await callback.message.answer(confirmText, reply_markup=main_admin_kb())
+        await callback.message.answer(confirmText, reply_markup=main_admin_kb(userRoleId))
 
         await dialog_manager.done()
     else:
@@ -212,9 +218,10 @@ async def on_update_confirmation(callback: CallbackQuery, widget, dialog_manager
         await dialog_manager.switch_to(TaskUpdate.id)
 
 
-async def process_delete_task(call: CallbackQuery, widget, dialog_manager: DialogManager, **kwargs):
+async def process_delete_task(call: CallbackQuery, widget, dialog_manager: DialogManager, auth: User|None, **kwargs):
     session = dialog_manager.middleware_data.get("session_with_commit")
 
+    userRoleId = auth.role_id if auth else 3
     id = dialog_manager.find("id").get_value()
     task = await TaskDAO.find_one_or_none_by_id(session, id)
     
@@ -234,16 +241,20 @@ async def process_delete_task(call: CallbackQuery, widget, dialog_manager: Dialo
         count = await TaskDAO.delete(session, taskDto)
         text = f"Удалено {count} записей"
         await session.commit()
-        await call.answer(text)
+        await call.message.answer(
+            text,
+            reply_markup=main_admin_kb(userRoleId)
+        )
         
         await dialog_manager.done()
     else:
         await call.answer("Запись задачи не найдена!\nВведите другой id.")
 
 
-async def on_status_change_selected(call: CallbackQuery, widget, dialog_manager: DialogManager, item_id: str):
+async def on_status_change_selected(call: CallbackQuery, widget, dialog_manager: DialogManager, item_id: str, auth: User|None, **kwargs):
     session = dialog_manager.middleware_data.get("session_without_commit")
     
+    userRoleId = auth.role_id if auth else 3
     user_id = call.from_user.id
     id = dialog_manager.find('id').get_value()
 
@@ -262,7 +273,7 @@ async def on_status_change_selected(call: CallbackQuery, widget, dialog_manager:
 
         await call.answer(f"Запись задачи успешно обновлена!")
         text = "Запись задачи успешно сохранена"
-        await call.message.answer(text, reply_markup=main_admin_kb())
+        await call.message.answer(text, reply_markup=main_admin_kb(userRoleId))
 
         await dialog_manager.done()
     else:
@@ -270,9 +281,10 @@ async def on_status_change_selected(call: CallbackQuery, widget, dialog_manager:
         await dialog_manager.switch_to(TaskUpdate.status)
 
 
-async def on_priority_change_selected(call: CallbackQuery, widget, dialog_manager: DialogManager, item_id: str):
+async def on_priority_change_selected(call: CallbackQuery, widget, dialog_manager: DialogManager, item_id: str, auth: User|None, **kwargs):
     session = dialog_manager.middleware_data.get("session_without_commit")
 
+    userRoleId = auth.role_id if auth else 3
     user_id = call.from_user.id
     id = dialog_manager.find('id').get_value()
 
@@ -291,7 +303,7 @@ async def on_priority_change_selected(call: CallbackQuery, widget, dialog_manage
 
         await call.answer(f"Запись задачи успешно обновлена!")
         text = "Запись задачи успешно сохранена"
-        await call.message.answer(text, reply_markup=main_admin_kb())
+        await call.message.answer(text, reply_markup=main_admin_kb(userRoleId))
 
         await dialog_manager.done()
     else:
@@ -299,9 +311,10 @@ async def on_priority_change_selected(call: CallbackQuery, widget, dialog_manage
         await dialog_manager.switch_to(TaskUpdate.priority)
 
 
-async def on_region_change_selected(call: CallbackQuery, widget, dialog_manager: DialogManager, item_id: str):
+async def on_region_change_selected(call: CallbackQuery, widget, dialog_manager: DialogManager, item_id: str, auth: User|None, **kwargs):
     session = dialog_manager.middleware_data.get("session_without_commit")
 
+    userRoleId = auth.role_id if auth else 3
     user_id = call.from_user.id
     id = dialog_manager.find('id').get_value()
 
@@ -320,16 +333,17 @@ async def on_region_change_selected(call: CallbackQuery, widget, dialog_manager:
 
         await call.answer(f"Запись задачи успешно обновлена!")
         text = "Запись задачи успешно сохранена"
-        await call.message.answer(text, reply_markup=main_admin_kb())
+        await call.message.answer(text, reply_markup=main_admin_kb(userRoleId))
 
         await dialog_manager.done()
     else:
         await call.message.answer("Запись задачи не найдена!")
         await dialog_manager.switch_to(TaskUpdate.region)
 
-async def on_dates_change_confirmation(call: CallbackQuery, widget, dialog_manager: DialogManager, *kwargs):
+async def on_dates_change_confirmation(call: CallbackQuery, widget, dialog_manager: DialogManager, auth: User|None, **kwargs):
     session = dialog_manager.middleware_data.get("session_without_commit")
     
+    userRoleId = auth.role_id if auth else 3
     user_id = call.from_user.id
     id = dialog_manager.find('id').get_value()
 
@@ -347,7 +361,7 @@ async def on_dates_change_confirmation(call: CallbackQuery, widget, dialog_manag
 
         await call.answer(f"Запись задачи успешно обновлена!")
         text = "Запись задачи успешно сохранена"
-        await call.message.answer(text, reply_markup=main_admin_kb())
+        await call.message.answer(text, reply_markup=main_admin_kb(userRoleId))
 
         await dialog_manager.done()
     else:

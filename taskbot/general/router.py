@@ -3,10 +3,11 @@ from aiogram import Router, F
 from aiogram.filters import CommandStart, Command, CommandObject
 from aiogram.types import Message
 from sqlalchemy.ext.asyncio import AsyncSession
-from taskbot.admin.kbs import main_admin_kb
-from taskbot.dao.dao import UserDAO, RoleDAO
-from taskbot.dao.schemas import UserDtoBase
-from taskbot.admin.schemas import UserTelegramId, UserRoleId
+
+from ..admin.kbs import main_admin_kb
+from ..dao.dao import UserDAO, RoleDAO
+from ..dao.schemas import UserDtoBase
+from ..admin.schemas import UserTelegramId, UserRoleId
 
 async def getAdminFromMessage(message: Message, session_without_commit: AsyncSession):
     return UserDtoBase(

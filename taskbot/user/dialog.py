@@ -1,6 +1,7 @@
 from aiogram_dialog import Dialog
-from taskbot.user.state import UserCreate, UserUpdate
-from taskbot.user.windows import get_users_window, get_user_id_window, get_user_first_name_window, get_user_last_name_window, get_user_region_window, get_user_role_window, get_create_confirmation_window, get_update_confirmation_window, get_delete_window
+
+from ..user.state import UserCreate, UserUpdate
+from ..user.windows import get_users_window, get_user_id_window, get_user_first_name_window, get_user_last_name_window, get_user_region_window, get_user_role_window, get_create_confirmation_window, get_update_confirmation_window, get_delete_window
 
 user_create_dialog = Dialog(
     get_user_first_name_window(UserCreate),

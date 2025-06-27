@@ -1,5 +1,6 @@
 from aiogram_dialog import DialogManager
-from taskbot.dao.dao import RoleDAO
+
+from ..dao.dao import RoleDAO
 
 async def get_all_roles(dialog_manager: DialogManager, **kwargs):
     session = dialog_manager.middleware_data.get("session_without_commit")
