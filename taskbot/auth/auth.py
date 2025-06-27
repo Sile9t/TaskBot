@@ -1,3 +1,4 @@
+from loguru import logger
 from typing import Callable, Dict, Any, Awaitable
 from aiogram import BaseMiddleware
 from aiogram.types import Message, CallbackQuery
@@ -13,12 +14,17 @@ class AuthenticateMiddleware(BaseMiddleware):
             event: Message | CallbackQuery,
             data: Dict[str, Any]
     ):
-        async with async_session_maker() as session:
+        if (event.callback_query is not None):
+            userId = event.callback_query.from_user.id
+        elif (event.message is not None):
             userId = event.message.from_user.id
-            user = await UserDAO.find_one_or_none(
-                session,
-                UserTelegramId(telegram_id=userId)
-            )
+        
+        if (userId is not None):
+            async with async_session_maker() as session:
+                user = await UserDAO.find_one_or_none(
+                    session,
+                    UserTelegramId(telegram_id=userId)
+                )
 
-        data['auth'] = user
+            data['auth'] = user
         await handler(event, data)

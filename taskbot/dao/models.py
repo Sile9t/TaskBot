@@ -1,9 +1,9 @@
 from datetime import datetime, timedelta, date
-from typing import Annotated, List, Optional
+from typing import List, Optional
 from sqlalchemy import String, Boolean, Integer, TIMESTAMP, func, ForeignKey, text, Table, Column
 from sqlalchemy.orm import Mapped, mapped_column, relationship, declared_attr
 
-from .database import Base, DeclarativeBase
+from .database import Base
 
 
 # #
@@ -213,3 +213,4 @@ class ReferLink(Base):
     @declared_attr
     def __tablename__(cls) -> str:
         return "refer_links"
+    

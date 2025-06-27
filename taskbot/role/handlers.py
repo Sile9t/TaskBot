@@ -6,7 +6,6 @@ from taskbot.dao.dao import RoleDAO
 from taskbot.dao.schemas import RoleDto, RoleDtoBase
 from taskbot.admin.kbs import main_admin_kb
 from taskbot.role.kbs import role_menu_kb
-from taskbot.role.state import RoleUpdate
 
 async def go_menu(call: CallbackQuery, button: Button, dialog_manager: DialogManager):
     await call.answer("Сценарий отменен!")

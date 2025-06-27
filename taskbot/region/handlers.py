@@ -1,4 +1,3 @@
-from loguru import logger
 from typing import Any
 from aiogram.types import CallbackQuery, Message
 from aiogram_dialog import DialogManager
@@ -7,7 +6,6 @@ from taskbot.dao.dao import RegionDAO
 from taskbot.dao.schemas import RegionDto, RegionDtoBase
 from taskbot.admin.kbs import main_admin_kb
 from taskbot.region.kbs import region_menu_kb
-from taskbot.region.state import RegionUpdate
 
 async def go_menu(call: CallbackQuery, button: Button, dialog_manager: DialogManager):
     await call.answer("Сценарий отменен!")

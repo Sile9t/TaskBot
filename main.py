@@ -11,6 +11,7 @@ from apscheduler.schedulers.asyncio import AsyncIOScheduler
 from apscheduler.jobstores.sqlalchemy import SQLAlchemyJobStore
 from apscheduler.executors.asyncio import AsyncIOExecutor
 from apscheduler.triggers.cron import CronTrigger
+
 from config import settings, dp
 from taskbot.dao.database_middleware import DatabaseMiddlewareWithCommit, DatabaseMiddlewareWithoutCommit
 from taskbot.jobs.jobs import send_daily_digest
@@ -43,13 +44,11 @@ from taskbot.task.dialog import task_create_dialog, tasks_read_dialog, task_upda
 
 async def set_commands(bot: Bot):
     commands = [
-        # BotCommand(command='help', description='Список команд'),
         BotCommand(command='start', description='Старт'),
         BotCommand(command='admin_panel', description='Панель администрирования'),
         BotCommand(command='role_menu', description='Меню для должностей'),
         BotCommand(command='task_menu', description='Меню для задач'),
         BotCommand(command='user_menu', description='Меню для пользователей'),
-        # BotCommand(command='employee_menu', description='Меню для сотрудников'),
         BotCommand(command='region_menu', description='Меню для регионов'),
         BotCommand(command='status_menu', description='Меню для статусов задач'),
         BotCommand(command='priority_menu', description='Меню для приоритетов задач'),
@@ -78,7 +77,6 @@ async def start_bot(bot: Bot):
 async def stop_bot():
     logger.error("Бот остановлен!")
 
-#TODO: fix tasks cancellation on bot stoping
 async def main():
     bot = Bot(token=settings.BOT_TOKEN, default=DefaultBotProperties(parse_mode=ParseMode.HTML))
     jobstores = {
@@ -121,8 +119,6 @@ async def main():
     dp.include_routers(priority_router, priority_create_dialog, priorities_read_dialog, priority_update_dialog, priority_delete_dialog)
 
     dp.include_routers(task_router, task_create_dialog, tasks_read_dialog, task_update_dialog, task_delete_dialog, task_status_change_dialog, task_priority_change_dialog, task_region_change_dialog, task_set_performers_dialog, task_change_dates_dialog)
-
-    dp.include_router(notification_router)
 
     dp.include_router(general_router)
         

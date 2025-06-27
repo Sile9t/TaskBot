@@ -2,7 +2,6 @@ import re
 from aiogram.fsm.context import FSMContext
 from aiogram.types import Message
 from loguru import logger
-from config import bot
 
 def extract_number(text):
     match = re.search(r'\b(\d+)\b', text)
@@ -12,6 +11,7 @@ def extract_number(text):
         return None
     
 async def process_dell_text_msg(message: Message, state: FSMContext):
+    bot = message.bot
     data = await state.get_data()
     last_msg_id = data.get('last_msg_id')
 

@@ -13,7 +13,7 @@ class BaseDAO(Generic[T]):
 
     @classmethod
     async def find_one_or_none_by_id(cls, session: AsyncSession, data_id: int):
-        # Найти запись по ID
+        """Найти запись по ID"""
         logger.info(f"Поиск {cls.model.__name__} с ID: {data_id}")
         try:
             query = select(cls.model).filter_by(id=data_id)
@@ -30,7 +30,7 @@ class BaseDAO(Generic[T]):
 
     @classmethod
     async def find_one_or_none(cls, session: AsyncSession, filters: BaseModel):
-        # Найти одну запись по фильтрам
+        """Найти одну запись по фильтрам"""
         filter_dict = filters.model_dump(exclude_unset=True)
         logger.info(f"Поиск одной записи {cls.model.__name__} по фильтрам: {filter_dict}")
         try:
@@ -48,7 +48,7 @@ class BaseDAO(Generic[T]):
 
     @classmethod
     async def find_all(cls, session: AsyncSession, filters: BaseModel = None):
-        # Найти все записи по фильтрам
+        """Найти все записи по фильтрам"""
         filter_dict = filters.model_dump(exclude_unset=True) if filters else {}
         logger.info(f"Поиск всех записей {cls.model.__name__} по фильтрам: {filter_dict}")
         try:
@@ -63,7 +63,7 @@ class BaseDAO(Generic[T]):
 
     @classmethod
     async def add(cls, session: AsyncSession, values: BaseModel):
-        # Добавить одну запись
+        """Добавить одну запись"""
         values_dict = values.model_dump(exclude_unset=True)
         logger.info(f"Добавление записи {cls.model.__name__} с параметрами: {values_dict}")
         new_instance = cls.model(**values_dict)
@@ -79,7 +79,7 @@ class BaseDAO(Generic[T]):
 
     @classmethod
     async def delete(cls, session: AsyncSession, filters: BaseModel):
-        # Удалить записи по фильтру
+        """Удалить записи по фильтру"""
         filter_dict = filters.model_dump(exclude_unset=True)
         logger.info(f"Удаление записей {cls.model.__name__} по фильтру: {filter_dict}")
         if not filter_dict:
@@ -99,7 +99,7 @@ class BaseDAO(Generic[T]):
 
     @classmethod
     async def count(cls, session: AsyncSession, filters: BaseModel = None):
-        # Подсчитать количество записей
+        """Подсчитать количество записей"""
         filter_dict = filters.model_dump(exclude_unset=True) if filters else {}
         logger.info(f"Подсчет количества записей {cls.model.__name__} по фильтру: {filter_dict}")
         try:
@@ -114,7 +114,7 @@ class BaseDAO(Generic[T]):
 
     @classmethod
     async def paginate(cls, session: AsyncSession, page: int = 1, page_size: int = 10, filters: BaseModel = None):
-        # Пагинация записей
+        """Пагинация записей"""
         filter_dict = filters.model_dump(exclude_unset=True) if filters else {}
         logger.info(
             f"Пагинация записей {cls.model.__name__} по фильтру: {filter_dict}, страница: {page}, размер страницы: {page_size}")

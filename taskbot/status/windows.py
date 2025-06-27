@@ -1,19 +1,20 @@
 from operator import itemgetter
 from aiogram.fsm.state import StatesGroup, State
-from aiogram.types import ContentType
 from aiogram_dialog import Window
-from aiogram_dialog.widgets.kbd import Button, Group, ScrollingGroup, Select, Calendar, CalendarConfig, Back, Cancel, NumberedPager, Row, Next, SwitchTo, CurrentPage, NextPage, PrevPage, FirstPage, LastPage
+from aiogram_dialog.widgets.kbd import Button, Group, ScrollingGroup, Select, Cancel, Row, Next, CurrentPage, NextPage, PrevPage, FirstPage, LastPage
 from aiogram_dialog.widgets.kbd.select import OnItemClick
 from aiogram_dialog.widgets.widget_event import WidgetEventProcessor
-from aiogram_dialog.widgets.input import MessageInput, TextInput
+from aiogram_dialog.widgets.input import TextInput
 from aiogram_dialog.widgets.text import Const, Format, List
 from aiogram_dialog.widgets.utils import WidgetSrc
+
 from taskbot.status.getters import get_all_statuses, get_status_id_tuples, get_confirmed_data
 from taskbot.general.handlers import cancel_logic
 from taskbot.status.handlers import (
     go_menu, on_status_selected, on_create_confirmation, on_update_confirmation, process_delete_status, on_status_id_input_error
 )
 from taskbot.status.state import StatusCreate, StatusRead, StatusUpdate, StatusDelete
+
 
 MAIN_BTNS = Row(
             Cancel(Const("В меню"), on_click=go_menu),

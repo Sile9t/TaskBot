@@ -5,9 +5,7 @@ from aiogram.types import CallbackQuery, Message
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from taskbot.admin.kbs import main_admin_kb
-from taskbot.dao.dao import UserDAO
 from taskbot.dao.models import User
-from taskbot.admin.schemas import UserTelegramId
 from taskbot.admin.filters import IsAdmin
 
 

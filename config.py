@@ -1,15 +1,9 @@
 import os
-from typing import List
 from loguru import logger
-from aiogram import Bot, Dispatcher
-from aiogram.enums import ParseMode
+from aiogram import Dispatcher
 from aiogram.fsm.storage.memory import MemoryStorage
-from aiogram.fsm.storage.redis import RedisStorage
-from aiogram.client.default import DefaultBotProperties
 from configobj import ConfigObj
 from pydantic_settings import BaseSettings, SettingsConfigDict
-from apscheduler.schedulers.asyncio import AsyncIOScheduler
-from apscheduler.jobstores.sqlalchemy import SQLAlchemyJobStore
 
 config = ConfigObj("config.ini")
 
@@ -39,11 +33,9 @@ class Settings(BaseSettings):
     
 settings = Settings()
 
-# storage = RedisStorage.from_url(settings.REDIS)
 storage = MemoryStorage()
 dp = Dispatcher(storage=storage)
 
-#TODO: change to log folder where will be log files for every day
 log_file_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "logs/dump.log")
 logger.add(log_file_path, format=settings.FORMAT_LOG, level="INFO", rotation=settings.LOG_ROTATION)
 database_url = settings.get_db_url()

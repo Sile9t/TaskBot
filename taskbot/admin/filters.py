@@ -4,11 +4,9 @@ from aiogram.filters import BaseFilter
 from aiogram.types import Message 
 from sqlalchemy.ext.asyncio import AsyncSession
 from taskbot.dao.dao import UserDAO
-from taskbot.admin.schemas import UserTelegramAndRoleIds, UserTelegramId
+from taskbot.admin.schemas import UserTelegramId
 from taskbot.dao.session_maker import connection
 
-from taskbot.dao.dao import RoleDAO
-from taskbot.dao.schemas import UserDtoBase
 
 class IsAdmin(BaseFilter):
     def __init__(self, expected: bool = True):

@@ -1,10 +1,8 @@
 import operator
 from aiogram.fsm.state import StatesGroup, State
 from aiogram_dialog import Window
-from aiogram_dialog.widgets.kbd import Button, Group, ScrollingGroup, Select, Calendar, CalendarConfig, Back, Cancel, NumberedPager, Row, Next, SwitchTo, CurrentPage, NextPage, PrevPage, FirstPage, LastPage, Checkbox, Radio, Multiselect
-from aiogram_dialog.widgets.kbd.select import OnItemClick
-from aiogram_dialog.widgets.widget_event import WidgetEventProcessor
-from aiogram_dialog.widgets.input import MessageInput, TextInput
+from aiogram_dialog.widgets.kbd import Button, Group, ScrollingGroup, Select, Calendar, Cancel, Row, Next, CurrentPage, NextPage, PrevPage, FirstPage, LastPage, Multiselect
+from aiogram_dialog.widgets.input import TextInput
 from aiogram_dialog.widgets.text import Const, Format, List
 from aiogram_dialog.widgets.utils import WidgetSrc
 
@@ -17,11 +15,12 @@ from taskbot.region.windows import get_region_selection_window
 from taskbot.region.handlers import on_region_selected
 from taskbot.user.getters import get_performer_id_tuples
 from taskbot.task.handlers import (
-    go_menu, cancel_logic, on_task_selected, on_startline_selected, on_deadline_selected, on_is_active_selected, on_create_confirmation, on_update_confirmation, process_delete_task, on_task_id_input_error,
+    go_menu, cancel_logic, on_startline_selected, on_deadline_selected, on_is_active_selected, on_create_confirmation, on_update_confirmation, process_delete_task, on_task_id_input_error,
     on_status_change_selected, on_priority_change_selected, on_region_change_selected, on_performers_selected, on_performer_state_change,
     on_dates_change_confirmation
 )
 from taskbot.task.state import TaskCreate, TaskRead, TaskUpdate, TaskDelete, TaskPriorityUpdate, TaskStatusUpdate, TaskRegionUpdate, TaskPerformersUpdate, TaskDatesUpdate
+
 
 MAIN_BTNS = Row(
             Cancel(Const("В меню"), on_click=go_menu),

@@ -3,7 +3,7 @@ from aiogram.types import CallbackQuery, Message
 from aiogram_dialog import DialogManager
 from aiogram_dialog.widgets.kbd import Button
 from taskbot.dao.dao import RegionDAO
-from taskbot.dao.schemas import TaskStatusDto, TaskStatusDtoBase
+from taskbot.dao.schemas import TaskStatusDtoBase
 from taskbot.admin.kbs import main_admin_kb
 from taskbot.status.kbs import status_menu_kb
 from taskbot.status.state import StatusUpdate

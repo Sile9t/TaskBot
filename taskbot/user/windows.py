@@ -1,18 +1,20 @@
 from aiogram.fsm.state import StatesGroup, State
 from aiogram_dialog import Window
-from aiogram_dialog.widgets.kbd import Button, Group, ScrollingGroup, Select, Calendar, CalendarConfig, Back, Cancel, NumberedPager, Row, Next, SwitchTo, CurrentPage, NextPage, PrevPage, FirstPage, LastPage
-from aiogram_dialog.widgets.input import MessageInput, TextInput
+from aiogram_dialog.widgets.kbd import Button, Group, Cancel, Row, Next, CurrentPage, NextPage, PrevPage, FirstPage, LastPage
+from aiogram_dialog.widgets.input import TextInput
 from aiogram_dialog.widgets.text import Const, Format, List
 from aiogram_dialog.widgets.utils import WidgetSrc
+
 from taskbot.user.getters import get_all_users, get_confirmed_data
 from taskbot.role.windows import get_role_selection_window
 from taskbot.role.handlers import on_role_selected
 from taskbot.region.windows import get_region_selection_window
 from taskbot.region.handlers import on_region_selected
 from taskbot.user.handlers import (
-    go_menu, cancel_logic, on_user_selected, on_create_confirmation, on_update_confirmation, process_delete_user, on_user_id_input_error
+    go_menu, cancel_logic, on_create_confirmation, on_update_confirmation, process_delete_user, on_user_id_input_error
 )
 from taskbot.user.state import UserCreate, UserRead, UserUpdate, UserDelete
+
 
 MAIN_BTNS = Row(
             Cancel(Const("В меню"), on_click=go_menu),

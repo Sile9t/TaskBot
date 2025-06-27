@@ -8,6 +8,7 @@ from taskbot.dao.database import async_session_maker
 from taskbot.dao.dao import TaskDAO
 from config import settings
 
+
 class DailyTaskDigestSender:
     def __init__(self, bot: Bot):
         self.bot = bot

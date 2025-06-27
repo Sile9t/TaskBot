@@ -1,8 +1,6 @@
-from typing import List
-from aiogram.types import InlineKeyboardMarkup, ReplyKeyboardMarkup, KeyboardButton
-from aiogram.utils.keyboard import InlineKeyboardBuilder, ReplyKeyboardBuilder
+from aiogram.types import ReplyKeyboardMarkup, KeyboardButton
+from aiogram.utils.keyboard import InlineKeyboardBuilder
 
-from taskbot.dao.models import User
 
 def yes_no_kb():
     kb = InlineKeyboardBuilder()

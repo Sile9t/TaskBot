@@ -1,6 +1,4 @@
 from functools import wraps
-from typing import Optional
-from sqlalchemy import text
 
 from taskbot.dao.database import async_session_maker
 

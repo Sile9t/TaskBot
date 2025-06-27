@@ -1,6 +1,4 @@
-from typing import List
-from aiogram.types import InlineKeyboardMarkup, ReplyKeyboardMarkup, KeyboardButton
-from aiogram.utils.keyboard import InlineKeyboardBuilder, ReplyKeyboardBuilder
+from aiogram.utils.keyboard import InlineKeyboardBuilder
 
 def role_menu_kb():
     kb = InlineKeyboardBuilder()
