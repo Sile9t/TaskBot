@@ -10,6 +10,7 @@ __pycache__/
 config.ini
 
 # Ignore log files
+logs/
 log.*
 *.log
 
