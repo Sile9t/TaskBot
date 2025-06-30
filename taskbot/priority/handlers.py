@@ -3,7 +3,6 @@ from aiogram.types import CallbackQuery, Message
 from aiogram_dialog import DialogManager
 from aiogram_dialog.widgets.kbd import Button
 
-from ..dao.models import User
 from taskbot.dao.dao import TaskPriorityDAO
 from taskbot.dao.schemas import TaskPriorityDto, TaskPriorityDtoBase
 from taskbot.admin.kbs import main_admin_kb
@@ -34,7 +33,8 @@ async def on_priority_id_input_error(message: Message, dialog_: Any, dialog_mana
     await message.answer("Номер должен быть числом!")
 
 
-async def on_create_confirmation(callback: CallbackQuery, widget, dialog_manager: DialogManager, auth: User|None, **kwargs):
+async def on_create_confirmation(callback: CallbackQuery, widget, dialog_manager: DialogManager, **kwargs):
+    auth = dialog_manager.middleware_data.get('auth')
     session = dialog_manager.middleware_data.get("session_with_commit")
 
     userRoleId = auth.role_id if auth else 3
@@ -62,7 +62,8 @@ async def on_create_confirmation(callback: CallbackQuery, widget, dialog_manager
         await dialog_manager.back()
 
     
-async def on_update_confirmation(callback: CallbackQuery, widget, dialog_manager: DialogManager, auth: User|None,**kwargs):
+async def on_update_confirmation(callback: CallbackQuery, widget, dialog_manager: DialogManager, **kwargs):
+    auth = dialog_manager.middleware_data.get('auth')
     session = dialog_manager.middleware_data.get("session_with_commit")
     
     userRoleId = auth.role_id if auth else 3
@@ -92,7 +93,8 @@ async def on_update_confirmation(callback: CallbackQuery, widget, dialog_manager
         await dialog_manager.switch_to(PriorityUpdate.id)
 
 
-async def process_delete_priority(call: CallbackQuery, widget, dialog_manager: DialogManager, auth: User|None, **kwargs):
+async def process_delete_priority(call: CallbackQuery, widget, dialog_manager: DialogManager, **kwargs):
+    auth = dialog_manager.middleware_data.get('auth')
     session = dialog_manager.middleware_data.get("session_with_commit")
 
     userRoleId = auth.role_id if auth else 3

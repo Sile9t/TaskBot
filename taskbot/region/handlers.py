@@ -3,7 +3,6 @@ from aiogram.types import CallbackQuery, Message
 from aiogram_dialog import DialogManager
 from aiogram_dialog.widgets.kbd import Button
 
-from ..dao.models import User
 from ..dao.dao import RegionDAO
 from ..dao.schemas import RegionDto, RegionDtoBase
 from ..admin.kbs import main_admin_kb
@@ -16,7 +15,8 @@ async def go_menu(call: CallbackQuery, button: Button, dialog_manager: DialogMan
         reply_markup=region_menu_kb()
     )
 
-async def cancel_logic(callback: CallbackQuery, button: Button, dialog_manager: DialogManager, auth: User|None, **kwargs):
+async def cancel_logic(callback: CallbackQuery, button: Button, dialog_manager: DialogManager, **kwargs):
+    auth = dialog_manager.middleware_data.get('auth')
     userRoleId = auth.role_id if auth else 3
     await callback.answer("Сценарий отменен!")
     await callback.message.answer(
@@ -49,7 +49,8 @@ async def add_selected_region_to_dialog(call: CallbackQuery, widget, dialog_mana
     dialog_manager.dialog_data['region'] = region
 
 
-async def on_create_confirmation(callback: CallbackQuery, widget, dialog_manager: DialogManager, auth: User|None, **kwargs):
+async def on_create_confirmation(callback: CallbackQuery, widget, dialog_manager: DialogManager, **kwargs):
+    auth = dialog_manager.middleware_data.get('auth')
     session = dialog_manager.middleware_data.get("session_with_commit")
 
     userRoleId = auth.role_id if auth else 3
@@ -75,7 +76,8 @@ async def on_create_confirmation(callback: CallbackQuery, widget, dialog_manager
         await dialog_manager.back()
 
     
-async def on_update_confirmation(callback: CallbackQuery, widget, dialog_manager: DialogManager, auth: User|None, **kwargs):
+async def on_update_confirmation(callback: CallbackQuery, widget, dialog_manager: DialogManager, **kwargs):
+    auth = dialog_manager.middleware_data.get('auth')
     session = dialog_manager.middleware_data.get("session_with_commit")
     
     userRoleId = auth.role_id if auth else 3

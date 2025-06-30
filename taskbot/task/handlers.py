@@ -14,7 +14,8 @@ from ..task.kbs import task_menu_kb
 from ..task.state import TaskCreate, TaskUpdate, TaskPerformersUpdate
 
 
-async def go_menu(call: CallbackQuery, button: Button, dialog_manager: DialogManager, auth: User|None, **kwargs):
+async def go_menu(call: CallbackQuery, button: Button, dialog_manager: DialogManager, **kwargs):
+    auth = dialog_manager.middleware_data.get('auth')
     userRoleId = auth.role_id if auth else 3
     await call.answer("Сценарий отменен!")
     await call.message.answer(
@@ -22,7 +23,8 @@ async def go_menu(call: CallbackQuery, button: Button, dialog_manager: DialogMan
         reply_markup=task_menu_kb(userRoleId)
     )
 
-async def cancel_logic(callback: CallbackQuery, button: Button, dialog_manager: DialogManager, auth: User|None, **kwargs):
+async def cancel_logic(callback: CallbackQuery, button: Button, dialog_manager: DialogManager, **kwargs):
+    auth = dialog_manager.middleware_data.get('auth')
     userRoleId = auth.role_id if auth else 3
     await callback.answer("Сценарий отменен!")
     await callback.message.answer(
@@ -106,7 +108,8 @@ async def on_performer_state_change(call: CallbackQuery, select: ManagedMultisel
     await session.commit()
 
 
-async def on_create_confirmation(call: CallbackQuery, widget, dialog_manager: DialogManager, auth: User|None, **kwargs):
+async def on_create_confirmation(call: CallbackQuery, widget, dialog_manager: DialogManager, **kwargs):
+    auth = dialog_manager.middleware_data.get('auth')
     session = dialog_manager.middleware_data.get("session_with_commit")
 
     userRoleId = auth.role_id if auth else 3
@@ -164,7 +167,8 @@ async def on_create_confirmation(call: CallbackQuery, widget, dialog_manager: Di
         await dialog_manager.back()
 
     
-async def on_update_confirmation(callback: CallbackQuery, widget, dialog_manager: DialogManager, auth: User|None, **kwargs):
+async def on_update_confirmation(callback: CallbackQuery, widget, dialog_manager: DialogManager, **kwargs):
+    auth = dialog_manager.middleware_data.get('auth')
     session = dialog_manager.middleware_data.get("session_with_commit")
     
     userRoleId = auth.role_id if auth else 3
@@ -218,7 +222,8 @@ async def on_update_confirmation(callback: CallbackQuery, widget, dialog_manager
         await dialog_manager.switch_to(TaskUpdate.id)
 
 
-async def process_delete_task(call: CallbackQuery, widget, dialog_manager: DialogManager, auth: User|None, **kwargs):
+async def process_delete_task(call: CallbackQuery, widget, dialog_manager: DialogManager, **kwargs):
+    auth = dialog_manager.middleware_data.get('auth')
     session = dialog_manager.middleware_data.get("session_with_commit")
 
     userRoleId = auth.role_id if auth else 3
@@ -251,7 +256,8 @@ async def process_delete_task(call: CallbackQuery, widget, dialog_manager: Dialo
         await call.answer("Запись задачи не найдена!\nВведите другой id.")
 
 
-async def on_status_change_selected(call: CallbackQuery, widget, dialog_manager: DialogManager, item_id: str, auth: User|None, **kwargs):
+async def on_status_change_selected(call: CallbackQuery, widget, dialog_manager: DialogManager, item_id: str, **kwargs):
+    auth = dialog_manager.middleware_data.get('auth')
     session = dialog_manager.middleware_data.get("session_without_commit")
     
     userRoleId = auth.role_id if auth else 3
@@ -281,7 +287,8 @@ async def on_status_change_selected(call: CallbackQuery, widget, dialog_manager:
         await dialog_manager.switch_to(TaskUpdate.status)
 
 
-async def on_priority_change_selected(call: CallbackQuery, widget, dialog_manager: DialogManager, item_id: str, auth: User|None, **kwargs):
+async def on_priority_change_selected(call: CallbackQuery, widget, dialog_manager: DialogManager, item_id: str, **kwargs):
+    auth = dialog_manager.middleware_data.get('auth')
     session = dialog_manager.middleware_data.get("session_without_commit")
 
     userRoleId = auth.role_id if auth else 3
@@ -311,7 +318,8 @@ async def on_priority_change_selected(call: CallbackQuery, widget, dialog_manage
         await dialog_manager.switch_to(TaskUpdate.priority)
 
 
-async def on_region_change_selected(call: CallbackQuery, widget, dialog_manager: DialogManager, item_id: str, auth: User|None, **kwargs):
+async def on_region_change_selected(call: CallbackQuery, widget, dialog_manager: DialogManager, item_id: str, **kwargs):
+    auth = dialog_manager.middleware_data.get('auth')
     session = dialog_manager.middleware_data.get("session_without_commit")
 
     userRoleId = auth.role_id if auth else 3
@@ -340,7 +348,8 @@ async def on_region_change_selected(call: CallbackQuery, widget, dialog_manager:
         await call.message.answer("Запись задачи не найдена!")
         await dialog_manager.switch_to(TaskUpdate.region)
 
-async def on_dates_change_confirmation(call: CallbackQuery, widget, dialog_manager: DialogManager, auth: User|None, **kwargs):
+async def on_dates_change_confirmation(call: CallbackQuery, widget, dialog_manager: DialogManager, **kwargs):
+    auth = dialog_manager.middleware_data.get('auth')
     session = dialog_manager.middleware_data.get("session_without_commit")
     
     userRoleId = auth.role_id if auth else 3
