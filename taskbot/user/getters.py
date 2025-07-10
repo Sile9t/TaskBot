@@ -37,8 +37,7 @@ async def get_confirmed_data(dialog_manager: DialogManager, **kwargs):
 
     first_name = dialog_manager.find("first_name").get_value()
     last_name = dialog_manager.find("last_name").get_value()
-    role_id = dialog_manager.dialog_data["role_id"]
-    role = await RoleDAO.find_one_or_none_by_id(session, role_id)
+    role = dialog_manager.dialog_data["role"]
     if (dialog_manager.dialog_data.get("region_id")):
         region_id = dialog_manager.dialog_data.get("region_id")
         region = await RegionDAO.find_one_or_none_by_id(session, region_id)

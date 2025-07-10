@@ -3,7 +3,6 @@ from aiogram.types import CallbackQuery, Message
 from aiogram_dialog import DialogManager
 from aiogram_dialog.widgets.kbd import Button
 
-from ..dao.models import User
 from ..dao.dao import UserDAO, RoleDAO, RegionDAO
 from ..dao.schemas import UserDtoBase, UserDtoBase
 from ..admin.kbs import main_admin_kb
@@ -19,7 +18,8 @@ async def go_menu(call: CallbackQuery, button: Button, dialog_manager: DialogMan
     )
 
 
-async def cancel_logic(callback: CallbackQuery, button: Button, dialog_manager: DialogManager, auth: User|None, **kwargs):
+async def cancel_logic(callback: CallbackQuery, button: Button, dialog_manager: DialogManager, **kwargs):
+    auth = dialog_manager.middleware_data.get('auth')
     userRoleId = auth.role_id if auth else 3
     await callback.answer("Сценарий отменен!")
     await callback.message.answer(
@@ -42,19 +42,16 @@ async def on_user_id_input_error(message: Message, dialog_: Any, dialog_manager:
     await message.answer("Номер должен быть числом!")
 
 
-async def on_create_confirmation(callback: CallbackQuery, widget, dialog_manager: DialogManager, auth: User|None, **kwargs):
+async def on_create_confirmation(callback: CallbackQuery, widget, dialog_manager: DialogManager, **kwargs):
+    auth = dialog_manager.middleware_data.get('auth')
     session = dialog_manager.middleware_data.get("session_with_commit")
 
     userRoleId = auth.role_id if auth else 3
     user_id = callback.from_user.id
     first_name = dialog_manager.find("first_name").get_value()
     last_name = dialog_manager.find("last_name").get_value()
-    role_id = dialog_manager.dialog_data["role_id"]
-    role = await RoleDAO.find_one_or_none_by_id(session, role_id)
-    if role is None:
-        await callback.message.answer("Такой должности не существует!")
-        return await dialog_manager.switch_to(UserCreate.role)
-
+    role = dialog_manager.dialog_data["role"]
+    
     if (dialog_manager.dialog_data.get("region_id")):
         region_id = dialog_manager.dialog_data.get("region_id")
         region = await RegionDAO.find_one_or_none_by_id(session, region_id)
@@ -65,7 +62,7 @@ async def on_create_confirmation(callback: CallbackQuery, widget, dialog_manager
     newuser = UserDtoBase(
         first_name=first_name,
         last_name=last_name,
-        role_id=role_id,
+        role_id=role.id,
         region_id=region_id
     )
 
@@ -83,7 +80,8 @@ async def on_create_confirmation(callback: CallbackQuery, widget, dialog_manager
         await dialog_manager.back()
 
     
-async def on_update_confirmation(callback: CallbackQuery, widget, dialog_manager: DialogManager, auth: User|None, **kwargs):
+async def on_update_confirmation(callback: CallbackQuery, widget, dialog_manager: DialogManager, **kwargs):
+    auth = dialog_manager.middleware_data.get('auth')
     session = dialog_manager.middleware_data.get("session_with_commit")
     
     userRoleId = auth.role_id if auth else 3
@@ -91,12 +89,7 @@ async def on_update_confirmation(callback: CallbackQuery, widget, dialog_manager
     id = dialog_manager.find("id").get_value()
     first_name = dialog_manager.find("first_name").get_value()
     last_name = dialog_manager.find("last_name").get_value()
-    role_id = dialog_manager.dialog_data["role_id"]
-    role = await RoleDAO.find_one_or_none_by_id(session, role_id)
-    if role is None:
-        await callback.message.answer("Такой должности не существует!")
-        return await dialog_manager.switch_to(UserUpdate.role)
-
+    role = dialog_manager.dialog_data["role"]
     if (dialog_manager.dialog_data.get("region_id")):
         region_id = dialog_manager.dialog_data.get("region_id")
         region = await RegionDAO.find_one_or_none_by_id(session, region_id)
@@ -110,7 +103,7 @@ async def on_update_confirmation(callback: CallbackQuery, widget, dialog_manager
 
         check.first_name = first_name
         check.last_name = last_name
-        check.role_id = role_id
+        check.role_id = role.id
         check.region_id = region_id
 
         await session.commit()
@@ -125,7 +118,8 @@ async def on_update_confirmation(callback: CallbackQuery, widget, dialog_manager
         await dialog_manager.switch_to(UserUpdate.id)
 
 
-async def process_delete_user(call: CallbackQuery, widget, dialog_manager: DialogManager, auth: User|None, **kwargs):
+async def process_delete_user(call: CallbackQuery, widget, dialog_manager: DialogManager, **kwargs):
+    auth = dialog_manager.middleware_data.get('auth')
     session = dialog_manager.middleware_data.get("session_with_commit")
 
     userRoleId = auth.role_id if auth else 3

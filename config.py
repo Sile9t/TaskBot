@@ -2,21 +2,21 @@ import os
 from loguru import logger
 from aiogram import Dispatcher
 from aiogram.fsm.storage.memory import MemoryStorage
-from configobj import ConfigObj
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
-config = ConfigObj("config.ini")
-
 class Settings(BaseSettings):
-    BOT_TOKEN: str = config['telegram']['token']
+    BOT_NAME: str
+    BOT_SHORT_DESCRIPTION: str
+    BOT_DESCRIPTION: str
+    BOT_TOKEN: str
 
-    JOBS: str = config['database']['jobs']['name']
+    JOBS_NAME: str
 
-    DB_USER: str = config['database']['user']
-    DB_PASSWORD: str = config['database']['password']
-    DB_HOST: str = config['database']['host']
-    DB_PORT: str = config['database']['port']
-    DB_NAME: str = config['database']['sqlite']['name']
+    DB_USER: str
+    DB_PASSWORD: str
+    DB_HOST: str
+    DB_PORT: str
+    DB_NAME: str
 
     FORMAT_LOG: str = "{time:YYYY-MM-DD at HH:mm:ss} | {level} | {message}"
     LOG_ROTATION: str = "10 MB"
@@ -29,7 +29,7 @@ class Settings(BaseSettings):
         return (f"sqlite+aiosqlite:///instance/{self.DB_NAME}") # connection for local async sqlite database
     
     def get_jobs_url(self):
-        return (f"sqlite:///jobs/{self.JOBS}") # connection for local jobs sqlite database
+        return (f"sqlite:///jobs/{self.JOBS_NAME}") # connection for local jobs sqlite database
     
 settings = Settings()
 

@@ -526,17 +526,17 @@ defaultStatuses = [
     TaskStatusDto(
         id=3,
         title='Доработать',
-        description='Задача находиться в работе'
+        description='Задачу требуется доработать'
     ),
     TaskStatusDto(
         id=4,
         title='Дозаполнить',
-        description='Задача находиться в работе'
+        description='Задачу требуется дозаполнить '
     ),
     TaskStatusDto(
         id=5,
         title='Активна',
-        description='Задача находиться в работе'
+        description='Задача находиться в работедзн -ьзн -ь'
     ),
     TaskStatusDto(
         id=6,
