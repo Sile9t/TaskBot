@@ -1,8 +1,8 @@
 run:
-	docker run -it -d --env-file .env --restart=unless-stopped --name tiar_smm_bot tiar_smm_bot_image
+	docker run -it -d --env-file .env --restart=unless-stopped --name region_task_bot region_task_bot_image
 stop:
-	docker stop tiar_smm_bot
+	docker stop region_task_bot
 attach:
-	docker attach tiar_smm_bot
+	docker attach region_task_bot
 dell:
-	docker rm tiar_smm_bot
+	docker rm region_task_bot
