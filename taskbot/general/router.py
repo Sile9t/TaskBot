@@ -8,6 +8,7 @@ from ..admin.kbs import main_admin_kb
 from ..dao.dao import UserDAO, RoleDAO
 from ..dao.schemas import UserDtoBase
 from ..admin.schemas import UserTelegramId, UserRoleId
+from ..dao.models import User
 
 async def getAdminFromMessage(message: Message, session_without_commit: AsyncSession):
     return UserDtoBase(
@@ -40,42 +41,10 @@ async def cmd_help(message: Message):
 
 
 @general_router.message(CommandStart())
-async def cmd_start(message: Message, session_with_commit: AsyncSession, command: CommandObject = None):
+async def cmd_start(message: Message, session_with_commit: AsyncSession, command: CommandObject = None, auth: User|None = None):
     logger.info(f"chat#{message.chat.id}|user#{message.from_user.id}: Вызов команды admin/start")
     
-    tgIdFilter = UserTelegramId(
-        telegram_id=message.from_user.id
+    return await message.answer(
+        f"👋🏻 Привет, {message.from_user.full_name}!\nВы зарегистрированы как {auth.role.name}.",
+        reply_markup=main_admin_kb(auth.role_id)
     )
-    check = await UserDAO.find_one_or_none(session_with_commit, tgIdFilter)
-    
-    if check is None:
-        filterModel = UserRoleId(role_id=1)
-        admins = await UserDAO.find_all(session_with_commit, filterModel)
-        logger.info("Admins:", admins)
-
-        if (len(admins) == 0):
-            newUser = await getAdminFromMessage(message, session_with_commit)
-        else:
-            newUser = await getEmployeeFromMessage(message, session_with_commit)
-
-        await UserDAO.add(session_with_commit, newUser)
-        
-        for admin in admins:
-            if (admin.telegram_id == message.from_user.id):
-                return await message.answer(
-                    f"Сотрудник {message.from_user.full_name} зарегистрирован.",
-                    reply_markup=None
-                )
-        
-        userRole = await RoleDAO.find_one_or_none_by_id(session_with_commit, newUser.role_id)
-
-        return await message.answer(
-            f"👋🏻 Привет, {message.from_user.full_name}!\nВы зарегистрированы как {userRole.name}.",
-            reply_markup=None
-        )
-
-    await message.answer(
-        f"👋🏻 Привет, {message.from_user.full_name}!\nВы зарегистрированы как {check.role.name}.",
-        reply_markup=main_admin_kb()
-    )
-

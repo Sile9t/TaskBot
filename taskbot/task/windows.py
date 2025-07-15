@@ -12,7 +12,7 @@ from ..status.handlers import on_status_selected
 from ..priority.windows import get_priority_selection_window
 from ..priority.handlers import on_priority_selected
 from ..region.windows import get_region_selection_window
-from ..region.handlers import on_region_selected
+from ..region.handlers import on_region_to_delete_selected
 from ..user.getters import get_performer_id_tuples
 from ..task.handlers import (
     go_menu, cancel_logic, on_startline_selected, on_deadline_selected, on_is_active_selected, on_create_confirmation, on_update_confirmation, process_delete_task, on_task_id_input_error,
@@ -241,7 +241,7 @@ def get_task_priority_window(stateGroup: StatesGroup = TaskCreate):
 def get_task_region_window(stateGroup: StatesGroup = TaskCreate):
     return get_region_selection_window(
         Const("Выберите регион"),
-        on_region_click=on_region_selected,
+        on_region_click=on_region_to_delete_selected,
         state=stateGroup.region,
         main_btns=MAIN_BTNS
     )

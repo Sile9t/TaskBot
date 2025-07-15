@@ -11,7 +11,7 @@ from aiogram_dialog.widgets.utils import WidgetSrc
 from ..status.getters import get_all_statuses, get_status_id_tuples, get_confirmed_data
 from ..general.handlers import cancel_logic
 from ..status.handlers import (
-    go_menu, on_status_selected, on_create_confirmation, on_update_confirmation, process_delete_status, on_status_id_input_error
+    go_menu, on_status_selected, on_create_confirmation, on_update_confirmation, process_delete_status, on_status_id_input_error, on_status_to_delete_selected
 )
 from ..status.state import StatusCreate, StatusRead, StatusUpdate, StatusDelete
 
@@ -183,12 +183,10 @@ def get_update_confirmation_window():
 
 
 def get_delete_window():
-    return get_statuses_window(
-        Const("Введите номер записи статуса."),
-        TextInput(
-            id="id",
-            type_factory=int,
-            on_success=Next(on_click=process_delete_status)
-        ),
-        state=StatusDelete.id
+    return get_status_selection_window(
+        Const("Выберите статус задачи для удаления"),
+
+        state=StatusDelete.id,
+        on_status_click=on_status_to_delete_selected,
+        main_btns=MAIN_BTNS
     )

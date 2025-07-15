@@ -88,7 +88,7 @@ async def on_performers_selected(call: CallbackQuery, widget, dialog_manager: Di
         await call.bot.send_message(performer_id,notificationText)
 
     await call.message.answer(f"Исполнители задачи:\n{caption}")
-    dialog_manager.done()
+    await dialog_manager.done()
 
 
 async def on_performer_state_change(call: CallbackQuery, select: ManagedMultiselect, dialog_manager: DialogManager, item: int, **kwargs):

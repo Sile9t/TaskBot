@@ -11,7 +11,7 @@ from aiogram_dialog.widgets.utils import WidgetSrc
 from ..region.getters import get_all_regions, get_region_id_tuples, get_confirmed_data, get_wire_confirmed_data
 from ..general.handlers import cancel_logic
 from ..region.handlers import (
-    go_menu, on_region_selected, on_create_confirmation, on_update_confirmation, on_region_wire_confirmation
+    go_menu, on_region_selected, on_create_confirmation, on_update_confirmation, on_region_wire_confirmation, on_region_to_delete_selected
 )
 from ..region.state import RegionCreate, RegionRead, RegionUpdate, RegionDelete, RegionWireChat
 
@@ -187,7 +187,7 @@ def get_delete_window():
         Const("Выберите регион для редактирования"),
 
         state=RegionDelete.id,
-        on_region_click=on_region_selected,
+        on_region_click=on_region_to_delete_selected,
         main_btns=MAIN_BTNS
     )
 

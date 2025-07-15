@@ -1,3 +1,5 @@
+build:
+	docker build -t region_task_bot_image .
 run:
 	docker run -it -d --env-file .env --restart=unless-stopped --name region_task_bot region_task_bot_image
 stop:

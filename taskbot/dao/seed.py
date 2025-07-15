@@ -536,7 +536,7 @@ defaultStatuses = [
     TaskStatusDto(
         id=5,
         title='Активна',
-        description='Задача находиться в работедзн -ьзн -ь'
+        description='Задача находиться в работе'
     ),
     TaskStatusDto(
         id=6,

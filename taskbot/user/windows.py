@@ -9,7 +9,7 @@ from ..user.getters import get_all_users, get_confirmed_data
 from ..role.windows import get_role_selection_window
 from ..role.handlers import on_role_selected
 from ..region.windows import get_region_selection_window
-from ..region.handlers import on_region_selected
+from ..region.handlers import on_region_to_delete_selected
 from ..user.handlers import (
     go_menu, cancel_logic, on_create_confirmation, on_update_confirmation, process_delete_user, on_user_id_input_error
 )
@@ -121,7 +121,7 @@ def get_user_role_window(stateGroup: StatesGroup = UserCreate):
 def get_user_region_window(stateGroup: StatesGroup = UserCreate):
     return get_region_selection_window(
         Const("Выберите регион пользователя"),
-        on_region_click=on_region_selected,
+        on_region_click=on_region_to_delete_selected,
         state=stateGroup.region,
         main_btns=MAIN_BTNS
     )
