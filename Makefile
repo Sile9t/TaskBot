@@ -1,7 +1,8 @@
 build:
+	docker rmi region_task_bot_image & 
 	docker build -t region_task_bot_image .
 run:
-	docker run -it -d --env-file .env --restart=unless-stopped --name region_task_bot region_task_bot_image
+	docker run -it -d --env-file ./.env --restart=unless-stopped --name region_task_bot region_task_bot_image
 stop:
 	docker stop region_task_bot
 attach:

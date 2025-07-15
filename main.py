@@ -106,6 +106,8 @@ async def main():
     dp.update.middleware.register(DatabaseMiddlewareWithCommit())
     dp.update.middleware.register(DatabaseMiddlewareWithoutCommit())
 
+    dp.include_router(general_router)
+    
     dp.include_router(admin_router)
 
     dp.include_routers(region_create_dialog, regions_read_dialog, region_update_dialog, region_delete_dialog, region_router, region_wire_chat_dialog)
@@ -120,7 +122,6 @@ async def main():
 
     dp.include_routers(task_router, task_create_dialog, tasks_read_dialog, task_update_dialog, task_delete_dialog, task_status_change_dialog, task_priority_change_dialog, task_region_change_dialog, task_set_performers_dialog, task_change_dates_dialog)
 
-    dp.include_router(general_router)
         
     dp.startup.register(start_bot)
     dp.shutdown.register(stop_bot)
