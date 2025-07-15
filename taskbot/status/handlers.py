@@ -24,13 +24,16 @@ async def on_status_selected(call: CallbackQuery, widget, dialog_manager: Dialog
     status_id = int(item_id)
     status = await TaskStatusDAO.find_one_or_none_by_id(session, status_id)
     
+    dialog_manager.dialog_data["status_id"] = status_id
     dialog_manager.dialog_data["status"] = status
     await call.answer(f"Выбрана запись №{status_id}")
     await dialog_manager.next()
 
 
 async def on_status_to_delete_selected(call: CallbackQuery, widget, dialog_manager: DialogManager, item_id: str, **kwargs):
-    session = dialog_manager.middleware_data.get("session_without_commit")
+    auth = dialog_manager.middleware_data.get('auth')
+    userRoleId = auth.role_id if auth else 3
+    session = dialog_manager.middleware_data.get("session_with_commit")
     status_id = int(item_id)
     count = await TaskStatusDAO.delete(
         session, 
@@ -38,13 +41,12 @@ async def on_status_to_delete_selected(call: CallbackQuery, widget, dialog_manag
             id=status_id
         )
     )
-    selected_region = await TaskStatusDAO.find_one_or_none_by_id(session, status_id)
-    if (selected_region is None):
-        return call.answer(f"Выбраная запись №{status_id} не существует. Выберите еще раз")
 
     text = f"Удалено {count} записей"
-    await session.commit()
-    await call.answer(text)
+    await call.message.answer(
+        text,
+        reply_markup=main_admin_kb(userRoleId)
+    )
 
     await dialog_manager.done()
 
@@ -84,7 +86,11 @@ async def on_update_confirmation(callback: CallbackQuery, widget, dialog_manager
     session = dialog_manager.middleware_data.get("session_with_commit")
     
     userRoleId = auth.role_id if auth else 3
-    status = dialog_manager.dialog_data.get('status') 
+    status_id = dialog_manager.dialog_data.get('status_id') 
+    status = await TaskStatusDAO.find_one_or_none_by_id(
+        session, 
+        status_id
+    )
     title = dialog_manager.find('title').get_value()
     description = dialog_manager.find('description').get_value()
     
@@ -94,37 +100,10 @@ async def on_update_confirmation(callback: CallbackQuery, widget, dialog_manager
         status.title = title
         status.description = description
 
-        await session.commit()
-
         text = "Запись статуса успешно обновлена."
-        await callback.answer(text)
-        await callback.message.answer(text, reply_markup=main_admin_kb(userRoleId))
+    else: 
+        text = "Запись статуса не найдена."
 
-        await dialog_manager.done()
+    await callback.message.answer(text, reply_markup=main_admin_kb(userRoleId))
+    await dialog_manager.done()
 
-
-async def process_delete_status(call: CallbackQuery, widget, dialog_manager: DialogManager, **kwargs):
-    auth = dialog_manager.middleware_data.get('auth')
-    session = dialog_manager.middleware_data.get("session_with_commit")
-
-    userRoleId = auth.role_id if auth else 3
-    id = dialog_manager.find("id").get_value()
-    status = dialog_manager.dialog_data.get('status')
-    
-    if status:
-        await call.answer("Удаление записи")
-        statusDto = statusDto(
-            id=status.id,
-            title=status.title,
-            description=status.description
-        )
-        count = await TaskStatusDAO.delete(session, statusDto)
-        text = f"Удалено {count} записей"
-        await session.commit()
-        await call.message.answer(
-            text,
-            reply_markup=main_admin_kb(userRoleId)
-        )
-        
-        await dialog_manager.done()
-    

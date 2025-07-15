@@ -16,11 +16,11 @@ async def go_menu(call: CallbackQuery, button: Button, dialog_manager: DialogMan
         reply_markup=region_menu_kb()
     )
 
-async def cancel_logic(callback: CallbackQuery, button: Button, dialog_manager: DialogManager, **kwargs):
+async def cancel_logic(call: CallbackQuery, button: Button, dialog_manager: DialogManager, **kwargs):
     auth = dialog_manager.middleware_data.get('auth')
     userRoleId = auth.role_id if auth else 3
     text = "Сценарий отменен."
-    await callback.message.answer(
+    await call.message.answer(
         text, 
         reply_markup=main_admin_kb(userRoleId)
     )
@@ -48,13 +48,10 @@ async def on_region_to_delete_selected(call: CallbackQuery, widget, dialog_manag
             id=region_id
         )
     )
-    selected_region = await RegionDAO.find_one_or_none_by_id(session, region_id)
-    if (selected_region is None):
-        return call.answer(f"Выбраная запись №{region_id} не существует. Выберите еще раз")
 
     text = f"Удалено {count} записей"
     await session.commit()
-    await call.answer(text)
+    await call.message.answer(text)
 
     await dialog_manager.done()
 
@@ -69,12 +66,12 @@ async def add_selected_region_to_dialog(call: CallbackQuery, widget, dialog_mana
     dialog_manager.dialog_data['region'] = region
 
 
-async def on_create_confirmation(callback: CallbackQuery, widget, dialog_manager: DialogManager, **kwargs):
+async def on_create_confirmation(call: CallbackQuery, widget, dialog_manager: DialogManager, **kwargs):
     auth = dialog_manager.middleware_data.get('auth')
     session = dialog_manager.middleware_data.get("session_with_commit")
 
     userRoleId = auth.role_id if auth else 3
-    user_id = callback.from_user.id
+    user_id = call.from_user.id
     name = dialog_manager.find("name").get_value()
     description = dialog_manager.find("description").get_value()
     newregion = RegionDtoBase(
@@ -85,17 +82,17 @@ async def on_create_confirmation(callback: CallbackQuery, widget, dialog_manager
     check = await RegionDAO.find_one_or_none(session, newregion)
     if not check:
         await RegionDAO.add(session, newregion)
-        await callback.answer(f"Запись успешно создана!")
+        await call.answer(f"Запись успешно создана!")
         text = "Запись успешно сохранена"
-        await callback.message.answer(text, reply_markup=main_admin_kb(userRoleId))
+        await call.message.answer(text, reply_markup=main_admin_kb(userRoleId))
 
         await dialog_manager.done()
     else:
-        await callback.message.answer("Такая запись уже существует!")
+        await call.message.answer("Такая запись уже существует!")
         await dialog_manager.back()
 
     
-async def on_update_confirmation(callback: CallbackQuery, widget, dialog_manager: DialogManager, **kwargs):
+async def on_update_confirmation(call: CallbackQuery, widget, dialog_manager: DialogManager, **kwargs):
     auth = dialog_manager.middleware_data.get('auth')
     session = dialog_manager.middleware_data.get('session_with_commit')
 
@@ -117,7 +114,7 @@ async def on_update_confirmation(callback: CallbackQuery, widget, dialog_manager
     else: 
         text = "Запись не найдена"
 
-    await callback.message.answer(text, reply_markup=main_admin_kb(userRoleId))
+    await call.message.answer(text, reply_markup=main_admin_kb(userRoleId))
     await dialog_manager.done()
 
 

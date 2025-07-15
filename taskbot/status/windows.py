@@ -11,7 +11,7 @@ from aiogram_dialog.widgets.utils import WidgetSrc
 from ..status.getters import get_all_statuses, get_status_id_tuples, get_confirmed_data
 from ..general.handlers import cancel_logic
 from ..status.handlers import (
-    go_menu, on_status_selected, on_create_confirmation, on_update_confirmation, process_delete_status, on_status_id_input_error, on_status_to_delete_selected
+    go_menu, on_status_selected, on_create_confirmation, on_update_confirmation, on_status_id_input_error, on_status_to_delete_selected
 )
 from ..status.state import StatusCreate, StatusRead, StatusUpdate, StatusDelete
 
@@ -109,22 +109,19 @@ def get_status_selection_window(*widgets: WidgetSrc, state: State = StatusUpdate
 
 
 def get_status_id_window(stateGroup: StatesGroup = StatusUpdate):
-    return get_statuses_window(
-        Const("Введите номер записи статуса для изменения."),
-        
-        TextInput(
-            id="id",
-            type_factory=int,
-            on_error=on_status_id_input_error,
-            on_success=Next()
-        ),
-        state=stateGroup.id
+    return get_status_selection_window(
+        Const("Выберите статус задачи для редактирования"),
+
+        state=stateGroup.id,
+        on_region_click=on_status_selected,
+        main_btns=MAIN_BTNS
     )
 
 
 def get_status_title_window(stateGroup: StatesGroup = StatusCreate):
     return Window(
         Const("Введите название статуса."),
+        Format("Текущее значение: <code>{dialog_data[status].title}</code>", when='update'),
         
         TextInput(
             id="title",
@@ -140,6 +137,7 @@ def get_status_title_window(stateGroup: StatesGroup = StatusCreate):
 def get_status_description_window(stateGroup: StatesGroup = StatusCreate):
     return Window(
         Const("Введите описание статуса."),
+        Format("Текущее значение: <code>{dialog_data[status].description}</code>", when='update'),
         
         TextInput(
             id="description",
